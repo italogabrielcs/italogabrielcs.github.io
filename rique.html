@@ -1,10 +1,224 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <title>Henrique</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Presente Especial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+      background: linear-gradient(135deg, #00c6ff, #007f5f);
+      color: #fff;
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 28px;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #fff;
+      color: #333;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      position: relative;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #f0f0f0;
+    }
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
+      min-height: 24px;
+    }
+    .box {
+      margin-top: 20px;
+      font-size: 50px;
+      transition: transform 0.5s ease;
+    }
+    .open {
+      transform: rotate(20deg) scale(1.2);
+      color: gold;
+    }
+    .fotos {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .fotos img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 3px solid white;
+      animation: pulsar 2s infinite alternate;
+    }
+    @keyframes pulsar {
+      from { transform: scale(1); opacity: 0.8; }
+      to { transform: scale(1.1); opacity: 1; }
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .creditos {
+      margin-top: 20px;
+      font-size: 12px;
+      text-align: center;
+      opacity: 0.7;
+    }
+    .pedido {
+      font-size: 20px;
+      margin-top: 20px;
+      display: none;
+    }
+    .coracao {
+      position: fixed;
+      font-size: 24px;
+      animation: descer 5s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes descer {
+      0% { transform: translateY(-50px); opacity: 1; }
+      100% { transform: translateY(100vh); opacity: 0; }
+    }
+    .dica {
+      font-size: 12px;
+      margin-top: 5px;
+      opacity: 0.8;
+    }
+    .termos-link {
+      color: #fff;
+      text-decoration: underline;
+      cursor: pointer;
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Hello Word!</h1>
+
+  <h1 id="titulo">Seja bem-vindo <span id="nome"></span>!</h1>
+
+  <div class="container">
+    <div class="fotos">
+      <img src="https://via.placeholder.com/120" alt="Foto 1">
+      <img src="https://via.placeholder.com/120" alt="Foto 2">
+      <img src="https://via.placeholder.com/120" alt="Foto 3">
+      <img src="https://via.placeholder.com/120" alt="Foto 4">
+    </div>
+
+    <p>Para abrir o presente, aceite os termos e digite a senha:</p>
+
+    <a class="termos-link" onclick="alert(`Pergunte a Italo! :)`)">Termos e Condições</a>
+
+    <label>
+      <input type="checkbox" id="termos"> Aceito os termos
+    </label>
+
+    <input type="password" id="senha" placeholder="Digite a senha">
+    <div class="dica">💡 Dica: É a palavra que define quem você será depois de abrir a caixa.</div>
+
+    <button id="abrir">Abrir Presente</button>
+
+    <div class="message" id="mensagem"></div>
+    <div class="box" id="caixa">💝</div>
+    <div class="pedido" id="pedido">💖 Quer namorar comigo? 💖</div>
+
+    <div class="creditos">Criado com ❤️ por Italo</div>
+  </div>
+
+  <script>
+    const nome = prompt("Qual é o seu segundo nome?");
+    if (nome === null || nome.trim().toLowerCase() !== "henrique") {
+      alert("Acesso negado! Você não pode continuar.");
+      window.location.href = "https://www.google.com";
+    } else {
+      document.getElementById('nome').textContent = ' ' + nome;
+    }
+
+    const senhaCorreta = "NAMORADO";
+
+    document.getElementById('abrir').addEventListener('click', function() {
+      const input = document.getElementById("senha").value;
+      const termosAceitos = document.getElementById("termos").checked;
+      const mensagem = document.getElementById("mensagem");
+      const caixa = document.getElementById("caixa");
+      const pedido = document.getElementById("pedido");
+
+      if (!termosAceitos) {
+        mensagem.textContent = "Você precisa aceitar os termos de uso!";
+        mensagem.style.color = "yellow";
+        caixa.classList.remove("open");
+        return;
+      }
+
+      if (input.toUpperCase() === senhaCorreta) {
+        mensagem.textContent = "Sim! Agora somos namorados! 💑";
+        mensagem.style.color = "lightgreen";
+        caixa.classList.add("open");
+        caixa.textContent = "🎉";
+        pedido.style.display = "block";
+        criarCoracoes();
+      } else {
+        mensagem.textContent = "Senha incorreta. Tente novamente!";
+        mensagem.style.color = "salmon";
+        caixa.classList.remove("open");
+        caixa.textContent = "💝";
+      }
+    });
+
+    function criarCoracoes() {
+      for (let i = 0; i < 30; i++) {
+        const coracao = document.createElement('div');
+        coracao.classList.add('coracao');
+        coracao.textContent = '❤️';
+        coracao.style.left = Math.random() * 100 + 'vw';
+        coracao.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        document.body.appendChild(coracao);
+        setTimeout(() => coracao.remove(), 6000);
+      }
+    }
+  </script>
+
 </body>
 </html>
