@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>v0.1 - Henrique & Italo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link id="favicon" rel="icon" type="image/png" href="">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #00a8ff, #00ff9d); /* azul 💙 e verde 💚 */
+      background-size: 400% 400%;
+      animation: gradientFlow 15s ease infinite;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      text-align: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 400;
+      margin-bottom: 30px;
+    }
+
+    ul {
+      list-style: none;
+      text-align: left;
+      max-width: 500px;
+      margin: 0 auto 30px;
+      padding: 0;
+    }
+
+    ul li::before {
+      content: "✅ ";
+    }
+
+    ul li {
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+
+    button {
+      background: white;
+      color: #9b23ea;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #ffe6ff;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .hearts {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .heart {
+      position: absolute;
+      font-size: 24px;
+      animation: fall 6s linear forwards;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-40px); opacity: 1; }
+      100% { transform: translateY(100vh); opacity: 0; }
+    }
+
+    #timeline-content img {
+      width: 100%;
+      max-width: 280px;
+      height: auto;
+      border-radius: 12px;
+    }
+
+    .timeline-slider {
+      width: 90%;
+      max-width: 500px;
+      margin: auto;
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      #timeline-content {
+        padding: 0 10px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      h2 {
+        font-size: 1rem;
+      }
+
+      ul li {
+        font-size: 0.95rem;
+      }
+
+      #timeline-content img {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🚀 Atualização Concluída: Nosso primeiro mês como NAMORADOS!</h1>
+  <h2>1 mês desde o primeiro “sim” 💘<br>Agora com mais amor, abraços e expectativa de infinitas versões futuras!</h2>
+
+  <ul>
+    <li>Sistema de carinho ativado</li>
+    <li>Módulo de saudades integrado</li>
+    <li>Otimização de abraços e beijos (não só isso né hehe)</li>
+    <li>Sincronização de corações a cada batida</li>
+    <li>Estabilidade emocional aprimorada</li>
+    <li>Multiplicação de sorrisos</li>
+  </ul>
+
+  <button onclick="mostrarCoracoes()">Continuar evoluindo juntos 💖</button>
+
+  <!-- Timeline -->
+
+  <section style="max-width: 1000px; margin: 80px auto;">
+    <h2 style="font-size: 28px; margin-bottom: 10px;">📈 Timeline do Amor</h2>
+    <p style="font-size: 16px; margin-bottom: 40px;">
+      Até então (<strong>24/06/2025 - 00:01</strong>), acumulamos <strong>2.3GB</strong> no WhatsApp, o que supera todas as conversas, inclusive a de Costa.
+    </p>
+
+    <input type="range" min="0" max="5" value="0" step="1" id="slider" class="timeline-slider">
+    <div id="timeline-content" style="margin-top: 30px;"></div>
+  </section>
+
+  <!-- Spotify -->
+  <h1>Tá com saudades? Eu também. 💙</h1>
+  <h4>Escuta aqui, daqui a pouco tô de volta.</h4>
+  <p><br></p>
+  <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/1Ak1DAVAy926kpbkbIeNHV?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+
+  <!-- Contagem Regressiva -->
+  <div style="text-align: center; margin: 60px 0;">
+    <p id="contador" style="font-size: 20px; margin-top: 10px;">Carregando...</p>
+  </div>
+
+  <!-- Corações -->
+  <div class="hearts" id="hearts"></div>
+
+  <!-- Footer -->
+  <div class="footer">Versão 0.1 criada com ❤️ por Italo para Henrique</div>
+
+  <!-- Scripts -->
+  <script>
+    const eventos = [
+      {
+        data: "24 e 25/05",
+        texto: `O dia do pedido no Montserrat (o forte dos designers) 💍<br>Aniversário de Emy 🎉<br>Dormiu na minha casa por duas noites, a melhor noite das nossas vidas!`,
+        imagens: [
+          "https://i.imgur.com/kg8LWqV.jpeg",
+          "https://i.imgur.com/YEGO33S.jpeg",
+          "https://i.imgur.com/T1n4eRM.jpeg"
+        ]
+      },
+      {
+        data: "25/05",
+        texto: "Dia de praia com Bianca 🌊☀️",
+        imagens: [
+          "https://i.imgur.com/kRbKCRQ.jpeg"
+        ]
+      },
+      {
+        data: "28/05",
+        texto: `Primeiro evento juntos 💻<br>Passeio de bike no Parque da Cidade 🚴‍♂️<br>Saímos com nossa namorada Nyne 💖`,
+        imagens: [
+          "https://i.imgur.com/n8MG4r5.jpeg",
+          "https://i.imgur.com/BfuDv74.jpeg",
+          "https://i.imgur.com/swe8tyN.jpeg"
+        ]
+      },
+      {
+        data: "01/06",
+        texto: `Fomos ao Parque dos Dinossauros 🦕<br>Conheci Felipe, o ficanido de Nyne 😅`,
+        imagens: [
+          "https://i.imgur.com/yG3KSq4.jpeg",
+          "https://i.imgur.com/qLgLnqm.jpeg"
+        ]
+      },
+      {
+        data: "14/06",
+        texto: `Nosso almoço dos namorados na Cantina Volpi 🍝💘`,
+        imagens: [
+          "https://i.imgur.com/WaThGIx.jpeg"
+        ]
+      },
+      {
+        data: "🐜",
+        texto: `Talvez tenha mais… mas minha memória é de formiga 🐜<br>O coração não esquece nada. ❤️`,
+        imagens: [
+          "https://i.imgur.com/vu6fem8.jpeg"
+        ]
+      }
+    ];
+
+    const content = document.getElementById("timeline-content");
+    const slider = document.getElementById("slider");
+
+    function renderEvento(index) {
+      const ev = eventos[index];
+      content.innerHTML = `
+        <h3 style="font-size: 22px;">📅 ${ev.data}</h3>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 15px 0;">
+          ${ev.imagens.map(img => `<img src="${img}">`).join('')}
+        </div>
+        <p style="font-size: 16px;">${ev.texto}</p>
+      `;
+    }
+
+    slider.addEventListener("input", e => {
+      renderEvento(e.target.value);
+    });
+
+    renderEvento(0);
+
+    // Contagem regressiva
+    function proximaSexta18h() {
+      const agora = new Date();
+      const diaAtual = agora.getDay();
+      const diasFaltando = (5 - diaAtual + 7) % 7 || 7;
+      const proximaSexta = new Date(agora);
+      proximaSexta.setDate(agora.getDate() + diasFaltando);
+      proximaSexta.setHours(18, 0, 0, 0);
+      return proximaSexta;
+    }
+
+    const destino = proximaSexta18h();
+
+    function atualizarContagem() {
+      const agora = new Date();
+      const distancia = destino - agora;
+
+      if (distancia <= 0) {
+        document.getElementById("contador").textContent = "💖 Chegou a hora de te ver!";
+        clearInterval(intervalo);
+        return;
+      }
+
+      const dias = Math.floor(distancia / (1000 * 60 * 60 * 24));
+      const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
+      const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
+
+      document.getElementById("contador").textContent =
+        `Faltam ${dias} dia${dias !== 1 ? 's' : ''}, ${horas} hora${horas !== 1 ? 's' : ''}, ${minutos} minuto${minutos !== 1 ? 's' : ''} e ${segundos} segundo${segundos !== 1 ? 's' : ''} pra gente se ver!`;
+    }
+
+    const intervalo = setInterval(atualizarContagem, 1000);
+    atualizarContagem();
+
+    // Corações 💙💚
+    function criarCoracoesAnimados() {
+      const cores = ['💙', '💚'];
+
+      for (let i = 0; i < 25; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+        heart.textContent = cores[i % 2];
+        document.getElementById('hearts').appendChild(heart);
+        setTimeout(() => heart.remove(), 6000);
+      }
+    }
+
+  function mostrarCoracoes() {
+    let contador = 0;
+    const intervalo = setInterval(() => {
+      criarCoracoesAnimados();
+      contador++;
+      if (contador >= 5) clearInterval(intervalo); // Corações caem 5 vezes (~7 segundos)
+    }, 1500);
+  }
+
+
+  </script>
+
+<script>
+  const emojis = ['💙', '💚'];
+  let currentEmoji = 0;
+
+  function atualizarFavicon() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+
+    const ctx = canvas.getContext('2d');
+    ctx.font = '48px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.clearRect(0, 0, 64, 64);
+    ctx.fillText(emojis[currentEmoji], 32, 32);
+
+    const favicon = document.getElementById('favicon');
+    favicon.href = canvas.toDataURL('image/png');
+
+    currentEmoji = (currentEmoji + 1) % emojis.length;
+  }
+
+  // Atualiza a cada 1.5 segundos
+  setInterval(atualizarFavicon, 1500);
+  atualizarFavicon(); // chamada inicial
+</script>
+
+
+</body>
+</html>
