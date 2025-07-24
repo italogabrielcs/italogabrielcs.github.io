@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feliz Dois Meses! 💙💚</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      opacity: 0.25;
+      filter: blur(6px);
+      animation: slide 50s linear infinite;
+      background-size: cover;
+      background-position: center;
+    }
+
+    @keyframes slide {
+      0%   { background-image: url('https://i.imgur.com/MOv4TPq.jpeg'); }
+      20%  { background-image: url('https://i.imgur.com/H7N6As6.jpeg'); }
+      40%  { background-image: url('https://i.imgur.com/cp8tves.jpeg'); }
+      60%  { background-image: url('https://i.imgur.com/BJ6V95Y.jpeg'); }
+      80%  { background-image: url('https://i.imgur.com/xSTN4KH.jpeg'); }
+      100% { background-image: url('https://i.imgur.com/LU2si7D.jpeg'); }
+    }
+
+    h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: 3em;
+      margin-top: 40px;
+    }
+
+    p, .contador {
+      max-width: 600px;
+      font-size: 1.2em;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 30px;
+      text-align: left;
+      width: 80%;
+      max-width: 600px;
+    }
+
+    li {
+      padding: 8px 0;
+      font-size: 1.1em;
+      display: flex;
+      align-items: center;
+    }
+
+    li input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+
+    .creditos {
+      margin-top: 40px;
+      font-size: 0.9em;
+      opacity: 0.7;
+    }
+
+    .contador {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.3em;
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+
+  <h1>Feliz dois meses, meu xuxu! 💙💚</h1>
+  <p>Vamos juntos viver essa história infinita. ✨</p>
+
+  <div class="contador" id="contador"></div>
+
+  <h4>
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-number" id="beijos">0</div>
+         💋 Beijos
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="saidas">0</div>
+        🌳 Saídas
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="fotos" style="font-size: medium;">0</div>
+        📷 Fotos Juntos
+      </div>
+    </div>
+
+  </h4>
+
+
+  <ul>
+    <h2>📌 LISTA DE LUGARES PARA IR COM O MELHOR NAMORADO DO MUNDO 🌍</h2>
+    <li><input type="checkbox" /> Cinema da UFBA</li>
+    <li><input type="checkbox" /> Cine Glauber Rocha</li>
+    <li><input type="checkbox" /> Cine + MAM</li>
+    <li><input type="checkbox" /> Praia da Preguiça</li>
+    <li><input type="checkbox" /> Solar do Unhão</li>
+    <li><input type="checkbox" /> Museu de Arte Contemporânea</li>
+    <li><input type="checkbox" /> MUCAB</li>
+    <li><input type="checkbox" /> Casa da Música</li>
+    <li><input type="checkbox" /> Galeria do Mercado</li>
+    <li><input type="checkbox" /> Casa das Histórias</li>
+    <li><input type="checkbox" /> Casa do Rio Vermelho</li>
+    <li><input type="checkbox" /> Planetário da UFBA</li>
+    <li><input type="checkbox" /> Jogo do Bahia</li>
+    <li><input type="checkbox" /> Museu do Bahia</li>
+    <li><input type="checkbox" /> Almoçar na Gamboa</li>
+    <li><input type="checkbox" /> Passar uma tarde em Itapuã, falar de amor em Itapuã</li>
+    <li><input type="checkbox" /> Passear no Carmo</li>
+    <li><input type="checkbox" /> Galeria Mercado</li>
+    <li><input type="checkbox" /> Caramurê</li>
+    <li><input type="checkbox" /> Terê gastro bar</li>
+    <li><input type="checkbox" /> Café 2D</li>
+    <li><input type="checkbox" /> Museu do Mar</li>
+    <li><input type="checkbox" /> Casa do Carnaval</li>
+  </ul>
+
+  <div class="creditos">Feito com 💙 e 💚 por Italo</div>
+
+  <!-- Música de fundo -->
+  <iframe style="display:visible;" src="https://open.spotify.com/embed/track/1ewnsEdiX9GcsclM4FvR4J?utm_source=generator&autoplay=1" width="0" height="0" frameborder="0" allow="autoplay; clipboard-write; encrypted-media;"></iframe>
+
+  <!-- Script do contador -->
+  <script>
+    function atualizarContador() {
+      const inicio = new Date("2025-05-24T00:00:00");
+      const agora = new Date();
+      const diff = agora - inicio;
+
+      const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutos = Math.floor((diff / (1000 * 60)) % 60);
+      const segundos = Math.floor((diff / 1000) % 60);
+
+      document.getElementById("contador").textContent =
+        `peeeeerdi as contas...`;
+    }
+
+    setInterval(atualizarContador, 1000);
+    atualizarContador();
+
+   const beijosTarget = 231;
+    const saidasTarget = 17;
+    const fotosTarget = 58;
+
+    function animateCounter(id, target) {
+      let current = 0;
+      const increment = Math.ceil(target / 100);
+      const el = document.getElementById(id);
+
+      const interval = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          current = target;
+          clearInterval(interval);
+        }
+        el.textContent = current;
+      }, 40);
+    }
+
+    animateCounter("beijos", beijosTarget);
+    animateCounter("saidas", saidasTarget);
+    animateCounter("fotos", fotosTarget);
+  </script>
+</body>
+</html>
