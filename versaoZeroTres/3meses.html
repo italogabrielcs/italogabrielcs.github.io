@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link id="favicon" rel="icon" type="image/png" href="">
+  <meta charset="UTF-8">
+  <title>feliz 3 meses!</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #003366, #006644);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+      position: relative;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3em;
+      z-index: 2;
+    }
+
+    p {
+      font-size: 1.5em;
+      z-index: 2;
+    }
+
+    /* corações */
+    .heart {
+      position: absolute;
+      bottom: -20px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 24px;
+      animation: floatUp 8s linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-110vh) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    /* fotos subindo */
+    .floating-photo {
+      position: absolute;
+      bottom: -150px;
+      width: 250px;
+      height: 400px;
+      object-fit: cover;
+      border-radius: 12px;
+      animation: floatUpPhoto 12s linear infinite;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    @keyframes floatUpPhoto {
+      0% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(-120vh) scale(1.2) rotate(15deg);
+        opacity: 0;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <h1>feliz 3 meses! 💙💚</h1><br>
+  <p>"E o amor? O que é senão um monte de gostar?"✨</p>
+
+  <script>
+    // corações subindo
+    function createHeart() {
+      const heart = document.createElement("div");
+      heart.classList.add("heart");
+      heart.innerHTML = "💙";
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.style.fontSize = Math.random() * 20 + 20 + "px";
+      heart.style.animationDuration = (Math.random() * 5 + 5) + "s";
+      document.body.appendChild(heart);
+
+      setTimeout(() => heart.remove(), 10000);
+    }
+    setInterval(createHeart, 800);
+
+    // fotos subindo
+    const fotos = [
+      "foto1.jpg",
+      "foto2.jpeg",
+      "foto3.jpg",
+      "foto4.jpg",
+      "foto5.jpg",
+      "foto6.jpeg",
+      "foto7.jpg"
+    ];
+
+    function createPhoto() {
+      const img = document.createElement("img");
+      img.src = fotos[Math.floor(Math.random() * fotos.length)];
+      img.classList.add("floating-photo");
+      img.style.left = Math.random() * 100 + "vw";
+      img.style.animationDuration = (Math.random() * 6 + 8) + "s";
+      document.body.appendChild(img);
+
+      setTimeout(() => img.remove(), 13000);
+    }
+    setInterval(createPhoto, 4000);
+
+    const emojis = ['💙', '💚'];
+  let currentEmoji = 0;
+
+  function atualizarFavicon() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+
+    const ctx = canvas.getContext('2d');
+    ctx.font = '48px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.clearRect(0, 0, 64, 64);
+    ctx.fillText(emojis[currentEmoji], 32, 32);
+
+    const favicon = document.getElementById('favicon');
+    favicon.href = canvas.toDataURL('image/png');
+
+    currentEmoji = (currentEmoji + 1) % emojis.length;
+  }
+
+  // Atualiza a cada 1.5 segundos
+  setInterval(atualizarFavicon, 1500);
+  atualizarFavicon(); // chamada inicial
+  </script>
+</body>
+</html>
