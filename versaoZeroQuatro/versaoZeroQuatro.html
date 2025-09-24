@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>💙💚 4 Meses</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .hero-content {
+      text-align: center;
+      z-index: 2;
+    }
+
+    .logo {
+      font-size: clamp(4rem, 12vw, 8rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    .tagline {
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      font-weight: 300;
+      opacity: 0.9;
+    }
+
+    .celebration-text {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      font-weight: 600;
+      margin-top: 30px;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .gallery-section {
+      padding: 100px 0;
+      background: #0f0f0f;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 60px;
+      margin-top: 80px;
+    }
+
+    .project-card {
+      position: relative;
+      aspect-ratio: 4/3;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.4s ease;
+    }
+
+    .project-card:hover {
+      transform: scale(1.02);
+    }
+
+    .project-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .project-card:hover .project-image {
+      transform: scale(1.1);
+    }
+
+    .project-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .project-card:hover .project-overlay {
+      opacity: 1;
+    }
+
+    .project-number {
+      font-size: 4rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .modal-content {
+      max-width: 90vw;
+      max-height: 90vh;
+      position: relative;
+    }
+
+    .modal-image {
+      width: 100%;
+      height: auto;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: -50px;
+      right: 0;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+      padding: 10px;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+
+    .close-modal:hover {
+      opacity: 1;
+    }
+
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .floating-heart {
+      position: absolute;
+      font-size: clamp(20px, 4vw, 30px);
+      animation: float 15s linear infinite;
+      opacity: 0.3;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.3;
+      }
+      90% {
+        opacity: 0.1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .brand-mark {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      font-size: 2rem;
+      z-index: 10;
+      opacity: 0.6;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 20px;
+      }
+      
+      .gallery-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        margin-top: 60px;
+      }
+      
+      .project-card {
+        aspect-ratio: 1;
+      }
+      
+      .brand-mark {
+        bottom: 20px;
+        right: 20px;
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-elements" id="floatingElements"></div>
+
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="logo">💙💚</h1>
+      <div class="celebration-text">Feliz 4 meses de namoro!</div>
+      <p class="tagline">te amoooooo</p>
+    </div>
+  </section>
+
+  <section class="gallery-section">
+    <div class="container">
+      <div class="gallery-grid">
+        <div class="project-card" onclick="openModal('foto1.jpg')">
+          <img src="foto1.jpg" alt="01" class="project-image">
+          <div class="project-overlay">
+            <div class="project-number">01</div>
+          </div>
+        </div>
+
+        <div class="project-card" onclick="openModal('foto2.jpg')">
+          <img src="foto2.jpg" alt="02" class="project-image">
+          <div class="project-overlay">
+            <div class="project-number">02</div>
+          </div>
+        </div>
+
+        <div class="project-card" onclick="openModal('foto3.jpg')">
+          <img src="foto3.jpg" alt="03" class="project-image">
+          <div class="project-overlay">
+            <div class="project-number">03</div>
+          </div>
+        </div>
+
+        <div class="project-card" onclick="openModal('foto4.jpg')">
+          <img src="foto4.jpg" alt="04" class="project-image">
+          <div class="project-overlay">
+            <div class="project-number">04</div>
+          </div>
+        </div>
+
+        <div class="project-card" onclick="openModal('foto5.jpg')">
+          <img src="foto5.jpg" alt="05" class="project-image">
+          <div class="project-overlay">
+            <div class="project-number">05</div>
+          </div>
+        </div>
+
+        <div class="project-card" onclick="openModal('foto6.jpg')">
+          <img src="foto6.jpg" alt="06" class="project-image">
+          <div class="project-overlay">
+            <div class="project-number">06</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="brand-mark">💙💚</div>
+
+  <div class="modal" id="modal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="close-modal" onclick="closeModal()">×</button>
+      <img class="modal-image" id="modalImage" src="" alt="">
+    </div>
+  </div>
+
+  <audio id="backgroundMusic" loop>
+    <source src="musica.mp3" type="audio/mpeg">
+    <source src="musica.ogg" type="audio/ogg">
+  </audio>
+
+  <script>
+    function openModal(imageSrc) {
+      startMusic();
+      document.getElementById('modalImage').src = imageSrc;
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+
+    // Elementos flutuantes minimalistas
+    function createFloatingHeart() {
+      const heart = document.createElement('div');
+      heart.className = 'floating-heart';
+      heart.innerHTML = Math.random() > 0.5 ? '💙' : '💚';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDelay = Math.random() * 5 + 's';
+      heart.style.animationDuration = (Math.random() * 10 + 10) + 's';
+      
+      document.getElementById('floatingElements').appendChild(heart);
+      
+      setTimeout(() => heart.remove(), 20000);
+    }
+
+    setInterval(createFloatingHeart, 3000);
+
+    // Música de fundo
+    let musicStarted = false;
+    const music = document.getElementById('backgroundMusic');
+    music.volume = 0.3;
+    
+    function startMusic() {
+      if (!musicStarted) {
+        music.play().then(() => {
+          musicStarted = true;
+        }).catch(() => {
+          console.log('Autoplay bloqueado');
+        });
+      }
+    }
+    
+    // Tenta tocar ao carregar
+    document.addEventListener('DOMContentLoaded', startMusic);
+    
+    // Toca em qualquer interação
+    document.addEventListener('click', startMusic);
+    document.addEventListener('touchstart', startMusic);
+    document.addEventListener('keydown', startMusic);
+    
+    // Scroll suave
+    document.addEventListener('DOMContentLoaded', function() {
+      const hero = document.querySelector('.hero');
+      hero.addEventListener('click', function() {
+        document.querySelector('.gallery-section').scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
+</body>
+</html>
