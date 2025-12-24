@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Panda - Presente Personalizado</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="main-container">
+        <div class="mobile-frame">
+            <div class="status-bar">
+                <div class="chevron-down">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m6 9 6 6 6-6"></path>
+                    </svg>
+                </div>
+                <div class="title">FELIZ 7 MESES! 💙💚</div>
+                <div class="ellipsis">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="19" cy="12" r="1"></circle>
+                        <circle cx="5" cy="12" r="1"></circle>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="photo-carousel">
+                <div class="swiper">
+                    <div class="swiper-slide active">
+                        <img src="image1.jpg" alt="Foto do casal">
+                    </div>
+                    <div class="swiper-slide">
+                        <img src="image2.jpeg" alt="Foto do casal">
+                    </div>
+                    <div class="swiper-slide">
+                        <img src="image3.JPG" alt="Foto do casal">
+                    </div>
+                </div>
+                <div class="carousel-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+
+            <div class="music-player">
+                <div class="song-info">
+                    <div class="song-details">
+                        <h3>Pausa</h3>
+                        <span>Joyce Alane</span>
+                    </div>
+                    <div class="check-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4">
+                            <path d="M20 6 9 17l-5-5"></path>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress" style="width: 0%"></div>
+                    <div class="progress-handle" style="left: 0%"></div>
+                </div>
+                
+                <div class="time-info">
+                    <span>0:00</span>
+                    <span>-4:48</span>
+                </div>
+                
+                <div class="player-controls">
+                    <svg class="shuffle" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m18 14 4 4-4 4"></path>
+                        <path d="m18 2 4 4-4 4"></path>
+                        <path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"></path>
+                    </svg>
+                    
+                    <div class="control-buttons">
+                        <svg class="prev disabled" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="19 20 9 12 19 4 19 20"></polygon>
+                            <line x1="5" x2="5" y1="19" y2="5"></line>
+                        </svg>
+                        
+                        <div class="play-button">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                        </div>
+                        
+                        <svg class="next" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                            <line x1="19" x2="19" y1="5" y2="19"></line>
+                        </svg>
+                    </div>
+                    
+                    <svg class="repeat" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m17 2 4 4-4 4"></path>
+                        <path d="M3 11v-1a4 4 0 0 1 4-4h14"></path>
+                        <path d="m7 22-4-4 4-4"></path>
+                        <path d="M21 13v1a4 4 0 0 1-4 4H3"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="about-section">
+                <div class="about-header">
+                    <img src="capa.jpg" alt="Foto do casal">
+                    <div class="overlay"></div>
+                    <h2>Sobre o casal</h2>
+                </div>
+                
+                <div class="couple-info">
+                    <h3>Italo e Henrique</h3>
+                    <span>Juntos desde 2020,<br> Namorando desde 2025</span>
+                    
+                    <div class="time-grid">
+                        <div class="time-card">
+                            <span class="number" id="years">0</span>
+                            <span class="label">Anos</span>
+                        </div>
+                        <div class="time-card">
+                            <span class="number" id="months">7</span>
+                            <span class="label">Meses</span>
+                        </div>
+                        <div class="time-card">
+                            <span class="number" id="days">0</span>
+                            <span class="label">Dias</span>
+                        </div>
+                        <div class="time-card">
+                            <span class="number" id="hours">14</span>
+                            <span class="label">Horas</span>
+                        </div>
+                        <div class="time-card">
+                            <span class="number" id="minutes">33</span>
+                            <span class="label">Minutos</span>
+                        </div>
+                        <div class="time-card">
+                            <span class="number" id="seconds">00</span>
+                            <span class="label">Segundos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="message-section">
+                <h2>Uma mensagem de amor</h2>
+                <div class="message-content">
+                    <p>"Intimidade é quando a gente pode ser quem a gente é, sem medo de perder o outro." <br><i>- Carla Madeira, A Natureza da Mordida</i><br>Obrigado por essa liberdade! :3</p>
+                    <div class="message-fade"></div>
+                </div>
+                <button class="show-message-btn">Mostrar Mensagem</button>
+            </div>
+
+            <div class="gallery-section">
+                <h2>Conheça Henrique e Italo</h2>
+                <div class="gallery-grid">
+                    <div class="gallery-item">
+                        <img src="corrida.jpg" alt="Nossos Dates">
+                        <div class="gallery-overlay"></div>
+                        <span>Primeira corrida</span>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="show.jpg" alt="Fotos aleatórias">
+                        <div class="gallery-overlay"></div>
+                        <span>Primeiro show</span>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="viagem.jpg" alt="Primeira viagem">
+                        <div class="gallery-overlay"></div>
+                        <span>Primeira viagem</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wrapped-section">
+                <div class="wrapped-content">
+                    <div class="wrapped-graphic">
+                        <div class="gradient-shape"></div>
+                    </div>
+                    <h2>Nosso<br>Relacionamento<br>Wrapped</h2>
+                    <p>Explore o 2025 em casal</p>
+                    <button class="vamos-la-btn" onclick="openStories()">Vamos lá</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden Audio Element -->
+    <audio id="musicPlayer" preload="auto">
+        <source src="musica1.mp3" type="audio/mpeg">
+        <source src="musica2.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- Stories Modal -->
+    <div class="stories-modal" id="storiesModal">
+        <div class="stories-container">
+            <div class="story-header">
+                <div class="story-progress">
+                    <div class="progress-bar-story active" data-story="0"></div>
+                    <div class="progress-bar-story" data-story="1"></div>
+                    <div class="progress-bar-story" data-story="2"></div>
+                </div>
+                <button class="close-stories" onclick="closeStories()">&times;</button>
+            </div>
+            
+            <div class="story-content">
+                <div class="story active" data-story="0">
+                    <video autoplay muted loop>
+                        <source src="video1.mp4" type="video/mp4">
+                    </video>
+                    <div class="story-text">
+                        <h3></h3>
+                        <p></p>
+                    </div>
+                </div>
+                
+                <div class="story" data-story="1">
+                    <video muted loop>
+                        <source src="video2.mp4" type="video/mp4">
+                    </video>
+                    <div class="story-text">
+                        <h3></h3>
+                        <p></p>
+                    </div>
+                </div>
+                
+                <div class="story" data-story="2">
+                    <video muted loop>
+                        <source src="video3.mp4" type="video/mp4">
+                    </video>
+                    <div class="story-text">
+                        <h3></h3>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-navigation">
+                <div class="nav-area prev" onclick="previousStory()"></div>
+                <div class="nav-area next" onclick="nextStory()"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
