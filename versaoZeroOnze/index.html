@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz 11 Meses!</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div class="page-shell">
+        <header class="top-bar">
+            <div class="logo">
+                <span class="logo-dot"></span>
+                <span>rique & italo</span>
+            </div>
+            <div class="status">v0.11</div>
+        </header>
+
+        <main class="card">
+            <section class="hero-card">
+                <div class="hero-badge">Bem-vindo, meu amor!</div>
+                <h1>💙💚 Feliz 11 Meses! 💚💙</h1>
+                <p>Há 6 anos, nasce uma amizade, há 11 meses, nasce um namoro e em breve um casamento. 💑</p>
+            </section>
+
+            <section class="stat-card">
+                <div class="stat-item">
+                    <strong id="days">0</strong>
+                    <span>Dias juntos</span>
+                </div>
+                <div class="stat-item">
+                    <strong id="hours">00</strong>
+                    <span>Horas</span>
+                </div>
+                <div class="stat-item">
+                    <strong id="minutes">00</strong>
+                    <span>Minutos</span>
+                </div>
+                <div class="stat-item">
+                    <strong id="seconds">00</strong>
+                    <span>Segundos</span>
+                </div>
+            </section>
+
+            <section class="timeline-card">
+                <div class="timeline-header">
+                    <div>
+                        <strong>Timeline</strong>
+                        <p>Fotos passando conforme a nossa história</p>
+                    </div>
+                    <div class="pill">Foto</div>
+                </div>
+                <div class="timeline-window">
+                    <div class="timeline-track">
+                        <div class="timeline-item"><span>Inicio</span></div>
+                        <div class="timeline-media">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczNR9KZfDmrerBVoVmqX07B_8O9KvWEITKEe6EkRx4qsjz5UpInNPl3O1L_vzpthAV6vskDqOyyDBXFuHG6eMnVFcr0Bcz5hz58OHzpjN8sGexzfrj-3BUTcTN03H2pfXCbsfCd0WDJ-RX4xHeo1EAKE=w912-h608-s-no-gm?authuser=0" alt="Nossa primeira foto juntos">
+                        </div>
+                        <div class="timeline-media">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczMqWGhm2hF1a03i2SjV7tMFmYMBOnozUQT-dhySvtynhnnwd-zLjRYXJGFOKydKUWomereYKMuXyLGBks3uF75vVUqGIgXakbRoEXr_mNUJS721DqkwcKfqkbYTFmuIFo_25qQqyQnBPIAkBWiWHAjZVw=w912-h608-s-no-gm?authuser=0" alt="Um momento especial">
+                        </div>
+                        <div class="timeline-media">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczNHqx2gTxKCYDBVIZZvoe4Zpo_uzmwLW884VjpnWum5qFjM3D8abzQTV07Q4mjWSxPY1AAXvETKjQF4YrpFUxu847Tv9KSJj9TCRwwNgey89HmVDHVwcL5TYG6zDaZOMwk8hXFmioCxzD-edv1c0lKt=w912-h684-s-no-gm?authuser=0" alt="Celebrando juntos">
+                        </div>
+                        <div class="timeline-media">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczMMhRT0ovlBI1YuuYkAdvtOMpqJtpxQJ8UUvOOkj6rXjpY653I0yVBHVR1BT1TDFwqAGtGqFyiuyl2YfR8GxBS6lr3wL3YIU2Q-5Pdb5ZtcUHmLnnYFpwhNRLrNPimMHhENK8sHlw8hvDM2G0vdiNBs=w912-h608-s-no-gm?authuser=0" alt="Nossos sorrisos">
+                        </div>
+                        <div class="timeline-item"><span>Agora</span></div>
+                        <div class="timeline-media">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczOuneTd27pSnYgdJQW0zeVLd7miVZutDraUKl-FWHktVa_Fnfr_L9m0VNJwC_zbiqgFl8FY0QzLoZoIipHxrgWtBjeZNZ2rU25Vsv7XhRPGPyQzt5kwEproCENfixTGU9Ld69u3I80CmmjctLZRArks=w912-h684-s-no-gm?authuser=0 alt="Nossa primeira foto juntos">
+                        </div>
+                        <div class="timeline-media">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczNFlzQwBa3RSVyaTcHdKOz6ALku5fjG6GH5kl603o3cCWI4jk9-W3bbhyroD4BTN8lbhK3hiDjsYuAes9pQG2RDUNW3jheUOyFGnwsU6Rs8d9OmfsJB0cwosi-FHVjoHma-9sPweEkAC_Wmt_CKqG1P=w912-h684-s-no-gm?authuser=0" alt="Um momento especial">
+                        </div>
+                        <div class="timeline-media">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczOUHeMKhuNkJTn7Dujo5r_otJ_CeIQ-vIu1q8LUuD-EyQlkX0T5G7knmIo2eCwx5NDjaK-gPP74l9G1pWfRFHxhp89ZSHKJjfCE_6Xp5LYfGPg_K_MKiuw_C_TGHZFQirvzHdqFkp6dYpnGALz-5jbD=w912-h684-s-no-gm?authuser=0" alt="Celebrando juntos">
+                        </div>
+                        <div class="timeline-media">
+                            <img src="https://lh3.googleusercontent.com/pw/AP1GczMhFQ2Dq0yLz4fsg0KzBwvHSKy1DdFdLHuN0wlj9xiQrAB5GfciXcYIE8GvOShTxL_-D0ODyFOCsKNn292WDYF3exvCkRAZoN-sAiqcqVepzWBObz5e4yJANWvskOvOhyKcGEccULwoRVtxBbIa0oDJ=w912-h684-s-no-gm?authuser=0" alt="Nossos sorrisos">
+                        </div>
+                        <div class="timeline-item"><span>Fim</span></div>
+                    </div>
+                    <div class="playhead"></div>
+                </div>
+            </section>
+
+            <section class="gift-card">
+                <div class="gift-label">Surpresa</div>
+                <button class="open-gift" id="present">🎁 Clique para abrir!</button>
+                <p>Toque no presente e descubra o que você vai ganhar.</p>
+            </section>
+
+            <section class="game-card">
+                <div class="game-header">
+                    <div>
+                        <strong>Joguinho da Paçoca</strong>
+                        <p>Clique nas paçocas que aparecem antes que elas sumam!</p>
+                    </div>
+                    <span class="pill">Diversão</span>
+                </div>
+                <div class="game-panel">
+                    <div class="game-info">
+                        <span>Pontos <strong id="game-score">0</strong></span>
+                        <span>Tempo <strong id="game-timer">20</strong>s</span>
+                    </div>
+                    <div class="game-area" id="gameArea">
+                        <div class="game-overlay">Clique em jogar para começar</div>
+                    </div>
+                    <button class="btn-secondary" id="startGame">Jogar</button>
+                </div>
+            </section>
+
+            <section class="message-card" id="message">
+                <h2>VOCÊ GANHOU UM BEIJO!</h2>
+                <p>E aquele beijo que você me prometeu? Vem aqui que eu vou te dar!<br><i>Não esqueci do presente material não, viu?</i></p>
+                <div class="inline-hearts">💙💚💙💚</div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
