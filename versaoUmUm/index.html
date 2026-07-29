@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1 Ano e 1 Mês 💚💙</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="icon" id="favicon" href="#" />
+</head>
+<body>
+
+  <!-- MENSAGEM -->
+  <section class="message-section">
+    <div class="blobs">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
+    <div class="message-box">
+      <span class="msg-emoji">💚💙</span>
+      <h1>Feliz, Um Ano e 1 Mês!</h1>
+      <p>
+        "Amar é compreender que somos dois indivíduos particulares que decidiram compartilhar uma vida singular."
+      </p>
+      <p class="msg-sign">Com todo meu amor, <strong>Pitico</strong> 💚💙</p>
+    </div>
+  </section>
+
+  <!-- TELA DE PINTURA -->
+  <section class="paint-section">
+    <h2 class="section-title">Pinte para Mim 🎨</h2>
+    <p class="paint-subtitle">você pinta como eu pinto? 😏</p>
+
+    <div class="paint-wrapper">
+
+      <div class="paint-controls">
+        <div class="control-group">
+          <label>Cores</label>
+          <div class="color-palette">
+            <button class="color-btn active" style="background:#a8d8b9" data-color="#a8d8b9"></button>
+            <button class="color-btn" style="background:#a8c8e8" data-color="#a8c8e8"></button>
+            <button class="color-btn" style="background:#b8e0d2" data-color="#b8e0d2"></button>
+            <button class="color-btn" style="background:#c5dff8" data-color="#c5dff8"></button>
+            <button class="color-btn" style="background:#d4edda" data-color="#d4edda"></button>
+            <button class="color-btn" style="background:#cce5ff" data-color="#cce5ff"></button>
+            <button class="color-btn" style="background:#f9c6d0" data-color="#f9c6d0"></button>
+            <button class="color-btn" style="background:#fde8c8" data-color="#fde8c8"></button>
+            <button class="color-btn" style="background:#e8d5f5" data-color="#e8d5f5"></button>
+            <button class="color-btn" style="background:#fff0b3" data-color="#fff0b3"></button>
+            <button class="color-btn" style="background:#f5f5f5" data-color="#f5f5f5"></button>
+            <button class="color-btn" style="background:#2d2d2d" data-color="#2d2d2d"></button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label>Tamanho: <span id="brush-size-label">8</span>px</label>
+          <input type="range" id="brush-size" min="2" max="40" value="8" />
+        </div>
+
+        <div class="control-group">
+          <label>Ferramenta</label>
+          <div class="tool-btns">
+            <button class="tool-btn active" id="btn-brush"><i class="fas fa-paintbrush"></i> Pincel</button>
+            <button class="tool-btn" id="btn-eraser"><i class="fas fa-eraser"></i> Borracha</button>
+          </div>
+        </div>
+
+        <div class="control-group actions">
+          <button class="action-btn" id="btn-clear"><i class="fas fa-trash"></i> Limpar</button>
+          <button class="action-btn save" id="btn-download"><i class="fas fa-download"></i> Salvar desenho</button>
+        </div>
+      </div>
+
+      <canvas id="paint-canvas"></canvas>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Feito com 💚💙 para comemorar 1 ano e 1 mês juntos</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

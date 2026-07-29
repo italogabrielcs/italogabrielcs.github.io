@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1 Ano e 2 Meses 💚💙</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" id="favicon" href="#" />
+</head>
+<body>
+
+  <!-- GRAIN OVERLAY -->
+  <div class="grain"></div>
+
+  <!-- PLAYER DE MÚSICA -->
+  <div class="music-player" id="music-player">
+    <button class="play-btn" id="play-btn" aria-label="Tocar música">
+      <svg id="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      <svg id="icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+    </button>
+    <div class="player-info">
+      <span class="player-title">Por Você</span>
+      <span class="player-sub">Jão</span>
+    </div>
+    <div class="player-bar">
+      <div class="player-progress" id="player-progress"></div>
+    </div>
+  </div>
+  <audio id="audio" src="Por Você.mp3" loop></audio>
+
+  <!-- HERO / CAPA -->
+  <section class="hero" id="home">
+    <div class="hero-inner">
+      <p class="hero-label">um álbum de memórias</p>
+      <h1 class="hero-title">1 Ano<br /><em>e Dois Meses</em></h1>
+      <p class="hero-date">24 · V · MMXXV — 24 · VII · MMXXV</p>
+      <div class="hero-divider"></div>
+      <p class="hero-sub">escrito por quem te ama</p>
+    </div>
+    <div class="hero-photo-wrap">
+      <img src="foto1.jpg" alt="Foto do casal" class="hero-photo" />
+      <div class="photo-caption">fotografia I</div>
+    </div>
+    <a href="#mensagem" class="scroll-hint">↓</a>
+  </section>
+
+  <!-- FAIXA / MENSAGEM -->
+  <section class="track-section" id="mensagem">
+    <div class="track-number">01</div>
+    <div class="track-content">
+      <h2 class="track-title">Por Você</h2>
+      <p class="track-meta">escrita por <em>Jão e Pedro Tófani</em> · produzida com amor</p>
+      <div class="track-divider"></div>
+      <p class="track-lyrics">
+        Se não for pra comprar nosso carro<br /><br />
+        Se não for pra vestir nossos filhos<br /><br />
+        Se eu não for te levar num bar caro<br /><br />
+        Dizer que eu que pago
+      </p>
+      <p class="track-sign">— com todo meu amor</p>
+    </div>
+  </section>
+
+  <!-- GALERIA / FOTOGRAFIAS -->
+  <section class="gallery-section" id="momentos">
+    <div class="gallery-header">
+      <span class="gallery-label">fotografias</span>
+      <h2 class="gallery-title">Nossos Momentos</h2>
+    </div>
+    <div class="gallery">
+      <figure class="gallery-item">
+        <img src="foto7.jpg" alt="Momento 1" />
+        <figcaption>fotografia II</figcaption>
+      </figure>
+      <figure class="gallery-item tall">
+        <img src="foto2.jpg" alt="Momento 2" />
+        <figcaption>fotografia III</figcaption>
+      </figure>
+      <figure class="gallery-item">
+        <img src="foto3.jpg" alt="Momento 3" />
+        <figcaption>fotografia IV</figcaption>
+      </figure>
+      <figure class="gallery-item">
+        <img src="foto4.jpg" alt="Momento 4" />
+        <figcaption>fotografia V</figcaption>
+      </figure>
+      <figure class="gallery-item tall">
+        <img src="foto5.jpg" alt="Momento 5" />
+        <figcaption>fotografia VI</figcaption>
+      </figure>
+      <figure class="gallery-item">
+        <img src="foto6.jpg" alt="Momento 6" />
+        <figcaption>fotografia VII</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- TRACKLIST / TIMELINE -->
+  <section class="tracklist-section" id="historia">
+    <div class="tracklist-header">
+      <span class="gallery-label">faixas</span>
+      <h2 class="gallery-title">Nossa História</h2>
+    </div>
+    <ol class="tracklist">
+      <li>
+        <span class="tl-num">01</span>
+        <div class="tl-body">
+          <strong>O Começo</strong>
+          <span class="tl-time">(∞)</span>
+          <p>Um menino com foto de anime veio falar comigo e desde então, minha vida mudou para sempre.</p>
+        </div>
+      </li>
+      <li>
+        <span class="tl-num">02</span>
+        <div class="tl-body">
+          <strong>Primeiro Beijo</strong>
+          <span class="tl-time">(inesquecível)</span>
+          <p>No Jardim dos Namorados, nos beijamos pela primeira vez.</p>
+        </div>
+      </li>
+      <li>
+        <span class="tl-num">03</span>
+        <div class="tl-body">
+          <strong>Primeira Viagem</strong>
+          <span class="tl-time">(saudades)</span>
+          <p>Praia do Forte. Exploramos o mundo juntos e criamos memórias incríveis.</p>
+        </div>
+      </li>
+      <li>
+        <span class="tl-num">04</span>
+        <div class="tl-body">
+          <strong>1 Ano e 2 Meses</strong>
+          <span class="tl-time">(e contando)</span>
+          <p>Catorze meses inteiros de amor, cumplicidade e felicidade.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- CONTADOR -->
+  <section class="counter-section">
+    <p class="counter-label">tempo juntos</p>
+    <div class="counters">
+      <div class="counter-item"><span id="days" class="counter-num">0</span><span>dias</span></div>
+      <div class="counter-sep">·</div>
+      <div class="counter-item"><span id="hours" class="counter-num">0</span><span>horas</span></div>
+      <div class="counter-sep">·</div>
+      <div class="counter-item"><span id="minutes" class="counter-num">0</span><span>minutos</span></div>
+      <div class="counter-sep">·</div>
+      <div class="counter-item"><span id="seconds" class="counter-num">0</span><span>segundos</span></div>
+    </div>
+  </section>
+
+  <!-- COLOFÃO / FOOTER -->
+  <footer class="footer">
+    <p class="footer-credit">Um álbum dirigido por <em>Pitico</em></p>
+    <p class="footer-credit">Fotografado com amor · Produzido com saudade</p>
+    <p class="footer-year">MMXXV</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
