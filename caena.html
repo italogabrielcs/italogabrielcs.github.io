@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inclusão Tech 2026.2 • Projetos Finais CAENA — Impacto Vital</title>
+  
+  <!-- Google Fonts: Space Grotesk, Plus Jakarta Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            caena: {
+              bg: '#0B132B',
+              surface: '#131F42',
+              card: '#1C2541',
+              border: '#2A3863',
+              orange: '#FF5400',
+              gold: '#FFB800',
+              emerald: '#10B981',
+              danger: '#EF4444',
+              muted: '#94A3B8'
+            }
+          },
+          fontFamily: {
+            display: ['"Space Grotesk"', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-primary: #0B132B;
+      --bg-surface: #131F42;
+      --bg-card: #1C2541;
+      --accent-orange: #FF5400;
+      --accent-gold: #FFB800;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 12% 10%, rgba(255, 84, 0, 0.14) 0%, transparent 35%),
+        radial-gradient(circle at 88% 15%, rgba(255, 184, 0, 0.10) 0%, transparent 35%),
+        radial-gradient(circle at 50% 90%, rgba(19, 31, 66, 0.9) 0%, transparent 60%);
+      background-attachment: fixed;
+      color: #F8FAFC;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .gradient-tech {
+      background: linear-gradient(135deg, #FF5400 0%, #FFB800 100%);
+    }
+
+    .text-gradient-tech {
+      background: linear-gradient(135deg, #FF5400 0%, #FFB800 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .glass-panel {
+      background: rgba(19, 31, 66, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+    }
+
+    .glass-card {
+      background: rgba(28, 37, 65, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(255, 184, 0, 0.35);
+    }
+
+    .team-tab-active {
+      background: linear-gradient(135deg, rgba(255, 84, 0, 0.22) 0%, rgba(255, 184, 0, 0.14) 100%);
+      border-color: #FF5400 !important;
+      box-shadow: 0 10px 25px -5px rgba(255, 84, 0, 0.25);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B132B;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2A3863;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #FF5400;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { border-color: rgba(239, 68, 68, 0.45); }
+      50% { border-color: rgba(239, 68, 68, 0.95); }
+    }
+    .doubt-pulse {
+      animation: pulse-border 2s infinite;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col selection:bg-caena-orange selection:text-white">
+
+  <div class="border-b border-white/10 bg-[#080E21]/90 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-mono font-semibold gradient-tech text-slate-950 shadow-sm">
+          <i class="fa-solid fa-microchip"></i> INCLUSÃO TECH 2026.2
+        </span>
+        <span class="text-slate-300 font-medium flex items-center gap-1.5">
+          <i class="fa-solid fa-robot text-caena-gold"></i> Curso de Robótica — CAENA
+        </span>
+        <span class="hidden md:inline-block text-slate-600">•</span>
+        <span class="hidden md:inline-flex items-center gap-1.5 text-slate-300 bg-white/5 px-2.5 py-1 rounded-md border border-white/10 font-mono">
+          <i class="fa-solid fa-chalkboard-user text-caena-orange"></i> Prof. Italo Gabriel (UFBA)
+        </span>
+        <!-- Indicador de Status Firebase -->
+        <span id="firebaseStatus" class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 font-mono text-[10px] border border-emerald-500/30">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizado
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="copyTinkercadCode()" title="Clique para copiar o código da turma no Tinkercad" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-caena-surface hover:bg-caena-card border border-caena-border text-slate-300 transition cursor-pointer">
+          <i class="fa-solid fa-cube text-caena-gold"></i>
+          <span class="hidden sm:inline">Tinkercad Turma:</span>
+          <code class="font-mono font-bold text-caena-gold">MRX RNT M63</code>
+          <i class="fa-regular fa-copy text-[10px] text-slate-400"></i>
+        </button>
+
+        <button onclick="openSafetyModal()" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-medium transition">
+          <i class="fa-solid fa-leaf"></i>
+          <span class="hidden sm:inline">Guia Ecodesign & Bancada</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <header class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 pb-4">
+    <div class="glass-panel rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+      <div class="absolute -right-12 -top-12 w-64 h-64 rounded-full bg-gradient-to-br from-caena-orange/20 to-caena-gold/5 blur-2xl pointer-events-none"></div>
+      
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 relative z-10">
+        <div class="space-y-2 max-w-2xl">
+          <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-caena-gold bg-caena-gold/10 border border-caena-gold/30 px-3 py-1 rounded-full">
+            <i class="fa-solid fa-heart-pulse text-caena-orange"></i> Projeto Final • Impacto Vital
+          </div>
+          <h1 class="font-display text-2xl sm:text-4xl font-bold tracking-tight text-white">
+            Gerenciamento de Projetos <span class="text-gradient-tech">Robótica CAENA</span>
+          </h1>
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+            “Soluções que geram um impacto essencial na vida das pessoas.” Acompanhe o progresso das equipes nas <strong class="text-white">3 Etapas de Desenvolvimento</strong> (Ideação, Circuito e Design) e registre o <strong class="text-caena-gold">Diário de Aula</strong> a cada encontro.
+          </p>
+        </div>
+
+        <!-- Primary Action Buttons -->
+        <div class="flex flex-wrap items-center gap-3">
+          <button onclick="openTeamModal()" class="gradient-tech hover:opacity-95 text-slate-950 font-display font-bold px-5 py-3 rounded-xl shadow-lg shadow-caena-orange/25 flex items-center gap-2 transition transform active:scale-95">
+            <i class="fa-solid fa-plus-circle text-lg"></i>
+            <span>Nova Equipe / Projeto</span>
+          </button>
+
+          <div class="flex items-center gap-2">
+            <button onclick="exportDataJSON()" title="Exportar backup em JSON" class="glass-card hover:bg-white/10 text-slate-200 px-3.5 py-3 rounded-xl text-sm font-medium flex items-center gap-2 transition">
+              <i class="fa-solid fa-download text-caena-gold"></i>
+              <span class="hidden sm:inline">Exportar</span>
+            </button>
+            <label title="Importar arquivo JSON" class="glass-card hover:bg-white/10 text-slate-200 px-3.5 py-3 rounded-xl text-sm font-medium flex items-center gap-2 transition cursor-pointer">
+              <i class="fa-solid fa-upload text-caena-orange"></i>
+              <span class="hidden sm:inline">Importar</span>
+              <input type="file" id="importJsonInput" accept=".json" class="hidden" onchange="importDataJSON(event)" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 mt-7 pt-6 border-t border-white/10">
+        <!-- KPI 1 -->
+        <div class="glass-card rounded-xl p-4 flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-xl bg-caena-orange/15 border border-caena-orange/30 flex items-center justify-center text-caena-orange text-lg shrink-0">
+            <i class="fa-solid fa-users-gear"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">Equipes Ativas</p>
+            <p id="kpiTotalTeams" class="font-display text-2xl font-bold text-white">0</p>
+          </div>
+        </div>
+
+        <!-- KPI 2 -->
+        <div class="glass-card rounded-xl p-4 flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-xl bg-caena-gold/15 border border-caena-gold/30 flex items-center justify-center text-caena-gold text-lg shrink-0">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">Progresso Médio</p>
+            <p id="kpiAvgProgress" class="font-display text-2xl font-bold text-caena-gold">0%</p>
+          </div>
+        </div>
+
+        <!-- KPI 3 -->
+        <div class="glass-card rounded-xl p-4 flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-lg shrink-0">
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">Etapas Concluídas</p>
+            <p id="kpiCompletedSteps" class="font-display text-2xl font-bold text-emerald-400">0/0</p>
+          </div>
+        </div>
+
+        <!-- KPI 4: Open Doubts Alert -->
+        <div onclick="toggleGlobalDoubtFilter()" title="Clique para filtrar equipes com dúvidas pendentes" class="glass-card rounded-xl p-4 flex items-center justify-between gap-2 cursor-pointer group">
+          <div class="flex items-center gap-3.5">
+            <div id="kpiDoubtsIconBox" class="w-11 h-11 rounded-xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400 text-lg shrink-0">
+              <i class="fa-solid fa-hand-sparkles"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 font-medium group-hover:text-white transition">Dúvidas Abertas</p>
+              <div class="flex items-baseline gap-2">
+                <p id="kpiOpenDoubts" class="font-display text-2xl font-bold text-red-400">0</p>
+                <span id="kpiTotalLogs" class="text-[11px] font-mono text-slate-400">(0 aulas)</span>
+              </div>
+            </div>
+          </div>
+          <span id="doubtFilterBadge" class="hidden text-[10px] font-mono px-2 py-0.5 rounded bg-red-500 text-white">FILTRO ATIVO</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-16 flex-1 space-y-6">
+    
+    <section class="glass-panel rounded-2xl p-4 sm:p-5 space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <h2 class="font-display text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-layer-group text-caena-orange"></i>
+            <span>Selecione a Equipe / Bancada</span>
+          </h2>
+          <span id="teamCountBadge" class="text-xs font-mono px-2 py-0.5 rounded-md bg-white/10 text-slate-300">3 equipes</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <!-- Search Input -->
+          <div class="relative flex-1 sm:w-64">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input 
+              type="text" 
+              id="teamSearchInput" 
+              oninput="handleSearchTeams(this.value)"
+              placeholder="Buscar equipe, projeto ou aluno..." 
+              class="w-full pl-9 pr-8 py-2 rounded-xl bg-caena-bg/90 border border-caena-border text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-caena-orange transition"
+            />
+            <button id="clearSearchBtn" onclick="clearTeamSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <!-- View Mode Switch -->
+          <div class="inline-flex rounded-xl bg-caena-bg p-1 border border-caena-border">
+            <button id="btnViewDetail" onclick="setViewMode('detail')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-caena-orange text-slate-950">
+              <i class="fa-solid fa-sliders mr-1"></i> Bancada da Equipe
+            </button>
+            <button id="btnViewOverview" onclick="setViewMode('overview')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white">
+              <i class="fa-solid fa-table-cells-large mr-1"></i> Painel da Turma
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="teamSelectorContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <!-- Populated dynamically -->
+      </div>
+    </section>
+
+    <!-- CLASS OVERVIEW SECTION -->
+    <section id="classOverviewSection" class="hidden space-y-4">
+      <div class="glass-panel rounded-2xl p-5">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 class="font-display text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-chalkboard-user text-caena-gold"></i>
+              Visão Geral da Turma — Comparativo de Etapas & Dúvidas
+            </h3>
+            <p class="text-xs text-slate-400">Acompanhe rapidamente como está cada equipe nas 3 etapas e clique para abrir a bancada.</p>
+          </div>
+          <button onclick="resetDemoDataConfirm()" class="text-xs text-slate-400 hover:text-caena-gold underline flex items-center gap-1">
+            <i class="fa-solid fa-rotate-left"></i> Restaurar dados de demonstração
+          </button>
+        </div>
+        <div id="overviewGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </section>
+
+    <div id="activeTeamWorkspace" class="space-y-6">
+      
+      <section class="glass-panel rounded-2xl p-5 sm:p-6 relative overflow-hidden">
+        <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-5 pb-5 border-b border-white/10">
+          <div class="space-y-2.5 flex-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="activeTeamBadge" class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-caena-orange/20 border border-caena-orange/40 text-caena-gold"></span>
+              <span id="activeProjectCategory" class="px-2.5 py-1 rounded-md text-xs font-mono bg-white/5 border border-white/10 text-slate-300">
+                Impacto Vital
+              </span>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-caena-gold/15 border border-caena-gold/30 text-caena-gold text-xs font-mono">
+                <i class="fa-solid fa-star"></i>
+                <span id="activeTeamPoints">0 pts</span>
+                <button onclick="adjustTeamPoints(1)" title="+1 Ponto (Participação, Foco)" class="ml-1 px-1.5 py-0.2 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 rounded text-[11px] font-bold transition">+</button>
+                <button onclick="adjustTeamPoints(-1)" title="-1 Ponto (Conversa, Celular)" class="px-1.5 py-0.2 bg-red-500/20 hover:bg-red-500/40 text-red-300 rounded text-[11px] font-bold transition">-</button>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-baseline gap-3">
+              <h2 id="activeProjectName" class="font-display text-2xl sm:text-3xl font-bold text-white"></h2>
+            </div>
+
+            <div class="bg-caena-bg/70 border border-white/10 rounded-xl p-3.5">
+              <p class="text-[11px] font-mono uppercase tracking-wider text-caena-gold mb-1 flex items-center gap-1.5">
+                <i class="fa-solid fa-bullseye"></i> Problema Real & Impacto Vital na Comunidade:
+              </p>
+              <p id="activeProjectProblem" class="text-slate-200 text-sm leading-relaxed"></p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <span class="text-xs font-mono text-slate-400 mr-1"><i class="fa-solid fa-microchip text-caena-orange mr-1"></i>Componentes:</span>
+              <div id="activeTeamComponents" class="flex flex-wrap gap-1.5"></div>
+            </div>
+          </div>
+
+          <div class="lg:w-80 glass-card rounded-xl p-4 flex flex-col justify-between space-y-4 shrink-0">
+            <div>
+              <div class="flex items-center justify-between text-xs mb-1.5">
+                <span class="font-mono uppercase text-slate-300">Progresso Geral do Projeto</span>
+                <span id="activeTeamProgressPct" class="font-mono font-bold text-base text-caena-gold">0%</span>
+              </div>
+              <div class="w-full h-3 bg-caena-bg rounded-full overflow-hidden border border-white/10">
+                <div id="activeTeamProgressBar" class="h-full gradient-tech transition-all duration-500 rounded-full" style="width: 0%"></div>
+              </div>
+              <div class="grid grid-cols-3 gap-2 mt-3 text-center">
+                <div class="bg-caena-bg/80 rounded-lg p-1.5 border border-white/5">
+                  <span class="block text-[10px] text-slate-400">💡 Ideação</span>
+                  <span id="pillarPctIdeacao" class="font-mono text-xs font-bold text-white">0%</span>
+                </div>
+                <div class="bg-caena-bg/80 rounded-lg p-1.5 border border-white/5">
+                  <span class="block text-[10px] text-slate-400">⚡ Circuito</span>
+                  <span id="pillarPctCircuito" class="font-mono text-xs font-bold text-white">0%</span>
+                </div>
+                <div class="bg-caena-bg/80 rounded-lg p-1.5 border border-white/5">
+                  <span class="block text-[10px] text-slate-400">🎨 Design</span>
+                  <span id="pillarPctDesign" class="font-mono text-xs font-bold text-white">0%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/10">
+              <div id="activeTeamLinks" class="flex items-center gap-2"></div>
+              <div class="flex items-center gap-1.5 ml-auto">
+                <button onclick="openTeamModal(window.state.selectedTeamId)" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white flex items-center gap-1.5 transition">
+                  <i class="fa-solid fa-pen-to-square text-caena-gold"></i> Editar Equipe
+                </button>
+                <button onclick="confirmDeleteTeam(window.state.selectedTeamId)" title="Excluir equipe" class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/25 text-red-400 text-xs transition">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-2">
+              <i class="fa-solid fa-id-badge text-caena-gold"></i> Integrantes & Papéis (Slide 68)
+            </h3>
+          </div>
+          <div id="activeTeamRolesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-lg gradient-tech text-slate-950 flex items-center justify-center text-sm font-bold">12</span>
+              <span>Etapas de Desenvolvimento do Projeto</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300">
+              Atualize o status e descreva detalhadamente <strong class="text-white">como está cada etapa</strong> (Salva automaticamente ao clicar fora).
+            </p>
+          </div>
+        </div>
+        <div id="pillarsContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-5"></div>
+      </section>
+
+      <section class="glass-panel rounded-2xl p-5 sm:p-6 space-y-6 border-t-4 border-t-caena-orange">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+          <div>
+            <div class="inline-flex items-center gap-2 text-xs font-mono uppercase text-caena-gold mb-1">
+              <i class="fa-solid fa-book-journal-whills"></i> Check-in de Bancada
+            </div>
+            <h2 class="font-display text-xl sm:text-2xl font-bold text-white">Diário de Bordo da Equipe</h2>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="toggleLogForm()" id="btnToggleLogForm" class="gradient-tech text-slate-950 font-display font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition">
+              <i class="fa-solid fa-plus"></i> Registrar Aula de Hoje
+            </button>
+          </div>
+        </div>
+
+        <form id="classLogForm" onsubmit="handleSaveClassLog(event)" class="glass-card rounded-2xl p-5 space-y-4 border border-caena-orange/40">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <h3 id="logFormTitle" class="font-display font-bold text-base text-white flex items-center gap-2">
+              <i class="fa-solid fa-pen-nib text-caena-orange"></i>
+              Novo Registro para <span id="logFormTeamName" class="text-caena-gold"></span>
+            </h3>
+            <input type="hidden" id="editingLogId" value="" />
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2">
+              <label class="block text-xs font-mono uppercase text-slate-300 mb-1.5">Aula / Encontro *</label>
+              <select id="logLessonSelect" required class="w-full rounded-xl bg-caena-bg border border-caena-border px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-caena-orange">
+                <option value="Aula 01 - Introdução ao Universo Arduino & Tinkercad">Aula 01 - Introdução ao Universo Arduino & Tinkercad</option>
+                <option value="Aula 02 - Resistores, Jumpers & LEDs">Aula 02 - Resistores, Jumpers & LEDs</option>
+                <option value="Aula 03 - Entradas Digitais/Analógicas & Botões">Aula 03 - Entradas Digitais/Analógicas & Botões</option>
+                <option value="Aula 04 - Medindo Distâncias com Ultrassônico">Aula 04 - Medindo Distâncias com Ultrassônico</option>
+                <option value="Aula 05 - Sinais Analógicos vs. Digitais & Variáveis">Aula 05 - Sinais Analógicos vs. Digitais & Variáveis</option>
+                <option value="Aula 06 - Inteligência Artificial Generativa">Aula 06 - Inteligência Artificial Generativa</option>
+                <option value="Aula 07 - Desvendando os Drones">Aula 07 - Desvendando os Drones</option>
+                <option value="Aula 08 - Design Sustentável & Ecodesign">Aula 08 - Design Sustentável & Ecodesign</option>
+                <option value="Aula 09 - Sensor de Umidade e Temperatura (DHT11)">Aula 09 - Sensor de Umidade e Temperatura (DHT11)</option>
+                <option value="Oficina Impacto Vital - Desenvolvimento do Projeto Final" selected>Oficina Impacto Vital - Projeto Final</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-mono uppercase text-slate-300 mb-1.5">Data da Aula *</label>
+              <input type="date" id="logDateInput" required class="w-full rounded-xl bg-caena-bg border border-caena-border px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-caena-orange" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="bg-emerald-950/20 border border-emerald-500/30 rounded-xl p-3.5 flex flex-col">
+              <label class="text-xs font-display font-bold text-emerald-400 uppercase flex items-center gap-1.5 mb-2">
+                <i class="fa-solid fa-rocket"></i> 1. Avanços da Aula *
+              </label>
+              <textarea id="logAdvancesInput" rows="4" required placeholder="O que a equipe construiu ou programou hoje?" class="w-full flex-1 rounded-lg bg-caena-bg/90 border border-white/10 p-2.5 text-xs sm:text-sm text-white focus:border-emerald-400 resize-none"></textarea>
+            </div>
+            <div class="bg-red-950/20 border border-red-500/30 rounded-xl p-3.5 flex flex-col">
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-xs font-display font-bold text-red-400 uppercase flex items-center gap-1.5">
+                  <i class="fa-solid fa-circle-question"></i> 2. Dúvidas
+                </label>
+                <label class="inline-flex items-center gap-1.5 text-[11px] text-red-300 cursor-pointer">
+                  <input type="checkbox" id="logHasOpenDoubt" class="rounded accent-red-500" checked />
+                  <span>Precisa de ajuda</span>
+                </label>
+              </div>
+              <textarea id="logDoubtsInput" rows="4" placeholder="Deixe em branco se não houver dúvidas." class="w-full flex-1 rounded-lg bg-caena-bg/90 border border-white/10 p-2.5 text-xs sm:text-sm text-white focus:border-red-400 resize-none"></textarea>
+            </div>
+            <div class="bg-amber-950/20 border border-caena-gold/30 rounded-xl p-3.5 flex flex-col">
+              <label class="text-xs font-display font-bold text-caena-gold uppercase flex items-center gap-1.5 mb-2">
+                <i class="fa-solid fa-forward-step"></i> 3. Próximos Passos *
+              </label>
+              <textarea id="logNextStepsInput" rows="4" required placeholder="O que farão no próximo encontro?" class="w-full flex-1 rounded-lg bg-caena-bg/90 border border-white/10 p-2.5 text-xs sm:text-sm text-white focus:border-caena-gold resize-none"></textarea>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <div class="flex items-center gap-2 ml-auto">
+              <button type="button" onclick="resetClassLogForm()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 transition">Limpar</button>
+              <button type="submit" class="gradient-tech text-slate-950 font-display font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm shadow-lg flex items-center gap-2 transition">
+                <i class="fa-solid fa-floppy-disk"></i> <span id="logSubmitBtnText">Salvar Registro da Aula</span>
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h3 class="font-display font-bold text-base sm:text-lg text-white flex items-center gap-2">
+              <i class="fa-solid fa-clock-rotate-left text-caena-gold"></i> Histórico de Aulas
+              <span id="teamLogsCountBadge" class="text-xs font-mono px-2 py-0.5 rounded-full bg-white/10 text-slate-300">0 registros</span>
+            </h3>
+            <div class="flex items-center gap-2">
+              <button id="filterLogsAll" onclick="setTeamLogFilter('all')" class="px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-caena-orange text-slate-950 transition">Todas as Aulas</button>
+              <button id="filterLogsDoubts" onclick="setTeamLogFilter('doubts')" class="px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-white/5 text-slate-300 transition flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-red-500"></span> Dúvidas Pendentes
+              </button>
+            </div>
+          </div>
+          <div id="teamLogsTimeline" class="space-y-3.5"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="border-t border-white/10 bg-[#080E21] py-6 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full gradient-tech"></span>
+        <span class="font-display font-bold text-white">Inclusão Tech 2026.2 • CAENA</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-4">
+        <span>Prof. Italo Gabriel (Mestrado Ciência da Computação - UFBA)</span>
+        <button onclick="resetDemoDataConfirm()" class="text-caena-gold hover:underline">Restaurar Exemplos Padrão</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODALS (Hidden by default) -->
+  <div id="teamModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
+    <div class="glass-panel rounded-2xl max-w-3xl w-full p-6 sm:p-7 border border-caena-orange/40 shadow-2xl my-8 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-white/10">
+        <div>
+          <span class="text-[11px] font-mono uppercase text-caena-gold">Cadastro de Bancada • Impacto Vital</span>
+          <h3 id="teamModalTitle" class="font-display text-xl font-bold text-white">Nova Equipe</h3>
+        </div>
+        <button onclick="closeTeamModal()" class="w-8 h-8 rounded-lg bg-white/5 text-slate-300 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="teamForm" onsubmit="handleSaveTeam(event)" class="space-y-5 mt-5">
+        <input type="hidden" id="modalTeamId" value="" />
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-mono uppercase text-slate-300 mb-1">Nome da Equipe *</label>
+            <input type="text" id="modalTeamName" required placeholder="Ex: Equipe Alpha" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3.5 py-2.5 text-sm text-white" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-mono uppercase text-slate-300 mb-1">Nome do Projeto Final *</label>
+            <input type="text" id="modalProjectName" required placeholder="Ex: Bag to Rise 🎒" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3.5 py-2.5 text-sm text-white" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-mono uppercase text-slate-300 mb-1">Problema & Impacto *</label>
+          <textarea id="modalProjectProblem" rows="2" required class="w-full rounded-xl bg-caena-bg border border-caena-border p-3 text-sm text-white"></textarea>
+        </div>
+        <div class="bg-caena-bg/60 rounded-xl p-4 border border-white/10 space-y-3">
+          <p class="text-xs font-mono uppercase text-caena-gold"><i class="fa-solid fa-users"></i> Papéis na Equipe (Slide 68)</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div><label class="block text-[11px] text-slate-300 mb-1">Eng. de Prompt</label><input type="text" id="rolePrompt" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
+            <div><label class="block text-[11px] text-slate-300 mb-1">Líder de Hardware</label><input type="text" id="roleHardware" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
+            <div><label class="block text-[11px] text-slate-300 mb-1">Piloto do Código</label><input type="text" id="roleCode" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
+            <div><label class="block text-[11px] text-slate-300 mb-1">Testador / Debugger</label><input type="text" id="roleTester" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-mono uppercase text-slate-300 mb-2">Componentes</label>
+          <div id="modalComponentsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs"></div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div><label class="block text-xs font-mono uppercase text-slate-300 mb-1">Tinkercad URL</label><input type="url" id="modalTinkercadUrl" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
+          <div><label class="block text-xs font-mono uppercase text-slate-300 mb-1">Código URL</label><input type="url" id="modalCodeUrl" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
+          <div><label class="block text-xs font-mono uppercase text-slate-300 mb-1">Pontuação</label><input type="number" id="modalTeamPoints" value="10" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+          <button type="button" onclick="closeTeamModal()" class="px-4 py-2.5 rounded-xl bg-white/5 text-xs font-semibold text-slate-300">Cancelar</button>
+          <button type="submit" class="gradient-tech text-slate-950 font-display font-bold px-6 py-2.5 rounded-xl text-xs sm:text-sm shadow-lg">Salvar Equipe</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="safetyModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+    <div class="glass-panel rounded-2xl max-w-2xl w-full p-6 border border-emerald-500/40 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="font-display font-bold text-lg text-white">Guia de Ecodesign & Segurança</h3>
+        <button onclick="closeSafetyModal()" class="w-8 h-8 rounded-lg bg-white/5 text-slate-300"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-3 text-xs sm:text-sm text-slate-200">
+        <div class="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30"><p class="font-display font-bold text-red-400 mb-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i> 1. PROIBIDO Cola Quente em Sensores</p><p class="text-slate-300 text-xs">Destrói a eletrônica de forma permanente. Use velcro, elásticos ou fita.</p></div>
+        <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30"><p class="font-display font-bold text-emerald-400 mb-1"><i class="fa-solid fa-recycle mr-1"></i> 2. Ecodesign</p><p class="text-slate-300 text-xs">Montagem não-destrutiva com materiais recicláveis (papelão, sucata).</p></div>
+        <div class="p-3.5 rounded-xl bg-caena-gold/10 border border-caena-gold/30"><p class="font-display font-bold text-caena-gold mb-1"><i class="fa-solid fa-trophy mr-1"></i> 3. Avaliação (+1, +2, -1)</p><p class="text-slate-300 text-xs">Ganhe pontos pelo trabalho em equipe. Perca pontos por uso de celular e bagunça.</p></div>
+      </div>
+      <div class="flex justify-end pt-2"><button onclick="closeSafetyModal()" class="gradient-tech text-slate-950 font-display font-bold px-5 py-2 rounded-xl text-xs">Entendido</button></div>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+    <div class="glass-panel rounded-2xl max-w-md w-full p-6 border border-white/15 shadow-2xl space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center text-lg"><i class="fa-solid fa-circle-exclamation"></i></div>
+        <div>
+          <h3 id="confirmModalTitle" class="font-display font-bold text-base text-white"></h3>
+          <p id="confirmModalMessage" class="text-xs text-slate-300 mt-0.5"></p>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-xl bg-white/5 text-xs font-semibold text-slate-300">Cancelar</button>
+        <button id="confirmModalActionBtn" class="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-xs font-bold text-white">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+    // Integração Firebase baseada nos dados fornecidos
+    const firebaseConfig = {
+      apiKey: "AIzaSyB0S4faPWPLkk9cuXEzJwh_R0DdQgrjw8A",
+      authDomain: "inclusaotech-caena.firebaseapp.com",
+      databaseURL: "https://inclusaotech-caena-default-rtdb.firebaseio.com",
+      projectId: "inclusaotech-caena",
+      storageBucket: "inclusaotech-caena.firebasestorage.app",
+      messagingSenderId: "132537086801",
+      appId: "1:132537086801:web:e0b46e5d3d05b834c65970",
+      measurementId: "G-RKELW61KMW"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const AVAILABLE_COMPONENTS = [
+      'Arduino Uno / Nano', 'Sensor Ultrassônico HC-SR04', 'Sensor DHT11 (Temp/Umidade)', 
+      'Display LCD 16x2', 'LEDs & Resistores', 'Pushbutton (Botões)', 'Potenciômetro (Analógico)', 
+      'Servomotor / Motor DC', 'Buzzer / Alarme Sonoro', 'Ecodesign (Materiais Recicláveis)'
+    ];
+
+    const OFFICIAL_PILLARS = [
+      {
+        id: 'ideacao', title: '1. Ideação', subtitle: 'Problema, empatia e viabilidade', icon: 'fa-lightbulb',
+        accentClass: 'text-caena-gold', borderClass: 'border-caena-gold/30', bgBadge: 'bg-caena-gold/15 text-caena-gold',
+        steps: [
+          { key: 'def_problema', label: 'Definição do problema', hint: 'Qual dor real das pessoas vamos resolver?' },
+          { key: 'brainstorming', label: 'Brainstorming de soluções', hint: 'Ideias geradas pela equipe e IA' },
+          { key: 'viabilidade', label: 'Estudo de viabilidade', hint: 'É possível construir?' },
+          { key: 'escopo', label: 'Escopo do projeto', hint: 'O que o protótipo final fará?' }
+        ]
+      },
+      {
+        id: 'circuito', title: '2. Circuito', subtitle: 'Eletrônica, Tinkercad e C++', icon: 'fa-microchip',
+        accentClass: 'text-caena-orange', borderClass: 'border-caena-orange/30', bgBadge: 'bg-caena-orange/15 text-caena-orange',
+        steps: [
+          { key: 'escolha_comp', label: 'Escolha dos componentes', hint: 'Sensores e resistores' },
+          { key: 'esquema_eletrico', label: 'Esquema elétrico', hint: 'Tinkercad simulado' },
+          { key: 'montagem_proto', label: 'Montagem do protótipo', hint: 'Protoboard física' },
+          { key: 'prog_calibracao', label: 'Programação e calibração', hint: 'Código C++' }
+        ]
+      },
+      {
+        id: 'design', title: '3. Design & Ecodesign', subtitle: 'UX, estrutura sustentável', icon: 'fa-compass-drafting',
+        accentClass: 'text-emerald-400', borderClass: 'border-emerald-500/30', bgBadge: 'bg-emerald-500/15 text-emerald-400',
+        steps: [
+          { key: 'ux_design', label: 'Design de experiência', hint: 'Interação com usuário' },
+          { key: 'modelagem_fisica', label: 'Modelagem física', hint: 'Ecodesign sem cola no sensor' },
+          { key: 'identidade_visual', label: 'Identidade visual', hint: 'Nome, cores e caixas' },
+          { key: 'montagem_final', label: 'Montagem final', hint: 'Integração na carcaça' }
+        ]
+      }
+    ];
+
+    function getInitialDemoTeams() {
+      return [
+        {
+          id: 'team-bag-to-rise',
+          teamName: 'Equipe Horizonte Tech',
+          projectName: 'Bag to Rise — Mochila para Reerguer 🎒',
+          problemDescription: 'Mochila inteligente ergonômica com alerta de distância traseira e iluminação.',
+          points: 24, tinkercadUrl: 'https://www.tinkercad.com', codeUrl: 'https://codeshare.io/',
+          roles: { prompt: 'Ana', hardware: 'Carlos', code: 'Lucas', tester: 'Mariana' },
+          components: ['Arduino Uno / Nano', 'Sensor Ultrassônico HC-SR04', 'Ecodesign (Materiais Recicláveis)'],
+          steps: {
+            def_problema: { status: 'completed', notes: 'Problema validado: segurança noturna.' },
+            brainstorming: { status: 'completed', notes: 'Conceito validado.' }
+          },
+          logs: [
+            {
+              id: 'log-101', lesson: 'Aula 08 - Design Sustentável & Ecodesign', date: '2026-09-25',
+              advances: 'Construímos o case do Arduino.', doubts: 'Cabo soltando.',
+              hasOpenDoubt: true, professorReply: '', nextSteps: 'Testar fixação sem cola.'
+            }
+          ]
+        }
+      ];
+    }
+
+    const state = {
+      teams: [],
+      selectedTeamId: null,
+      viewMode: 'detail',
+      searchQuery: '',
+      globalDoubtFilter: false,
+      teamLogFilter: 'all'
+    };
+
+    window.state = state; // Global exposure for inline onclicks
+
+    // Evita recarregar a interface inteira (perdendo o foco do teclado) enquanto o aluno digita no form de etapas.
+    let isUserTyping = false;
+    let pendingRender = false;
+
+    window.addEventListener('focusin', (e) => {
+      if (['TEXTAREA', 'INPUT', 'SELECT'].includes(e.target.tagName)) isUserTyping = true;
+    });
+
+    window.addEventListener('focusout', (e) => {
+      if (['TEXTAREA', 'INPUT', 'SELECT'].includes(e.target.tagName)) {
+        setTimeout(() => {
+          isUserTyping = false;
+          if (pendingRender) { renderAll(); pendingRender = false; }
+        }, 150); // Delay curto para permitir que eventos 'change' e blur executem antes de recriar o DOM
+      }
+    });
+
+    // Função salva dados no Firebase
+    function saveState() {
+      set(ref(db, 'projetos_caena/equipes'), state.teams).catch(err => {
+        console.error('Erro ao salvar no Firebase:', err);
+        showToast('Erro de conexão ao salvar na nuvem.', 'error');
+      });
+    }
+
+    // Escutador em tempo real
+    let isInitialLoad = true;
+    onValue(ref(db, 'projetos_caena/equipes'), (snapshot) => {
+      const data = snapshot.val();
+      
+      if (data) {
+        state.teams = Array.isArray(data) ? data : Object.values(data);
+      } else if (isInitialLoad) {
+        state.teams = getInitialDemoTeams();
+        saveState();
+      }
+
+      if (!state.teams.some(t => t.id === state.selectedTeamId)) {
+        state.selectedTeamId = state.teams.length > 0 ? state.teams[0].id : null;
+      }
+
+      const statusBadge = document.getElementById('firebaseStatus');
+      if(statusBadge) statusBadge.classList.remove('hidden');
+
+      if (isInitialLoad) {
+        renderAll();
+        isInitialLoad = false;
+      } else {
+        if (isUserTyping) {
+          pendingRender = true; // Atrasa renderização visual para não interromper digitação
+        } else {
+          renderAll();
+          pendingRender = false;
+        }
+      }
+    });
+
+
+    function calculateTeamMetrics(team) {
+      let completedCount = 0, inProgressCount = 0;
+      const pillarScores = { ideacao: 0, circuito: 0, design: 0 };
+
+      OFFICIAL_PILLARS.forEach(pillar => {
+        let pillarPoints = 0;
+        pillar.steps.forEach(st => {
+          const stepObj = (team.steps && team.steps[st.key]) ? team.steps[st.key] : { status: 'pending' };
+          if (stepObj.status === 'completed') { completedCount++; pillarPoints += 1; }
+          else if (stepObj.status === 'in_progress') { inProgressCount++; pillarPoints += 0.5; }
+        });
+        pillarScores[pillar.id] = Math.round((pillarPoints / pillar.steps.length) * 100);
+      });
+
+      const totalProgressPct = Math.round(((completedCount + inProgressCount * 0.5) / 12) * 100);
+      const openDoubtsCount = (team.logs || []).filter(l => l.hasOpenDoubt && l.doubts && l.doubts.trim() !== '').length;
+
+      return { totalSteps: 12, completedCount, inProgressCount, totalProgressPct, pillarScores, openDoubtsCount, logsCount: (team.logs || []).length };
+    }
+
+    function escapeHtml(str) { return str ? String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]) : ''; }
+    function formatDateBR(dateStr) { return dateStr ? dateStr.split('-').reverse().join('/') : 'Sem data'; }
+
+    function renderKPIs() {
+      let sumProgress = 0, totalCompletedSteps = 0, totalOpenDoubts = 0, totalLogs = 0;
+      state.teams.forEach(team => {
+        const m = calculateTeamMetrics(team);
+        sumProgress += m.totalProgressPct; totalCompletedSteps += m.completedCount;
+        totalOpenDoubts += m.openDoubtsCount; totalLogs += m.logsCount;
+      });
+
+      const avgProgress = state.teams.length > 0 ? Math.round(sumProgress / state.teams.length) : 0;
+      document.getElementById('kpiTotalTeams').textContent = state.teams.length;
+      document.getElementById('kpiAvgProgress').textContent = `${avgProgress}%`;
+      document.getElementById('kpiCompletedSteps').textContent = `${totalCompletedSteps}/${state.teams.length * 12}`;
+      document.getElementById('kpiOpenDoubts').textContent = totalOpenDoubts;
+      document.getElementById('kpiTotalLogs').textContent = `(${totalLogs} registros)`;
+      document.getElementById('doubtFilterBadge').classList.toggle('hidden', !state.globalDoubtFilter);
+    }
+
+    function getFilteredTeams() {
+      return state.teams.filter(team => {
+        const m = calculateTeamMetrics(team);
+        if (state.globalDoubtFilter && m.openDoubtsCount === 0) return false;
+        if (!state.searchQuery) return true;
+        const q = state.searchQuery.toLowerCase();
+        return (team.teamName.toLowerCase().includes(q) || team.projectName.toLowerCase().includes(q) || team.problemDescription.toLowerCase().includes(q));
+      });
+    }
+
+    function renderTeamSelector() {
+      const container = document.getElementById('teamSelectorContainer');
+      const filtered = getFilteredTeams();
+      document.getElementById('teamCountBadge').textContent = `${filtered.length} de ${state.teams.length} equipes`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="col-span-full rounded-xl bg-caena-bg/60 border border-white/10 p-6 text-center text-sm text-slate-300">Nenhuma equipe encontrada.</div>`;
+        return;
+      }
+      if (!state.teams.some(t => t.id === state.selectedTeamId)) state.selectedTeamId = filtered[0].id;
+
+      container.innerHTML = filtered.map(team => {
+        const m = calculateTeamMetrics(team);
+        const isSelected = team.id === state.selectedTeamId;
+        return `
+          <div onclick="selectTeam('${team.id}')" class="glass-card rounded-xl p-3.5 cursor-pointer flex flex-col justify-between gap-2.5 ${isSelected ? 'team-tab-active' : 'hover:bg-white/5'} ${m.openDoubtsCount > 0 ? 'doubt-pulse' : ''}">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5"><span class="text-[11px] font-mono uppercase tracking-wider ${isSelected ? 'text-caena-gold font-bold' : 'text-slate-400'}">${escapeHtml(team.teamName)}</span><span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/10 text-caena-gold">★ ${team.points || 0}</span></div>
+                <h3 class="font-display font-bold text-sm sm:text-base text-white truncate mt-0.5">${escapeHtml(team.projectName)}</h3>
+              </div>
+              ${m.openDoubtsCount > 0 ? `<span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-red-500/20 text-red-300 border border-red-500/40"><i class="fa-solid fa-hand"></i> ${m.openDoubtsCount}</span>` : ''}
+            </div>
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-[11px] font-mono"><span class="text-slate-400">${m.completedCount}/12</span><span class="font-bold text-slate-200">${m.totalProgressPct}%</span></div>
+              <div class="w-full h-1.5 bg-caena-bg rounded-full overflow-hidden"><div class="h-full gradient-tech rounded-full" style="width: ${m.totalProgressPct}%"></div></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderClassOverview() {
+      const container = document.getElementById('overviewGridContainer');
+      container.innerHTML = getFilteredTeams().map(team => {
+        const m = calculateTeamMetrics(team);
+        return `
+          <div class="glass-card rounded-xl p-5 flex flex-col justify-between space-y-4 border border-white/10">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between gap-2"><span class="text-xs font-mono font-bold text-caena-gold">${escapeHtml(team.teamName)}</span><span class="text-xs font-mono px-2 py-0.5 rounded bg-white/10 text-white">${m.totalProgressPct}% concluído</span></div>
+              <h4 class="font-display font-bold text-lg text-white">${escapeHtml(team.projectName)}</h4>
+            </div>
+            <div class="space-y-2 bg-caena-bg/60 p-3 rounded-xl border border-white/5 text-xs">
+              <div class="flex justify-between"><span class="text-slate-400">💡 Ideação</span><span class="font-bold text-caena-gold">${m.pillarScores.ideacao}%</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">⚡ Circuito</span><span class="font-bold text-caena-orange">${m.pillarScores.circuito}%</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">🎨 Design</span><span class="font-bold text-emerald-400">${m.pillarScores.design}%</span></div>
+            </div>
+            <button onclick="selectTeam('${team.id}'); setViewMode('detail');" class="w-full py-2.5 rounded-xl bg-caena-orange/20 hover:bg-caena-orange text-caena-gold hover:text-slate-950 font-display font-bold text-xs transition border border-caena-orange/40">Abrir Bancada da Equipe <i class="fa-solid fa-arrow-right ml-1"></i></button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderActiveTeamWorkspace() {
+      const team = state.teams.find(t => t.id === state.selectedTeamId);
+      if (!team) return;
+      const m = calculateTeamMetrics(team);
+
+      document.getElementById('activeTeamBadge').textContent = team.teamName;
+      document.getElementById('activeProjectName').textContent = team.projectName;
+      document.getElementById('activeProjectProblem').textContent = team.problemDescription;
+      document.getElementById('activeTeamPoints').textContent = `${team.points || 0} pts`;
+      document.getElementById('logFormTeamName').textContent = team.teamName;
+
+      document.getElementById('activeTeamProgressPct').textContent = `${m.totalProgressPct}%`;
+      document.getElementById('activeTeamProgressBar').style.width = `${m.totalProgressPct}%`;
+      document.getElementById('pillarPctIdeacao').textContent = `${m.pillarScores.ideacao}%`;
+      document.getElementById('pillarPctCircuito').textContent = `${m.pillarScores.circuito}%`;
+      document.getElementById('pillarPctDesign').textContent = `${m.pillarScores.design}%`;
+
+      document.getElementById('activeTeamComponents').innerHTML = team.components?.length > 0 ? team.components.map(c => `<span class="px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs text-slate-200 font-mono">${escapeHtml(c)}</span>`).join('') : '<span class="text-xs text-slate-500">Nenhum</span>';
+      
+      let linksHtml = '';
+      if (team.tinkercadUrl) linksHtml += `<a href="${escapeHtml(team.tinkercadUrl)}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-caena-gold/15 hover:bg-caena-gold/25 text-caena-gold text-xs font-mono"><i class="fa-solid fa-cube"></i> Tinkercad</a>`;
+      if (team.codeUrl) linksHtml += `<a href="${escapeHtml(team.codeUrl)}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-caena-orange/15 hover:bg-caena-orange/25 text-caena-orange text-xs font-mono"><i class="fa-solid fa-code"></i> Código C++</a>`;
+      document.getElementById('activeTeamLinks').innerHTML = linksHtml || `<span class="text-[11px] text-slate-400 font-mono">Sem links</span>`;
+
+      const roles = team.roles || {};
+      const rolesList = [
+        { title: 'Eng. de Prompt', icon: 'fa-wand-magic-sparkles', name: roles.prompt || 'A definir', color: 'text-purple-400 border-purple-500/30 bg-purple-500/10' },
+        { title: 'Líder Hardware', icon: 'fa-plug-circle-bolt', name: roles.hardware || 'A definir', color: 'text-caena-orange border-caena-orange/30 bg-caena-orange/10' },
+        { title: 'Piloto Código', icon: 'fa-terminal', name: roles.code || 'A definir', color: 'text-caena-gold border-caena-gold/30 bg-caena-gold/10' },
+        { title: 'Testador', icon: 'fa-magnifying-glass-chart', name: roles.tester || 'A definir', color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' }
+      ];
+      document.getElementById('activeTeamRolesGrid').innerHTML = rolesList.map(r => `<div class="rounded-xl bg-caena-bg/75 border border-white/10 p-3 flex items-center gap-3"><div class="w-9 h-9 rounded-lg border ${r.color} flex items-center justify-center text-sm"><i class="fa-solid ${r.icon}"></i></div><div class="min-w-0"><p class="text-[11px] font-mono text-slate-400 truncate">${r.title}</p><p class="font-display font-bold text-sm text-white truncate">${escapeHtml(r.name)}</p></div></div>`).join('');
+
+      renderDevelopmentPillars(team, m);
+      renderTeamLogsTimeline(team);
+    }
+
+    function renderDevelopmentPillars(team, metrics) {
+      document.getElementById('pillarsContainer').innerHTML = OFFICIAL_PILLARS.map(pillar => {
+        const pct = metrics.pillarScores[pillar.id];
+        const stepsHtml = pillar.steps.map((step, idx) => {
+          const stepData = (team.steps && team.steps[step.key]) ? team.steps[step.key] : { status: 'pending', notes: '' };
+          const status = stepData.status || 'pending';
+          let bd = status === 'completed' ? 'border-emerald-500/35 bg-emerald-950/10' : status === 'in_progress' ? 'border-caena-gold/35 bg-amber-950/10' : 'border-white/10';
+          let st = status === 'completed' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : status === 'in_progress' ? 'bg-caena-gold/20 text-caena-gold border-caena-gold/40' : 'bg-slate-500/20 text-slate-300 border-slate-500/40';
+          
+          return `
+            <div class="rounded-xl bg-caena-bg/85 border ${bd} p-3.5 space-y-2.5 transition">
+              <div class="flex items-start justify-between gap-2">
+                <div><h4 class="font-display font-bold text-sm text-white">${step.label}</h4><p class="text-[11px] text-slate-400">${step.hint}</p></div>
+                <select onchange="handleStepStatusChange('${step.key}', this.value)" class="rounded-lg px-2.5 py-1 text-xs font-mono font-semibold border ${st} bg-caena-surface focus:outline-none cursor-pointer shrink-0">
+                  <option value="pending" ${status === 'pending' ? 'selected' : ''}>⏳ Pendente</option>
+                  <option value="in_progress" ${status === 'in_progress' ? 'selected' : ''}>⚡ Em Andar</option>
+                  <option value="completed" ${status === 'completed' ? 'selected' : ''}>✅ Concluído</option>
+                </select>
+              </div>
+              <div>
+                <div class="flex justify-between text-[11px] text-slate-400 mb-1"><span><i class="fa-regular fa-comment-dots mr-1 text-caena-gold"></i>Notas da etapa:</span><span id="saveIndicator_${step.key}" class="text-emerald-400 opacity-0 transition-opacity">Salvo ✓</span></div>
+                <!-- ONCHANGE aqui é vital para só salvar no Firebase após o clique fora do campo, evitando interrupções! -->
+                <textarea rows="2" onchange="handleStepNotesInput('${step.key}', this.value)" placeholder="Descreva os progressos e definições desta sub-etapa..." class="w-full rounded-lg bg-caena-surface/90 border border-white/10 p-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-caena-gold resize-y">${escapeHtml(stepData.notes || '')}</textarea>
+              </div>
+            </div>`;
+        }).join('');
+        return `
+          <div class="glass-panel rounded-2xl p-4 sm:p-5 border-t-4 ${pillar.borderClass} space-y-3">
+            <div class="flex items-center justify-between gap-2 pb-3 border-b border-white/10">
+              <div class="flex items-center gap-2.5"><div class="w-10 h-10 rounded-xl ${pillar.bgBadge} flex justify-center items-center text-lg"><i class="fa-solid ${pillar.icon}"></i></div><div><h3 class="font-display font-bold text-base text-white">${pillar.title}</h3><p class="text-xs text-slate-400">${pillar.subtitle}</p></div></div>
+              <span class="font-mono font-bold text-sm px-2.5 py-1 rounded-lg ${pillar.bgBadge}">${pct}%</span>
+            </div>
+            <div class="w-full h-1.5 bg-caena-bg rounded-full overflow-hidden"><div class="h-full gradient-tech transition-all" style="width: ${pct}%"></div></div>
+            <div class="space-y-3 pt-1">${stepsHtml}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function handleStepStatusChange(stepKey, newStatus) {
+      const team = state.teams.find(t => t.id === state.selectedTeamId);
+      if (!team) return;
+      if (!team.steps) team.steps = {};
+      if (!team.steps[stepKey]) team.steps[stepKey] = { status: 'pending', notes: '' };
+      team.steps[stepKey].status = newStatus;
+      saveState(); showToast('Status atualizado na nuvem!', 'success');
+    }
+
+    function handleStepNotesInput(stepKey, newNotes) {
+      const team = state.teams.find(t => t.id === state.selectedTeamId);
+      if (!team) return;
+      if (!team.steps) team.steps = {};
+      if (!team.steps[stepKey]) team.steps[stepKey] = { status: 'pending', notes: '' };
+      team.steps[stepKey].notes = newNotes;
+      saveState();
+      
+      const indicator = document.getElementById(`saveIndicator_${stepKey}`);
+      if (indicator) {
+        indicator.classList.remove('opacity-0');
+        setTimeout(() => indicator.classList.add('opacity-0'), 1600);
+      }
+    }
+
+    function renderTeamLogsTimeline(team) {
+      const container = document.getElementById('teamLogsTimeline');
+      const logs = (team.logs || []).filter(l => state.teamLogFilter === 'all' || (l.hasOpenDoubt && l.doubts));
+      document.getElementById('teamLogsCountBadge').textContent = `${team.logs?.length || 0} registros`;
+      
+      if (logs.length === 0) {
+        container.innerHTML = `<div class="rounded-2xl bg-caena-bg/60 p-8 text-center text-sm text-slate-300">Nenhum registro encontrado para este filtro.</div>`; return;
+      }
+
+      container.innerHTML = logs.map(log => {
+        const isPendingDoubt = log.hasOpenDoubt && log.doubts;
+        return `
+          <div class="glass-card rounded-2xl p-4 sm:p-5 border ${isPendingDoubt ? 'border-red-500/50' : 'border-white/10'} space-y-3.5">
+            <div class="flex flex-wrap justify-between gap-2 pb-3 border-b border-white/10">
+              <div class="flex gap-2">
+                <span class="px-3 py-1 rounded-lg bg-caena-orange/20 border border-caena-orange/40 text-caena-gold font-display font-bold text-xs"><i class="fa-solid fa-microchip mr-1"></i> ${escapeHtml(log.lesson)}</span>
+                <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-slate-300 font-mono text-xs">${formatDateBR(log.date)}</span>
+                ${isPendingDoubt ? `<span class="px-2.5 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 font-mono font-bold text-xs"><i class="fa-solid fa-hand"></i> Dúvida</span>` : ''}
+              </div>
+              <div class="flex gap-1.5">
+                ${log.doubts ? `<button onclick="toggleDoubtResolved('${log.id}')" class="px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition ${isPendingDoubt ? 'bg-emerald-500 text-slate-950' : 'bg-white/10 text-slate-300'}"><i class="fa-solid fa-check-double mr-1"></i> ${isPendingDoubt ? 'Marcar Resolvida' : 'Reabrir'}</button>` : ''}
+                <button onclick="editClassLog('${log.id}')" class="p-1.5 rounded-lg bg-white/5 text-slate-300 text-xs"><i class="fa-solid fa-pen"></i></button>
+                <button onclick="confirmDeleteClassLog('${log.id}')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-3.5 text-xs">
+              <div class="rounded-xl bg-emerald-950/20 border border-emerald-500/25 p-3.5"><span class="font-bold text-emerald-400 mb-1 block">Avanços</span><p class="text-slate-200 whitespace-pre-line">${escapeHtml(log.advances)}</p></div>
+              <div class="rounded-xl ${isPendingDoubt ? 'bg-red-950/30' : 'bg-caena-bg/60'} border border-white/10 p-3.5">
+                <span class="font-bold ${isPendingDoubt ? 'text-red-400' : 'text-slate-400'} mb-1 block">Dúvidas</span>
+                <p class="text-slate-200 whitespace-pre-line mb-2">${escapeHtml(log.doubts) || 'Nenhuma'}</p>
+                <div class="pt-2 border-t border-white/10">
+                  <input type="text" onchange="saveProfessorReply('${log.id}', this.value)" value="${escapeHtml(log.professorReply || '')}" placeholder="Resposta do Prof. Italo..." class="w-full bg-caena-bg/90 border border-white/10 px-2.5 py-1.5 rounded-lg text-caena-gold focus:outline-none focus:border-caena-gold"/>
+                </div>
+              </div>
+              <div class="rounded-xl bg-amber-950/20 border border-caena-gold/25 p-3.5"><span class="font-bold text-caena-gold mb-1 block">Próximos Passos</span><p class="text-slate-200 whitespace-pre-line">${escapeHtml(log.nextSteps)}</p></div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function handleSaveClassLog(event) {
+      event.preventDefault();
+      const team = state.teams.find(t => t.id === state.selectedTeamId);
+      if (!team) return;
+      const editingId = document.getElementById('editingLogId').value;
+      const lesson = document.getElementById('logLessonSelect').value;
+      const date = document.getElementById('logDateInput').value;
+      const advances = document.getElementById('logAdvancesInput').value.trim();
+      const doubts = document.getElementById('logDoubtsInput').value.trim();
+      const hasOpenDoubt = document.getElementById('logHasOpenDoubt').checked && doubts !== '';
+      const nextSteps = document.getElementById('logNextStepsInput').value.trim();
+
+      if (!team.logs) team.logs = [];
+      if (editingId) {
+        const idx = team.logs.findIndex(l => l.id === editingId);
+        if (idx !== -1) {
+          team.logs[idx] = { ...team.logs[idx], lesson, date, advances, doubts, hasOpenDoubt, nextSteps };
+          showToast('Registro de aula atualizado!', 'success');
+        }
+      } else {
+        team.logs.unshift({ id: 'log-' + Date.now(), lesson, date, advances, doubts, hasOpenDoubt, professorReply: '', nextSteps });
+        showToast('Diário de aula registrado na nuvem!', 'success');
+      }
+      saveState(); resetClassLogForm();
+    }
+
+    function toggleDoubtResolved(logId) {
+      const log = state.teams.find(t => t.id === state.selectedTeamId)?.logs?.find(l => l.id === logId);
+      if (log) { log.hasOpenDoubt = !log.hasOpenDoubt; saveState(); showToast('Status da dúvida alterado.', 'info'); }
+    }
+
+    function saveProfessorReply(logId, replyText) {
+      const log = state.teams.find(t => t.id === state.selectedTeamId)?.logs?.find(l => l.id === logId);
+      if (log) { log.professorReply = replyText.trim(); saveState(); showToast('Resposta do professor salva!', 'success'); }
+    }
+
+    function handleSaveTeam(event) {
+      event.preventDefault();
+      const id = document.getElementById('modalTeamId').value;
+      const newTeam = {
+        id: id || 'team-' + Date.now(),
+        teamName: document.getElementById('modalTeamName').value.trim(),
+        projectName: document.getElementById('modalProjectName').value.trim(),
+        problemDescription: document.getElementById('modalProjectProblem').value.trim(),
+        points: parseInt(document.getElementById('modalTeamPoints').value) || 0,
+        tinkercadUrl: document.getElementById('modalTinkercadUrl').value.trim(),
+        codeUrl: document.getElementById('modalCodeUrl').value.trim(),
+        roles: { prompt: document.getElementById('rolePrompt').value.trim(), hardware: document.getElementById('roleHardware').value.trim(), code: document.getElementById('roleCode').value.trim(), tester: document.getElementById('roleTester').value.trim() },
+        components: Array.from(document.querySelectorAll('input[name="teamComponent"]:checked')).map(el => el.value),
+        steps: id ? state.teams.find(t => t.id === id).steps : OFFICIAL_PILLARS.reduce((acc, p) => { p.steps.forEach(s => acc[s.key] = { status: 'pending', notes: '' }); return acc; }, {}),
+        logs: id ? state.teams.find(t => t.id === id).logs : []
+      };
+      
+      if (id) {
+        state.teams[state.teams.findIndex(t => t.id === id)] = newTeam; showToast('Equipe atualizada!', 'success');
+      } else {
+        state.teams.push(newTeam); state.selectedTeamId = newTeam.id; showToast('Nova equipe criada!', 'success');
+      }
+      saveState(); closeTeamModal();
+    }
+
+    function confirmDeleteTeam(teamId) {
+      if (state.teams.length <= 1) return showToast('Mantenha pelo menos uma equipe.', 'error');
+      openConfirmModal('Excluir Equipe?', 'Tem certeza que deseja apagar permanentemente essa equipe?', () => {
+        state.teams = state.teams.filter(t => t.id !== teamId);
+        state.selectedTeamId = state.teams[0].id;
+        saveState(); showToast('Equipe excluída', 'info');
+      });
+    }
+
+    function confirmDeleteClassLog(logId) {
+      openConfirmModal('Excluir Registro?', 'Deseja remover este registro do diário de bordo?', () => {
+        const team = state.teams.find(t => t.id === state.selectedTeamId);
+        if (team) { team.logs = team.logs.filter(l => l.id !== logId); saveState(); showToast('Registro removido.', 'info'); }
+      });
+    }
+
+    // Assign UI methods to Window for Inline Handlers
+    window.selectTeam = (id) => { state.selectedTeamId = id; renderTeamSelector(); renderActiveTeamWorkspace(); };
+    window.setViewMode = (mode) => {
+      state.viewMode = mode;
+      document.getElementById('classOverviewSection').classList.toggle('hidden', mode !== 'overview');
+      document.getElementById('activeTeamWorkspace').classList.toggle('hidden', mode === 'overview');
+      document.getElementById('btnViewOverview').className = `px-3 py-1.5 rounded-lg text-xs font-semibold transition ${mode === 'overview' ? 'bg-caena-orange text-slate-950' : 'text-slate-300'}`;
+      document.getElementById('btnViewDetail').className = `px-3 py-1.5 rounded-lg text-xs font-semibold transition ${mode === 'detail' ? 'bg-caena-orange text-slate-950' : 'text-slate-300'}`;
+      if (mode === 'overview') renderClassOverview(); else renderActiveTeamWorkspace();
+    };
+    window.handleSearchTeams = (q) => { state.searchQuery = q.trim(); document.getElementById('clearSearchBtn').classList.toggle('hidden', !q); renderTeamSelector(); if (state.viewMode === 'overview') renderClassOverview(); };
+    window.clearTeamSearch = () => { document.getElementById('teamSearchInput').value = ''; handleSearchTeams(''); };
+    window.toggleGlobalDoubtFilter = () => { state.globalDoubtFilter = !state.globalDoubtFilter; renderKPIs(); renderTeamSelector(); if (state.viewMode === 'overview') renderClassOverview(); };
+    window.setTeamLogFilter = (filter) => { state.teamLogFilter = filter; renderTeamLogsTimeline(state.teams.find(t => t.id === state.selectedTeamId)); };
+    window.adjustTeamPoints = (d) => { const team = state.teams.find(t => t.id === state.selectedTeamId); if(team) { team.points = Math.max(0, (team.points || 0) + d); saveState(); } };
+    
+    // Modal Helpers
+    window.openTeamModal = (id = null) => {
+      const t = id ? state.teams.find(t => t.id === id) : null;
+      document.getElementById('modalTeamId').value = t ? t.id : '';
+      document.getElementById('modalTeamName').value = t ? t.teamName : '';
+      document.getElementById('modalProjectName').value = t ? t.projectName : '';
+      document.getElementById('modalProjectProblem').value = t ? t.problemDescription : '';
+      document.getElementById('rolePrompt').value = t?.roles?.prompt || '';
+      document.getElementById('roleHardware').value = t?.roles?.hardware || '';
+      document.getElementById('roleCode').value = t?.roles?.code || '';
+      document.getElementById('roleTester').value = t?.roles?.tester || '';
+      document.getElementById('modalTinkercadUrl').value = t?.tinkercadUrl || '';
+      document.getElementById('modalCodeUrl').value = t?.codeUrl || '';
+      document.getElementById('modalTeamPoints').value = t?.points || 10;
+      
+      const sc = t?.components || ['Arduino Uno / Nano'];
+      document.getElementById('modalComponentsGrid').innerHTML = AVAILABLE_COMPONENTS.map(c => `<label class="flex items-center gap-2 p-2 rounded-lg bg-caena-bg border border-white/10 cursor-pointer"><input type="checkbox" name="teamComponent" value="${escapeHtml(c)}" ${sc.includes(c) ? 'checked' : ''} class="accent-caena-orange"><span class="text-slate-200 truncate">${escapeHtml(c)}</span></label>`).join('');
+      document.getElementById('teamModal').classList.remove('hidden'); document.getElementById('teamModal').classList.add('flex');
+    };
+    window.closeTeamModal = () => { document.getElementById('teamModal').classList.add('hidden'); document.getElementById('teamModal').classList.remove('flex'); };
+    window.openSafetyModal = () => { document.getElementById('safetyModal').classList.remove('hidden'); document.getElementById('safetyModal').classList.add('flex'); };
+    window.closeSafetyModal = () => { document.getElementById('safetyModal').classList.add('hidden'); document.getElementById('safetyModal').classList.remove('flex'); };
+    window.resetClassLogForm = () => { document.getElementById('editingLogId').value = ''; document.getElementById('logAdvancesInput').value = ''; document.getElementById('logDoubtsInput').value = ''; document.getElementById('logNextStepsInput').value = ''; window.setDefaultLogDate(); };
+    window.editClassLog = (id) => { const log = state.teams.find(t => t.id === state.selectedTeamId)?.logs?.find(l => l.id === id); if (log) { document.getElementById('editingLogId').value = log.id; document.getElementById('logLessonSelect').value = log.lesson; document.getElementById('logDateInput').value = log.date; document.getElementById('logAdvancesInput').value = log.advances; document.getElementById('logDoubtsInput').value = log.doubts || ''; document.getElementById('logHasOpenDoubt').checked = !!log.hasOpenDoubt; document.getElementById('logNextStepsInput').value = log.nextSteps; document.getElementById('classLogForm').scrollIntoView(); } };
+    window.toggleLogForm = () => { document.getElementById('classLogForm').scrollIntoView(); document.getElementById('logAdvancesInput').focus(); };
+    
+    let confCb = null;
+    window.openConfirmModal = (title, msg, cb) => { document.getElementById('confirmModalTitle').textContent = title; document.getElementById('confirmModalMessage').textContent = msg; confCb = cb; document.getElementById('confirmModal').classList.remove('hidden'); document.getElementById('confirmModal').classList.add('flex'); };
+    window.closeConfirmModal = () => { document.getElementById('confirmModal').classList.add('hidden'); document.getElementById('confirmModal').classList.remove('flex'); confCb = null; };
+    document.getElementById('confirmModalActionBtn').addEventListener('click', () => { if(confCb) confCb(); window.closeConfirmModal(); });
+
+    // Export/Import System
+    window.exportDataJSON = () => { const blob = new Blob([JSON.stringify(state.teams, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'caena_backup.json'; a.click(); URL.revokeObjectURL(a.href); };
+    window.importDataJSON = (e) => { const file = e.target.files[0]; if(!file) return; const r = new FileReader(); r.onload = (ev) => { try { state.teams = JSON.parse(ev.target.result); state.selectedTeamId = state.teams[0].id; saveState(); showToast('Importado com sucesso!'); } catch(err){ showToast('Formato JSON inválido', 'error'); } }; r.readAsText(file); e.target.value = ''; };
+    window.resetDemoDataConfirm = () => window.openConfirmModal('Restaurar Exemplos?', 'Isso apagará o progresso atual.', () => { state.teams = getInitialDemoTeams(); state.selectedTeamId = state.teams[0].id; saveState(); });
+    window.copyTinkercadCode = () => { navigator.clipboard.writeText('MRX RNT M63'); showToast('Código do Tinkercad copiado!'); };
+
+    window.showToast = (msg, type = 'success') => {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      const icon = type === 'error' ? 'fa-triangle-exclamation text-red-400' : (type === 'info' ? 'fa-bolt text-caena-gold' : 'fa-circle-check text-emerald-400');
+      const border = type === 'error' ? 'border-red-500/40' : (type === 'info' ? 'border-caena-gold/40' : 'border-emerald-500/40');
+      t.className = `glass-panel rounded-xl px-4 py-3 border ${border} shadow-xl flex items-center gap-3 text-sm text-white pointer-events-auto transition-all duration-300`;
+      t.innerHTML = `<i class="fa-solid ${icon}"></i><span class="font-medium">${escapeHtml(msg)}</span>`;
+      c.appendChild(t); setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 250); }, 3200);
+    };
+
+    window.setDefaultLogDate = () => { const el = document.getElementById('logDateInput'); if(el && !el.value) el.value = new Date().toISOString().split('T')[0]; };
+    
+    // Main UI Render Loop
+    function renderAll() {
+      renderKPIs();
+      renderTeamSelector();
+      if (state.viewMode === 'overview') renderClassOverview(); else renderActiveTeamWorkspace();
+    }
+
+    // Bind Global Configs
+    window.handleStepStatusChange = handleStepStatusChange;
+    window.handleStepNotesInput = handleStepNotesInput;
+    window.handleSaveClassLog = handleSaveClassLog;
+    window.handleSaveTeam = handleSaveTeam;
+    window.confirmDeleteTeam = confirmDeleteTeam;
+    window.toggleDoubtResolved = toggleDoubtResolved;
+    window.saveProfessorReply = saveProfessorReply;
+    window.confirmDeleteClassLog = confirmDeleteClassLog;
+    
+    window.addEventListener('DOMContentLoaded', () => { window.setDefaultLogDate(); });
+  </script>
+</body>
+</html>
