@@ -138,7 +138,7 @@
         </span>
         <span class="hidden md:inline-block text-slate-600">•</span>
         <span class="hidden md:inline-flex items-center gap-1.5 text-slate-300 bg-white/5 px-2.5 py-1 rounded-md border border-white/10 font-mono">
-          <i class="fa-solid fa-chalkboard-user text-caena-orange"></i> Prof. Italo Gabriel (UFBA)
+          <i class="fa-solid fa-chalkboard-user text-caena-orange"></i> Portal de Acompanhamento
         </span>
         <!-- Indicador de Status Firebase -->
         <span id="firebaseStatus" class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 font-mono text-[10px] border border-emerald-500/30">
@@ -310,9 +310,6 @@
             </h3>
             <p class="text-xs text-slate-400">Acompanhe rapidamente como está cada equipe nas 3 etapas e clique para abrir a bancada.</p>
           </div>
-          <button onclick="resetDemoDataConfirm()" class="text-xs text-slate-400 hover:text-caena-gold underline flex items-center gap-1">
-            <i class="fa-solid fa-rotate-left"></i> Restaurar dados de demonstração
-          </button>
         </div>
         <div id="overviewGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </div>
@@ -328,12 +325,6 @@
               <span id="activeProjectCategory" class="px-2.5 py-1 rounded-md text-xs font-mono bg-white/5 border border-white/10 text-slate-300">
                 Impacto Vital
               </span>
-              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-caena-gold/15 border border-caena-gold/30 text-caena-gold text-xs font-mono">
-                <i class="fa-solid fa-star"></i>
-                <span id="activeTeamPoints">0 pts</span>
-                <button onclick="adjustTeamPoints(1)" title="+1 Ponto (Participação, Foco)" class="ml-1 px-1.5 py-0.2 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 rounded text-[11px] font-bold transition">+</button>
-                <button onclick="adjustTeamPoints(-1)" title="-1 Ponto (Conversa, Celular)" class="px-1.5 py-0.2 bg-red-500/20 hover:bg-red-500/40 text-red-300 rounded text-[11px] font-bold transition">-</button>
-              </div>
             </div>
 
             <div class="flex flex-wrap items-baseline gap-3">
@@ -526,8 +517,8 @@
         <span class="font-display font-bold text-white">Inclusão Tech 2026.2 • CAENA</span>
       </div>
       <div class="flex flex-wrap items-center gap-4">
-        <span>Prof. Italo Gabriel (Mestrado Ciência da Computação - UFBA)</span>
-        <button onclick="resetDemoDataConfirm()" class="text-caena-gold hover:underline">Restaurar Exemplos Padrão</button>
+        <span>Gestão de Projetos Finais de Robótica</span>
+        <button onclick="openBackupModal()" class="text-caena-gold hover:underline flex items-center gap-1.5"><i class="fa-solid fa-clock-rotate-left"></i> Histórico de Versões</button>
       </div>
     </div>
   </footer>
@@ -572,10 +563,9 @@
           <label class="block text-xs font-mono uppercase text-slate-300 mb-2">Componentes</label>
           <div id="modalComponentsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs"></div>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div><label class="block text-xs font-mono uppercase text-slate-300 mb-1">Tinkercad URL</label><input type="url" id="modalTinkercadUrl" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
           <div><label class="block text-xs font-mono uppercase text-slate-300 mb-1">Código URL</label><input type="url" id="modalCodeUrl" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
-          <div><label class="block text-xs font-mono uppercase text-slate-300 mb-1">Pontuação</label><input type="number" id="modalTeamPoints" value="10" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
         </div>
         <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
           <button type="button" onclick="closeTeamModal()" class="px-4 py-2.5 rounded-xl bg-white/5 text-xs font-semibold text-slate-300">Cancelar</button>
@@ -594,7 +584,6 @@
       <div class="space-y-3 text-xs sm:text-sm text-slate-200">
         <div class="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30"><p class="font-display font-bold text-red-400 mb-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i> 1. PROIBIDO Cola Quente em Sensores</p><p class="text-slate-300 text-xs">Destrói a eletrônica de forma permanente. Use velcro, elásticos ou fita.</p></div>
         <div class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30"><p class="font-display font-bold text-emerald-400 mb-1"><i class="fa-solid fa-recycle mr-1"></i> 2. Ecodesign</p><p class="text-slate-300 text-xs">Montagem não-destrutiva com materiais recicláveis (papelão, sucata).</p></div>
-        <div class="p-3.5 rounded-xl bg-caena-gold/10 border border-caena-gold/30"><p class="font-display font-bold text-caena-gold mb-1"><i class="fa-solid fa-trophy mr-1"></i> 3. Avaliação (+1, +2, -1)</p><p class="text-slate-300 text-xs">Ganhe pontos pelo trabalho em equipe. Perca pontos por uso de celular e bagunça.</p></div>
       </div>
       <div class="flex justify-end pt-2"><button onclick="closeSafetyModal()" class="gradient-tech text-slate-950 font-display font-bold px-5 py-2 rounded-xl text-xs">Entendido</button></div>
     </div>
@@ -616,11 +605,26 @@
     </div>
   </div>
 
+  <div id="backupModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+    <div class="glass-panel rounded-2xl max-w-lg w-full p-6 border border-white/15 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3 shrink-0">
+        <h3 class="font-display font-bold text-lg text-white flex items-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-caena-gold"></i> Histórico de Versões
+        </h3>
+        <button onclick="closeBackupModal()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p class="text-xs text-slate-400">Escolha uma versão salva na nuvem para restaurar. Cuidado, os dados atuais serão substituídos pela versão selecionada.</p>
+      <div id="backupList" class="overflow-y-auto pr-2 space-y-2 flex-1 min-h-[200px] max-h-[350px]">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+  </div>
+
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+    import { getDatabase, ref, set, onValue, push, query, limitToLast, get } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
     // Integração Firebase baseada nos dados fornecidos
     const firebaseConfig = {
@@ -676,31 +680,6 @@
       }
     ];
 
-    function getInitialDemoTeams() {
-      return [
-        {
-          id: 'team-bag-to-rise',
-          teamName: 'Equipe Horizonte Tech',
-          projectName: 'Bag to Rise — Mochila para Reerguer 🎒',
-          problemDescription: 'Mochila inteligente ergonômica com alerta de distância traseira e iluminação.',
-          points: 24, tinkercadUrl: 'https://www.tinkercad.com', codeUrl: 'https://codeshare.io/',
-          roles: { prompt: 'Ana', hardware: 'Carlos', code: 'Lucas', tester: 'Mariana' },
-          components: ['Arduino Uno / Nano', 'Sensor Ultrassônico HC-SR04', 'Ecodesign (Materiais Recicláveis)'],
-          steps: {
-            def_problema: { status: 'completed', notes: 'Problema validado: segurança noturna.' },
-            brainstorming: { status: 'completed', notes: 'Conceito validado.' }
-          },
-          logs: [
-            {
-              id: 'log-101', lesson: 'Aula 08 - Design Sustentável & Ecodesign', date: '2026-09-25',
-              advances: 'Construímos o case do Arduino.', doubts: 'Cabo soltando.',
-              hasOpenDoubt: true, professorReply: '', nextSteps: 'Testar fixação sem cola.'
-            }
-          ]
-        }
-      ];
-    }
-
     const state = {
       teams: [],
       selectedTeamId: null,
@@ -729,12 +708,26 @@
       }
     });
 
-    // Função salva dados no Firebase
-    function saveState() {
+    let lastBackupTime = 0;
+    // Função salva dados no Firebase e cria histórico de versões anti-perda
+    function saveState(action = "Atualização de dados", forceBackup = false) {
       set(ref(db, 'projetos_caena/equipes'), state.teams).catch(err => {
         console.error('Erro ao salvar no Firebase:', err);
         showToast('Erro de conexão ao salvar na nuvem.', 'error');
       });
+
+      const now = Date.now();
+      // O backup ocorre forçadamente ao deletar/criar algo, ou a cada 2 minutos enquanto salvam etapas e notas
+      if (forceBackup || now - lastBackupTime > 2 * 60 * 1000) { 
+          lastBackupTime = now;
+          const backupRef = push(ref(db, 'projetos_caena/backups'));
+          set(backupRef, {
+            timestamp: now,
+            dateStr: new Date().toLocaleString('pt-BR'),
+            action: action,
+            data: state.teams || []
+          });
+      }
     }
 
     // Escutador em tempo real
@@ -745,12 +738,11 @@
       if (data) {
         state.teams = Array.isArray(data) ? data : Object.values(data);
       } else if (isInitialLoad) {
-        state.teams = getInitialDemoTeams();
-        saveState();
+        state.teams = []; // Inicia vazio sem apagar o que existe caso seja o primeiro load no banco vazio
       }
 
-      if (!state.teams.some(t => t.id === state.selectedTeamId)) {
-        state.selectedTeamId = state.teams.length > 0 ? state.teams[0].id : null;
+      if (state.teams.length > 0 && !state.teams.some(t => t.id === state.selectedTeamId)) {
+        state.selectedTeamId = state.teams[0].id;
       }
 
       const statusBadge = document.getElementById('firebaseStatus');
@@ -829,7 +821,7 @@
         container.innerHTML = `<div class="col-span-full rounded-xl bg-caena-bg/60 border border-white/10 p-6 text-center text-sm text-slate-300">Nenhuma equipe encontrada.</div>`;
         return;
       }
-      if (!state.teams.some(t => t.id === state.selectedTeamId)) state.selectedTeamId = filtered[0].id;
+      if (state.teams.length > 0 && !state.teams.some(t => t.id === state.selectedTeamId)) state.selectedTeamId = filtered[0].id;
 
       container.innerHTML = filtered.map(team => {
         const m = calculateTeamMetrics(team);
@@ -838,7 +830,7 @@
           <div onclick="selectTeam('${team.id}')" class="glass-card rounded-xl p-3.5 cursor-pointer flex flex-col justify-between gap-2.5 ${isSelected ? 'team-tab-active' : 'hover:bg-white/5'} ${m.openDoubtsCount > 0 ? 'doubt-pulse' : ''}">
             <div class="flex items-start justify-between gap-2">
               <div class="min-w-0">
-                <div class="flex items-center gap-1.5"><span class="text-[11px] font-mono uppercase tracking-wider ${isSelected ? 'text-caena-gold font-bold' : 'text-slate-400'}">${escapeHtml(team.teamName)}</span><span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/10 text-caena-gold">★ ${team.points || 0}</span></div>
+                <div class="flex items-center gap-1.5"><span class="text-[11px] font-mono uppercase tracking-wider ${isSelected ? 'text-caena-gold font-bold' : 'text-slate-400'}">${escapeHtml(team.teamName)}</span></div>
                 <h3 class="font-display font-bold text-sm sm:text-base text-white truncate mt-0.5">${escapeHtml(team.projectName)}</h3>
               </div>
               ${m.openDoubtsCount > 0 ? `<span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-red-500/20 text-red-300 border border-red-500/40"><i class="fa-solid fa-hand"></i> ${m.openDoubtsCount}</span>` : ''}
@@ -881,7 +873,6 @@
       document.getElementById('activeTeamBadge').textContent = team.teamName;
       document.getElementById('activeProjectName').textContent = team.projectName;
       document.getElementById('activeProjectProblem').textContent = team.problemDescription;
-      document.getElementById('activeTeamPoints').textContent = `${team.points || 0} pts`;
       document.getElementById('logFormTeamName').textContent = team.teamName;
 
       document.getElementById('activeTeamProgressPct').textContent = `${m.totalProgressPct}%`;
@@ -1003,7 +994,7 @@
                 <span class="font-bold ${isPendingDoubt ? 'text-red-400' : 'text-slate-400'} mb-1 block">Dúvidas</span>
                 <p class="text-slate-200 whitespace-pre-line mb-2">${escapeHtml(log.doubts) || 'Nenhuma'}</p>
                 <div class="pt-2 border-t border-white/10">
-                  <input type="text" onchange="saveProfessorReply('${log.id}', this.value)" value="${escapeHtml(log.professorReply || '')}" placeholder="Resposta do Prof. Italo..." class="w-full bg-caena-bg/90 border border-white/10 px-2.5 py-1.5 rounded-lg text-caena-gold focus:outline-none focus:border-caena-gold"/>
+                  <input type="text" onchange="saveProfessorReply('${log.id}', this.value)" value="${escapeHtml(log.professorReply || '')}" placeholder="Orientações do instrutor(a)..." class="w-full bg-caena-bg/90 border border-white/10 px-2.5 py-1.5 rounded-lg text-caena-gold focus:outline-none focus:border-caena-gold"/>
                 </div>
               </div>
               <div class="rounded-xl bg-amber-950/20 border border-caena-gold/25 p-3.5"><span class="font-bold text-caena-gold mb-1 block">Próximos Passos</span><p class="text-slate-200 whitespace-pre-line">${escapeHtml(log.nextSteps)}</p></div>
@@ -1035,7 +1026,7 @@
         team.logs.unshift({ id: 'log-' + Date.now(), lesson, date, advances, doubts, hasOpenDoubt, professorReply: '', nextSteps });
         showToast('Diário de aula registrado na nuvem!', 'success');
       }
-      saveState(); resetClassLogForm();
+      saveState("Novo registro de aula", true); resetClassLogForm();
     }
 
     function toggleDoubtResolved(logId) {
@@ -1056,7 +1047,6 @@
         teamName: document.getElementById('modalTeamName').value.trim(),
         projectName: document.getElementById('modalProjectName').value.trim(),
         problemDescription: document.getElementById('modalProjectProblem').value.trim(),
-        points: parseInt(document.getElementById('modalTeamPoints').value) || 0,
         tinkercadUrl: document.getElementById('modalTinkercadUrl').value.trim(),
         codeUrl: document.getElementById('modalCodeUrl').value.trim(),
         roles: { prompt: document.getElementById('rolePrompt').value.trim(), hardware: document.getElementById('roleHardware').value.trim(), code: document.getElementById('roleCode').value.trim(), tester: document.getElementById('roleTester').value.trim() },
@@ -1070,7 +1060,7 @@
       } else {
         state.teams.push(newTeam); state.selectedTeamId = newTeam.id; showToast('Nova equipe criada!', 'success');
       }
-      saveState(); closeTeamModal();
+      saveState("Cadastro/Edição de equipe", true); closeTeamModal();
     }
 
     function confirmDeleteTeam(teamId) {
@@ -1078,14 +1068,14 @@
       openConfirmModal('Excluir Equipe?', 'Tem certeza que deseja apagar permanentemente essa equipe?', () => {
         state.teams = state.teams.filter(t => t.id !== teamId);
         state.selectedTeamId = state.teams[0].id;
-        saveState(); showToast('Equipe excluída', 'info');
+        saveState("Exclusão de equipe", true); showToast('Equipe excluída', 'info');
       });
     }
 
     function confirmDeleteClassLog(logId) {
       openConfirmModal('Excluir Registro?', 'Deseja remover este registro do diário de bordo?', () => {
         const team = state.teams.find(t => t.id === state.selectedTeamId);
-        if (team) { team.logs = team.logs.filter(l => l.id !== logId); saveState(); showToast('Registro removido.', 'info'); }
+        if (team) { team.logs = team.logs.filter(l => l.id !== logId); saveState("Exclusão de registro", true); showToast('Registro removido.', 'info'); }
       });
     }
 
@@ -1103,7 +1093,6 @@
     window.clearTeamSearch = () => { document.getElementById('teamSearchInput').value = ''; handleSearchTeams(''); };
     window.toggleGlobalDoubtFilter = () => { state.globalDoubtFilter = !state.globalDoubtFilter; renderKPIs(); renderTeamSelector(); if (state.viewMode === 'overview') renderClassOverview(); };
     window.setTeamLogFilter = (filter) => { state.teamLogFilter = filter; renderTeamLogsTimeline(state.teams.find(t => t.id === state.selectedTeamId)); };
-    window.adjustTeamPoints = (d) => { const team = state.teams.find(t => t.id === state.selectedTeamId); if(team) { team.points = Math.max(0, (team.points || 0) + d); saveState(); } };
     
     // Modal Helpers
     window.openTeamModal = (id = null) => {
@@ -1118,7 +1107,6 @@
       document.getElementById('roleTester').value = t?.roles?.tester || '';
       document.getElementById('modalTinkercadUrl').value = t?.tinkercadUrl || '';
       document.getElementById('modalCodeUrl').value = t?.codeUrl || '';
-      document.getElementById('modalTeamPoints').value = t?.points || 10;
       
       const sc = t?.components || ['Arduino Uno / Nano'];
       document.getElementById('modalComponentsGrid').innerHTML = AVAILABLE_COMPONENTS.map(c => `<label class="flex items-center gap-2 p-2 rounded-lg bg-caena-bg border border-white/10 cursor-pointer"><input type="checkbox" name="teamComponent" value="${escapeHtml(c)}" ${sc.includes(c) ? 'checked' : ''} class="accent-caena-orange"><span class="text-slate-200 truncate">${escapeHtml(c)}</span></label>`).join('');
@@ -1136,10 +1124,52 @@
     window.closeConfirmModal = () => { document.getElementById('confirmModal').classList.add('hidden'); document.getElementById('confirmModal').classList.remove('flex'); confCb = null; };
     document.getElementById('confirmModalActionBtn').addEventListener('click', () => { if(confCb) confCb(); window.closeConfirmModal(); });
 
+    // Backup & Restore System
+    window.openBackupModal = async () => {
+      document.getElementById('backupModal').classList.remove('hidden'); document.getElementById('backupModal').classList.add('flex');
+      const list = document.getElementById('backupList');
+      list.innerHTML = '<p class="text-slate-400 text-sm">Carregando histórico da nuvem...</p>';
+      try {
+        const q = query(ref(db, 'projetos_caena/backups'), limitToLast(15));
+        const snapshot = await get(q);
+        const backups = [];
+        snapshot.forEach(child => { backups.push({ id: child.key, ...child.val() }); });
+        backups.reverse(); // Mais recentes primeiro
+        if (backups.length === 0) { list.innerHTML = '<p class="text-slate-400 text-sm">Nenhum backup encontrado.</p>'; return; }
+        list.innerHTML = backups.map(b => `
+          <div class="flex items-center justify-between p-3 border border-white/5 bg-white/5 rounded-xl mb-2">
+            <div>
+              <p class="text-sm font-bold text-white">${b.dateStr}</p>
+              <p class="text-[11px] font-mono text-caena-gold uppercase">${b.action}</p>
+            </div>
+            <button onclick="restoreBackup('${b.id}')" class="px-3 py-1.5 bg-caena-orange hover:bg-caena-gold text-slate-900 text-xs font-bold rounded-lg transition">Restaurar</button>
+          </div>
+        `).join('');
+      } catch (e) {
+        list.innerHTML = '<p class="text-red-400 text-sm">Erro ao carregar histórico.</p>';
+      }
+    };
+    window.closeBackupModal = () => { document.getElementById('backupModal').classList.add('hidden'); document.getElementById('backupModal').classList.remove('flex'); };
+    window.restoreBackup = (backupId) => {
+      openConfirmModal('Restaurar Versão?', 'Isso substituirá os dados atuais por esta versão. A versão atual também será salva como backup antes da troca.', async () => {
+        try {
+          const snapshot = await get(ref(db, `projetos_caena/backups/${backupId}/data`));
+          const oldData = snapshot.val();
+          if (oldData) {
+            state.teams = oldData;
+            if (state.teams.length > 0) state.selectedTeamId = state.teams[0].id;
+            saveState('Restauração de Backup', true);
+            showToast('Versão restaurada com sucesso!', 'success');
+            closeBackupModal();
+            renderAll();
+          }
+        } catch (e) { showToast('Erro ao ler backup.', 'error'); }
+      });
+    };
+
     // Export/Import System
     window.exportDataJSON = () => { const blob = new Blob([JSON.stringify(state.teams, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'caena_backup.json'; a.click(); URL.revokeObjectURL(a.href); };
-    window.importDataJSON = (e) => { const file = e.target.files[0]; if(!file) return; const r = new FileReader(); r.onload = (ev) => { try { state.teams = JSON.parse(ev.target.result); state.selectedTeamId = state.teams[0].id; saveState(); showToast('Importado com sucesso!'); } catch(err){ showToast('Formato JSON inválido', 'error'); } }; r.readAsText(file); e.target.value = ''; };
-    window.resetDemoDataConfirm = () => window.openConfirmModal('Restaurar Exemplos?', 'Isso apagará o progresso atual.', () => { state.teams = getInitialDemoTeams(); state.selectedTeamId = state.teams[0].id; saveState(); });
+    window.importDataJSON = (e) => { const file = e.target.files[0]; if(!file) return; const r = new FileReader(); r.onload = (ev) => { try { state.teams = JSON.parse(ev.target.result); state.selectedTeamId = state.teams[0].id; saveState("Importação de JSON", true); showToast('Importado com sucesso!'); } catch(err){ showToast('Formato JSON inválido', 'error'); } }; r.readAsText(file); e.target.value = ''; };
     window.copyTinkercadCode = () => { navigator.clipboard.writeText('MRX RNT M63'); showToast('Código do Tinkercad copiado!'); };
 
     window.showToast = (msg, type = 'success') => {
