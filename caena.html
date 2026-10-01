@@ -127,6 +127,13 @@
 
 <body class="min-h-screen flex flex-col selection:bg-caena-orange selection:text-white">
 
+  <!-- Tela de Carregamento -->
+  <div id="globalLoader" class="fixed inset-0 z-[100] bg-caena-bg flex flex-col items-center justify-center transition-opacity duration-500">
+    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-caena-orange mb-4"></i>
+    <h2 class="font-display text-xl font-bold text-white">Carregando Projetos...</h2>
+    <p class="text-sm text-slate-400 mt-2">Sincronizando com a nuvem em tempo real</p>
+  </div>
+
   <div class="border-b border-white/10 bg-[#080E21]/90 backdrop-blur-md sticky top-0 z-30">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
       <div class="flex items-center gap-2.5 flex-wrap">
@@ -386,7 +393,7 @@
         <div class="pt-4">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <i class="fa-solid fa-id-badge text-caena-gold"></i> Integrantes & Papéis (Slide 68)
+              <i class="fa-solid fa-id-badge text-caena-gold"></i> Integrantes & Responsabilidades
             </h3>
           </div>
           <div id="activeTeamRolesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
@@ -434,18 +441,10 @@
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="md:col-span-2">
-              <label class="block text-xs font-mono uppercase text-slate-300 mb-1.5">Aula / Encontro *</label>
+              <label class="block text-xs font-mono uppercase text-slate-300 mb-1.5">Dia da Semana *</label>
               <select id="logLessonSelect" required class="w-full rounded-xl bg-caena-bg border border-caena-border px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-caena-orange">
-                <option value="Aula 01 - Introdução ao Universo Arduino & Tinkercad">Aula 01 - Introdução ao Universo Arduino & Tinkercad</option>
-                <option value="Aula 02 - Resistores, Jumpers & LEDs">Aula 02 - Resistores, Jumpers & LEDs</option>
-                <option value="Aula 03 - Entradas Digitais/Analógicas & Botões">Aula 03 - Entradas Digitais/Analógicas & Botões</option>
-                <option value="Aula 04 - Medindo Distâncias com Ultrassônico">Aula 04 - Medindo Distâncias com Ultrassônico</option>
-                <option value="Aula 05 - Sinais Analógicos vs. Digitais & Variáveis">Aula 05 - Sinais Analógicos vs. Digitais & Variáveis</option>
-                <option value="Aula 06 - Inteligência Artificial Generativa">Aula 06 - Inteligência Artificial Generativa</option>
-                <option value="Aula 07 - Desvendando os Drones">Aula 07 - Desvendando os Drones</option>
-                <option value="Aula 08 - Design Sustentável & Ecodesign">Aula 08 - Design Sustentável & Ecodesign</option>
-                <option value="Aula 09 - Sensor de Umidade e Temperatura (DHT11)">Aula 09 - Sensor de Umidade e Temperatura (DHT11)</option>
-                <option value="Oficina Impacto Vital - Desenvolvimento do Projeto Final" selected>Oficina Impacto Vital - Projeto Final</option>
+                <option value="Terça-feira">Terça-feira</option>
+                <option value="Quinta-feira">Quinta-feira</option>
               </select>
             </div>
             <div>
@@ -551,17 +550,37 @@
           <textarea id="modalProjectProblem" rows="2" required class="w-full rounded-xl bg-caena-bg border border-caena-border p-3 text-sm text-white"></textarea>
         </div>
         <div class="bg-caena-bg/60 rounded-xl p-4 border border-white/10 space-y-3">
-          <p class="text-xs font-mono uppercase text-caena-gold"><i class="fa-solid fa-users"></i> Papéis na Equipe (Slide 68)</p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div><label class="block text-[11px] text-slate-300 mb-1">Eng. de Prompt</label><input type="text" id="rolePrompt" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
-            <div><label class="block text-[11px] text-slate-300 mb-1">Líder de Hardware</label><input type="text" id="roleHardware" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
-            <div><label class="block text-[11px] text-slate-300 mb-1">Piloto do Código</label><input type="text" id="roleCode" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
-            <div><label class="block text-[11px] text-slate-300 mb-1">Testador / Debugger</label><input type="text" id="roleTester" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
+          <p class="text-xs font-mono uppercase text-caena-gold mb-2"><i class="fa-solid fa-users"></i> Papéis e Responsabilidades na Equipe</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-300">🤖 Especialista em IA</label>
+              <p class="text-[9px] text-slate-400 mb-1 leading-tight">Interage com a IA (Gemini/ChatGPT) para tirar dúvidas, gerar códigos e buscar soluções criativas.</p>
+              <input type="text" id="rolePrompt" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-300">🔌 Construtor(a) de Hardware</label>
+              <p class="text-[9px] text-slate-400 mb-1 leading-tight">Conecta fios, botões e sensores na protoboard e monta a estrutura física (carcaça) do projeto.</p>
+              <input type="text" id="roleHardware" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-300">💻 Programador(a)</label>
+              <p class="text-[9px] text-slate-400 mb-1 leading-tight">Escreve e organiza a lógica, envia o código para o Arduino e simula virtualmente no Tinkercad.</p>
+              <input type="text" id="roleCode" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-300">🔎 Revisor(a) de Testes</label>
+              <p class="text-[9px] text-slate-400 mb-1 leading-tight">Testa o projeto físico constantemente, procura erros, revisa as conexões e valida o funcionamento final.</p>
+              <input type="text" id="roleTester" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" />
+            </div>
           </div>
         </div>
         <div>
           <label class="block text-xs font-mono uppercase text-slate-300 mb-2">Componentes</label>
-          <div id="modalComponentsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs"></div>
+          <div id="modalComponentsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs mb-2"></div>
+          <div class="flex gap-2">
+             <input type="text" id="newComponentInput" placeholder="Outro componente? Digite aqui..." class="flex-1 rounded-lg bg-caena-surface border border-caena-border px-3 py-1.5 text-xs text-white">
+             <button type="button" onclick="addNewComponent()" class="px-3 py-1.5 rounded-lg bg-caena-orange/20 text-caena-gold hover:bg-caena-orange hover:text-slate-900 transition text-xs font-bold">Adicionar</button>
+          </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div><label class="block text-xs font-mono uppercase text-slate-300 mb-1">Tinkercad URL</label><input type="url" id="modalTinkercadUrl" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
@@ -751,6 +770,15 @@
       if (isInitialLoad) {
         renderAll();
         isInitialLoad = false;
+        
+        // Remove a tela de carregamento de forma suave
+        setTimeout(() => {
+          const loader = document.getElementById('globalLoader');
+          if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+          }
+        }, 300);
       } else {
         if (isUserTyping) {
           pendingRender = true; // Atrasa renderização visual para não interromper digitação
@@ -890,12 +918,24 @@
 
       const roles = team.roles || {};
       const rolesList = [
-        { title: 'Eng. de Prompt', icon: 'fa-wand-magic-sparkles', name: roles.prompt || 'A definir', color: 'text-purple-400 border-purple-500/30 bg-purple-500/10' },
-        { title: 'Líder Hardware', icon: 'fa-plug-circle-bolt', name: roles.hardware || 'A definir', color: 'text-caena-orange border-caena-orange/30 bg-caena-orange/10' },
-        { title: 'Piloto Código', icon: 'fa-terminal', name: roles.code || 'A definir', color: 'text-caena-gold border-caena-gold/30 bg-caena-gold/10' },
-        { title: 'Testador', icon: 'fa-magnifying-glass-chart', name: roles.tester || 'A definir', color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' }
+        { title: 'Especialista em IA', desc: 'Gera códigos e interage com inteligência artificial.', icon: 'fa-wand-magic-sparkles', name: roles.prompt || 'A definir', color: 'text-purple-400 border-purple-500/30 bg-purple-500/10' },
+        { title: 'Construtor(a) Hardware', desc: 'Montagem física e fiação na protoboard.', icon: 'fa-plug-circle-bolt', name: roles.hardware || 'A definir', color: 'text-caena-orange border-caena-orange/30 bg-caena-orange/10' },
+        { title: 'Programador(a)', desc: 'Lógica e envio de código C++ para a placa.', icon: 'fa-terminal', name: roles.code || 'A definir', color: 'text-caena-gold border-caena-gold/30 bg-caena-gold/10' },
+        { title: 'Revisor(a) de Testes', desc: 'Procura bugs lógicos e avalia funcionamento.', icon: 'fa-magnifying-glass-chart', name: roles.tester || 'A definir', color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' }
       ];
-      document.getElementById('activeTeamRolesGrid').innerHTML = rolesList.map(r => `<div class="rounded-xl bg-caena-bg/75 border border-white/10 p-3 flex items-center gap-3"><div class="w-9 h-9 rounded-lg border ${r.color} flex items-center justify-center text-sm"><i class="fa-solid ${r.icon}"></i></div><div class="min-w-0"><p class="text-[11px] font-mono text-slate-400 truncate">${r.title}</p><p class="font-display font-bold text-sm text-white truncate">${escapeHtml(r.name)}</p></div></div>`).join('');
+      
+      document.getElementById('activeTeamRolesGrid').innerHTML = rolesList.map(r => `
+        <div class="rounded-xl bg-caena-bg/75 border border-white/10 p-3 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg border ${r.color} flex items-center justify-center text-sm shrink-0">
+            <i class="fa-solid ${r.icon}"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="text-[11px] font-mono text-slate-400 truncate">${r.title}</p>
+            <p class="font-display font-bold text-sm text-white truncate">${escapeHtml(r.name)}</p>
+            <p class="text-[9px] text-slate-500 mt-0.5 leading-tight line-clamp-2" title="${r.desc}">${r.desc}</p>
+          </div>
+        </div>
+      `).join('');
 
       renderDevelopmentPillars(team, m);
       renderTeamLogsTimeline(team);
@@ -978,7 +1018,7 @@
           <div class="glass-card rounded-2xl p-4 sm:p-5 border ${isPendingDoubt ? 'border-red-500/50' : 'border-white/10'} space-y-3.5">
             <div class="flex flex-wrap justify-between gap-2 pb-3 border-b border-white/10">
               <div class="flex gap-2">
-                <span class="px-3 py-1 rounded-lg bg-caena-orange/20 border border-caena-orange/40 text-caena-gold font-display font-bold text-xs"><i class="fa-solid fa-microchip mr-1"></i> ${escapeHtml(log.lesson)}</span>
+                <span class="px-3 py-1 rounded-lg bg-caena-orange/20 border border-caena-orange/40 text-caena-gold font-display font-bold text-xs"><i class="fa-solid fa-calendar-day mr-1"></i> ${escapeHtml(log.lesson)}</span>
                 <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-slate-300 font-mono text-xs">${formatDateBR(log.date)}</span>
                 ${isPendingDoubt ? `<span class="px-2.5 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 font-mono font-bold text-xs"><i class="fa-solid fa-hand"></i> Dúvida</span>` : ''}
               </div>
@@ -1109,7 +1149,9 @@
       document.getElementById('modalCodeUrl').value = t?.codeUrl || '';
       
       const sc = t?.components || ['Arduino Uno / Nano'];
-      document.getElementById('modalComponentsGrid').innerHTML = AVAILABLE_COMPONENTS.map(c => `<label class="flex items-center gap-2 p-2 rounded-lg bg-caena-bg border border-white/10 cursor-pointer"><input type="checkbox" name="teamComponent" value="${escapeHtml(c)}" ${sc.includes(c) ? 'checked' : ''} class="accent-caena-orange"><span class="text-slate-200 truncate">${escapeHtml(c)}</span></label>`).join('');
+      const allComps = [...new Set([...AVAILABLE_COMPONENTS, ...sc])];
+      
+      document.getElementById('modalComponentsGrid').innerHTML = allComps.map(c => `<label class="flex items-center gap-2 p-2 rounded-lg bg-caena-bg border border-white/10 cursor-pointer"><input type="checkbox" name="teamComponent" value="${escapeHtml(c)}" ${sc.includes(c) ? 'checked' : ''} class="accent-caena-orange"><span class="text-slate-200 truncate">${escapeHtml(c)}</span></label>`).join('');
       document.getElementById('teamModal').classList.remove('hidden'); document.getElementById('teamModal').classList.add('flex');
     };
     window.closeTeamModal = () => { document.getElementById('teamModal').classList.add('hidden'); document.getElementById('teamModal').classList.remove('flex'); };
@@ -1182,7 +1224,31 @@
       c.appendChild(t); setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 250); }, 3200);
     };
 
-    window.setDefaultLogDate = () => { const el = document.getElementById('logDateInput'); if(el && !el.value) el.value = new Date().toISOString().split('T')[0]; };
+    window.setDefaultLogDate = () => { 
+      const el = document.getElementById('logDateInput'); 
+      if(el && !el.value) {
+        const now = new Date();
+        el.value = now.toISOString().split('T')[0];
+        const daySelect = document.getElementById('logLessonSelect');
+        if (daySelect) {
+          const day = now.getDay();
+          if (day === 2) daySelect.value = 'Terça-feira';
+          else if (day === 4) daySelect.value = 'Quinta-feira';
+        }
+      } 
+    };
+    
+    window.addNewComponent = () => {
+      const input = document.getElementById('newComponentInput');
+      const val = input.value.trim();
+      if (!val) return;
+      const grid = document.getElementById('modalComponentsGrid');
+      const label = document.createElement('label');
+      label.className = "flex items-center gap-2 p-2 rounded-lg bg-caena-bg border border-white/10 cursor-pointer";
+      label.innerHTML = `<input type="checkbox" name="teamComponent" value="${escapeHtml(val)}" checked class="accent-caena-orange"><span class="text-slate-200 truncate">${escapeHtml(val)}</span>`;
+      grid.appendChild(label);
+      input.value = '';
+    };
     
     // Main UI Render Loop
     function renderAll() {
