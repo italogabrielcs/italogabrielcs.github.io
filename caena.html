@@ -305,7 +305,10 @@
           </div>
         </div>
         <div class="pt-4">
-          <h3 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-2 mb-3"><i class="fa-solid fa-users text-caena-gold"></i> Papéis na Bancada</h3>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <h3 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-2"><i class="fa-solid fa-users text-caena-gold"></i> Responsáveis na Bancada</h3>
+            <span class="text-[10px] text-slate-400 bg-white/5 px-2 py-1 rounded border border-white/10"><i class="fa-solid fa-circle-info text-caena-orange"></i> Responsável principal, mas toda a equipe colabora nas etapas!</span>
+          </div>
           <div id="activeTeamRolesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
         </div>
       </section>
@@ -416,7 +419,10 @@
         <div><label class="block text-xs font-mono text-slate-300 mb-1">Problema Real & Impacto *</label><textarea id="modalProjectProblem" rows="2" required class="w-full rounded-xl bg-caena-bg border border-caena-border p-3 text-sm text-white focus:outline-none focus:border-caena-orange"></textarea></div>
         
         <div class="bg-caena-bg/60 rounded-xl p-4 border border-white/10 space-y-3">
-          <p class="text-xs font-mono uppercase text-caena-gold mb-2"><i class="fa-solid fa-users"></i> Papéis na Equipe</p>
+          <div class="mb-3">
+            <p class="text-xs font-mono uppercase text-caena-gold"><i class="fa-solid fa-users"></i> Responsáveis na Equipe</p>
+            <p class="text-[10px] text-slate-400 mt-1">Defina o líder de cada função. Lembre-se: ter um responsável principal não impede que a equipe toda se ajude nas etapas!</p>
+          </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label class="block text-[11px] font-bold text-slate-300">Eng. de Prompt (Fala com IA)</label><input type="text" id="rolePrompt" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
             <div><label class="block text-[11px] font-bold text-slate-300">Líder de Hardware (Protoboard)</label><input type="text" id="roleHardware" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
@@ -516,6 +522,8 @@
     ];
 
     const state = { teams: [], selectedTeamId: null, viewMode: 'detail', searchQuery: '', globalDoubtFilter: false, teamLogFilter: 'all' };
+    window.state = state; // Torna o estado acessível globalmente (resolve o bug do botão de edição)
+    
     let isUserTyping = false, pendingRender = false, lastBackupTime = 0, isInitialLoad = true;
 
     window.addEventListener('focusin', (e) => { if (['TEXTAREA', 'INPUT', 'SELECT'].includes(e.target.tagName)) isUserTyping = true; });
