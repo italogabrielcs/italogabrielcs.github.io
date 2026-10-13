@@ -87,12 +87,14 @@
     input[type=number]::-webkit-inner-spin-button, 
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
+
+    .img-preview { width: 100%; height: 160px; object-fit: cover; border-radius: 0.5rem; background-color: rgba(0,0,0,0.2); }
   </style>
 </head>
 
 <body class="min-h-screen flex flex-col selection:bg-caena-orange selection:text-white">
 
-  <!-- TELA DE CARREGAMENTO (Esconde automaticamente ao baixar os dados do Firebase) -->
+  <!-- TELA DE CARREGAMENTO -->
   <div id="globalLoader" class="fixed inset-0 z-[100] bg-caena-bg flex flex-col items-center justify-center transition-opacity duration-500">
     <div class="relative w-20 h-20 mb-6">
       <div class="absolute inset-0 border-4 border-caena-surface rounded-full"></div>
@@ -118,11 +120,15 @@
           <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i> Firebase Sincronizado
         </span>
          <span class="hidden md:inline-flex items-center gap-1.5 text-caena-gold bg-caena-gold/10 px-2.5 py-1 rounded-md border border-caena-gold/20 font-mono font-bold">
-          v1.12.0
+          v1.16.0
         </span>
       </div>
 
       <div class="flex items-center gap-2">
+        <button onclick="toggleAdminMode()" id="btnAdminMode" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-500/10 hover:bg-slate-500/20 border border-slate-500/30 text-slate-300 font-medium transition cursor-pointer">
+          <i class="fa-solid fa-lock"></i>
+          <span class="hidden sm:inline">Modo Professor</span>
+        </button>
         <button onclick="copyTinkercadCode()" title="Clique para copiar o código da turma no Tinkercad" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-caena-surface hover:bg-caena-card border border-caena-border text-slate-300 transition cursor-pointer">
           <i class="fa-solid fa-cube text-caena-gold"></i>
           <span class="hidden sm:inline">Tinkercad Turma:</span>
@@ -155,12 +161,24 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-4">
+          <!-- Countdown Timer Updated -->
+          <div class="glass-card px-4 py-2.5 rounded-xl border-caena-orange/30 flex items-center gap-3 bg-red-500/5">
+             <div class="text-center bg-red-500/20 p-2 rounded-lg border border-red-500/30">
+               <i class="fa-regular fa-calendar-xmark text-red-400 text-lg"></i>
+             </div>
+             <div>
+                <p class="text-[10px] text-slate-400 font-mono uppercase">Entrega: 26 de Nov</p>
+                <p id="countdownTimer" class="font-display font-bold text-white text-sm">Calculando...</p>
+                <p id="classCountdown" class="text-[11px] font-mono text-caena-gold mt-0.5">Calculando aulas...</p>
+             </div>
+          </div>
+
           <button onclick="openTeamModal()" class="gradient-tech hover:opacity-95 text-slate-950 font-display font-bold px-5 py-3 rounded-xl shadow-lg shadow-caena-orange/25 flex items-center gap-2 transition transform active:scale-95">
             <i class="fa-solid fa-plus-circle text-lg"></i>
             <span>Nova Equipe / Projeto</span>
           </button>
 
-          <!-- BOTÃO DO ROBÔ DA QUEBRADA (GEM) COM CREDENCIAIS -->
+          <!-- BOTÃO DO ROBÔ DA QUEBRADA -->
           <div class="flex flex-col items-end">
             <a href="https://gemini.google.com/gem/1ZtpddeP5ZRMa6em_zFkQadxDPMOsBZUe?usp=sharing" target="_blank" rel="noopener noreferrer" class="glass-card bg-[#8A2BE2]/15 hover:bg-[#8A2BE2]/30 border-[#8A2BE2]/40 text-white px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 transition shadow-lg shadow-[#8A2BE2]/10 w-full justify-center">
               <span class="text-xl">🤖</span>
@@ -169,11 +187,11 @@
             </a>
             <div class="mt-2 px-3 py-2 rounded-lg bg-black/30 border border-white/5 text-[10px] text-slate-300 w-full shadow-inner">
                <div class="flex items-center gap-1.5 mb-1.5 text-caena-gold font-bold">
-                 <i class="fa-solid fa-user-lock"></i> Sem conta Google? Use a padrão:
+                 <i class="fa-solid fa-user-lock"></i> Conta Google dos Projetos:
                </div>
                <div class="font-mono flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-3">
-                 <span class="select-all text-white bg-white/5 px-1.5 py-0.5 rounded">inclusaotechcaena@gmail.com</span>
-                 <span class="select-all text-caena-orange bg-caena-orange/10 px-1.5 py-0.5 rounded">CAENA@2026</span>
+                 <span class="select-all text-white bg-white/5 px-1.5 py-0.5 rounded cursor-pointer" onclick="navigator.clipboard.writeText('inclusaotechcaena@gmail.com'); showToast('Email copiado')">inclusaotechcaena@gmail.com</span>
+                 <span class="select-all text-caena-orange bg-caena-orange/10 px-1.5 py-0.5 rounded cursor-pointer" onclick="navigator.clipboard.writeText('CAENA@2026'); showToast('Senha copiada')">CAENA@2026</span>
                </div>
             </div>
           </div>
@@ -226,6 +244,7 @@
           <div class="inline-flex rounded-xl bg-caena-bg p-1 border border-caena-border">
             <button id="btnViewDetail" onclick="setViewMode('detail')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-caena-orange text-slate-950"><i class="fa-solid fa-sliders mr-1"></i> Bancada da Equipe</button>
             <button id="btnViewOverview" onclick="setViewMode('overview')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white"><i class="fa-solid fa-table-cells-large mr-1"></i> Painel da Turma / Ranking</button>
+            <button id="btnViewInventory" onclick="setViewMode('inventory')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white"><i class="fa-solid fa-box-open mr-1"></i> Inventário</button>
           </div>
         </div>
       </div>
@@ -234,24 +253,37 @@
 
     <!-- SECTION: VISÃO GERAL (TELA DA TURMA E RANKING) -->
     <section id="classOverviewSection" class="hidden space-y-6">
-      
-      <!-- Ranking Pódio -->
       <div class="glass-panel rounded-2xl p-5 sm:p-6 border-t-4 border-caena-gold">
         <h3 class="font-display text-xl font-bold text-white flex items-center gap-2 mb-5">
           <i class="fa-solid fa-trophy text-caena-gold"></i> Ranking CAENA (Avaliação das Etapas + Extras)
         </h3>
-        
-        <div id="rankingContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:items-end">
-           <!-- Preenchido via JS (Top 3 ganham destaque, restante em lista) -->
-        </div>
+        <div id="rankingContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:items-end"></div>
       </div>
-
-      <!-- Resumo das Equipes -->
       <div class="glass-panel rounded-2xl p-5">
         <h3 class="font-display text-lg font-bold text-white flex items-center gap-2 mb-4">
           <i class="fa-solid fa-chalkboard-user text-caena-orange"></i> Acompanhamento das Bancadas
         </h3>
         <div id="overviewGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- SECTION: INVENTÁRIO DE COMPONENTES -->
+    <section id="inventorySection" class="hidden space-y-6">
+      <div class="glass-panel rounded-2xl p-5 sm:p-6 border-t-4 border-emerald-400">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+           <div>
+             <h3 class="font-display text-xl font-bold text-white flex items-center gap-2">
+               <i class="fa-solid fa-box-open text-emerald-400"></i> Inventário Geral de Componentes
+             </h3>
+             <p class="text-xs text-slate-400 mt-1">Lista consolidada de peças e os projetos que as requisitaram (com suas quantidades).</p>
+           </div>
+           <button onclick="exportInventoryTXT()" class="gradient-tech text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-lg transition">
+             <i class="fa-solid fa-download"></i> Exportar Lista (.txt)
+           </button>
+        </div>
+        <div id="inventoryContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+           <!-- Preenchido via JS -->
+        </div>
       </div>
     </section>
 
@@ -271,21 +303,35 @@
               </div>
               <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-mono">
                 <span>Extras (Comportamento): <span id="activeTeamPointsExtra">0</span> pts</span>
-                <button onclick="adjustTeamPoints(1)" class="ml-1 px-1.5 py-0.5 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-400 rounded text-[10px] font-bold transition">+</button>
-                <button onclick="adjustTeamPoints(-1)" class="px-1.5 py-0.5 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded text-[10px] font-bold transition">-</button>
+                <button onclick="adjustTeamPoints(1)" class="admin-only ml-1 px-1.5 py-0.5 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-400 rounded text-[10px] font-bold transition hidden">+</button>
+                <button onclick="adjustTeamPoints(-1)" class="admin-only px-1.5 py-0.5 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded text-[10px] font-bold transition hidden">-</button>
               </div>
             </div>
-            <h2 id="activeProjectName" class="font-display text-2xl sm:text-3xl font-bold text-white"></h2>
-            <div class="bg-caena-bg/70 border border-white/10 rounded-xl p-3.5">
-              <p class="text-[11px] font-mono uppercase tracking-wider text-caena-gold mb-1 flex items-center gap-1.5"><i class="fa-solid fa-bullseye"></i> Problema Real & Impacto Vital:</p>
-              <p id="activeProjectProblem" class="text-slate-200 text-sm leading-relaxed"></p>
-            </div>
-            <div class="flex flex-wrap items-center gap-2 pt-1">
-              <span class="text-xs font-mono text-slate-400 mr-1"><i class="fa-solid fa-microchip text-caena-orange mr-1"></i>Componentes:</span>
-              <div id="activeTeamComponents" class="flex flex-wrap gap-1.5"></div>
+            
+            <div class="flex flex-col md:flex-row gap-4 pt-1">
+              <div class="flex-1 space-y-3">
+                <h2 id="activeProjectName" class="font-display text-2xl sm:text-3xl font-bold text-white leading-tight"></h2>
+                <div class="bg-caena-bg/70 border border-white/10 rounded-xl p-3.5">
+                  <p class="text-[11px] font-mono uppercase tracking-wider text-caena-gold mb-1 flex items-center gap-1.5"><i class="fa-solid fa-bullseye"></i> Problema Real & Impacto Vital:</p>
+                  <p id="activeProjectProblem" class="text-slate-200 text-sm leading-relaxed"></p>
+                </div>
+                <div class="flex flex-col gap-2 pt-1">
+                  <span class="text-xs font-mono text-slate-400"><i class="fa-solid fa-microchip text-caena-orange mr-1"></i>Componentes e Quantidades:</span>
+                  <div id="activeTeamComponents" class="flex flex-wrap gap-1.5"></div>
+                </div>
+              </div>
+              
+              <!-- Prototype Image Container -->
+              <div class="w-full md:w-64 shrink-0 flex flex-col justify-center border border-white/10 rounded-xl overflow-hidden bg-caena-bg/50 relative group">
+                <img id="activeTeamImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' fill='%23131F42'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' fill='%2394A3B8'%3ESem imagem do protótipo%3C/text%3E%3C/svg%3E" alt="Protótipo" class="img-preview" />
+                <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onclick="openTeamModal(window.state.selectedTeamId)" class="px-3 py-1.5 rounded-lg bg-caena-orange/20 border border-caena-orange/50 text-caena-gold text-xs font-bold shadow-lg backdrop-blur-sm"><i class="fa-solid fa-camera mr-1"></i> Adicionar Foto</button>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="lg:w-80 glass-card rounded-xl p-4 flex flex-col justify-between space-y-4 shrink-0">
+
+          <div class="lg:w-80 glass-card rounded-xl p-4 flex flex-col justify-between space-y-4 shrink-0 h-full">
             <div>
               <div class="flex items-center justify-between text-xs mb-1.5"><span class="font-mono uppercase text-slate-300">Progresso do Projeto</span><span id="activeTeamProgressPct" class="font-mono font-bold text-base text-caena-gold">0%</span></div>
               <div class="w-full h-3 bg-caena-bg rounded-full overflow-hidden border border-white/10"><div id="activeTeamProgressBar" class="h-full gradient-tech transition-all duration-500 rounded-full" style="width: 0%"></div></div>
@@ -296,10 +342,10 @@
               </div>
             </div>
             <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/10">
-              <div id="activeTeamLinks" class="flex items-center gap-2"></div>
-              <div class="flex items-center gap-1.5 ml-auto">
+              <div id="activeTeamLinks" class="flex flex-wrap items-center gap-2"></div>
+              <div class="flex items-center gap-1.5 ml-auto w-full sm:w-auto justify-end mt-2 sm:mt-0">
                 <button onclick="openTeamModal(window.state.selectedTeamId)" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white flex items-center gap-1.5 transition"><i class="fa-solid fa-pen-to-square text-caena-gold"></i> Editar Equipe</button>
-                <button onclick="confirmDeleteTeam(window.state.selectedTeamId)" title="Excluir equipe" class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/25 text-red-400 text-xs transition"><i class="fa-solid fa-trash-can"></i></button>
+                <button onclick="confirmDeleteTeam(window.state.selectedTeamId)" title="Excluir equipe (Apenas Prof.)" class="admin-only p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/25 text-red-400 text-xs transition hidden"><i class="fa-solid fa-trash-can"></i></button>
               </div>
             </div>
           </div>
@@ -307,7 +353,7 @@
         <div class="pt-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
             <h3 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-2"><i class="fa-solid fa-users text-caena-gold"></i> Responsáveis na Bancada</h3>
-            <span class="text-[10px] text-slate-400 bg-white/5 px-2 py-1 rounded border border-white/10"><i class="fa-solid fa-circle-info text-caena-orange"></i> Responsável principal, mas toda a equipe colabora nas etapas!</span>
+            <span class="text-[10px] text-slate-400 bg-white/5 px-2 py-1 rounded border border-white/10"><i class="fa-solid fa-circle-info text-caena-orange"></i> Ter um responsável principal não impede que toda a equipe se ajude nas etapas!</span>
           </div>
           <div id="activeTeamRolesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
         </div>
@@ -321,8 +367,6 @@
             <p class="text-xs text-slate-400 mt-1">Altere o status, descreva os avanços e dê uma nota de 0 a 10 para cada etapa preenchida (a soma define o ranking).</p>
           </div>
         </div>
-        
-        <!-- Os 3 Pilares -->
         <div id="pillarsContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-5"></div>
       </section>
 
@@ -336,7 +380,7 @@
           <button onclick="toggleLogForm()" class="gradient-tech text-slate-950 font-display font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition"><i class="fa-solid fa-plus"></i> Registrar Aula</button>
         </div>
 
-        <form id="classLogForm" onsubmit="handleSaveClassLog(event)" class="glass-card rounded-2xl p-5 space-y-4 border border-caena-orange/40">
+        <form id="classLogForm" onsubmit="handleSaveClassLog(event)" class="glass-card rounded-2xl p-5 space-y-4 border border-caena-orange/40 hidden">
           <div class="flex items-center justify-between border-b border-white/10 pb-3">
             <h3 class="font-display font-bold text-base text-white flex items-center gap-2"><i class="fa-solid fa-pen-nib text-caena-orange"></i> Novo Registro para <span id="logFormTeamName" class="text-caena-gold"></span></h3>
             <input type="hidden" id="editingLogId" value="" />
@@ -372,7 +416,7 @@
             </div>
           </div>
           <div class="flex justify-end gap-2 pt-2">
-            <button type="button" onclick="resetClassLogForm()" class="px-4 py-2 rounded-xl bg-white/5 text-xs font-semibold text-slate-300">Limpar</button>
+            <button type="button" onclick="toggleLogForm()" class="px-4 py-2 rounded-xl bg-white/5 text-xs font-semibold text-slate-300">Cancelar</button>
             <button type="submit" class="gradient-tech text-slate-950 font-display font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm shadow-lg flex items-center gap-2"><i class="fa-solid fa-floppy-disk"></i> <span id="logSubmitBtnText">Salvar Registro</span></button>
           </div>
         </form>
@@ -395,10 +439,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
       <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full gradient-tech"></span><span class="font-display font-bold text-white">Inclusão Tech 2026.2 • CAENA</span></div>
       <div class="flex items-center gap-4">
-        <span class="text-caena-gold font-mono font-bold">v1.12.0</span>
+        <span class="text-caena-gold font-mono font-bold">v1.16.0</span>
         <span class="hidden sm:inline">•</span>
         <span>Gestão de Projetos Finais de Robótica</span>
-        <button onclick="openBackupModal()" class="text-caena-gold hover:underline flex items-center gap-1.5 ml-2"><i class="fa-solid fa-clock-rotate-left"></i> Histórico de Backups na Nuvem</button>
       </div>
     </div>
   </footer>
@@ -421,42 +464,67 @@
         <div class="bg-caena-bg/60 rounded-xl p-4 border border-white/10 space-y-3">
           <div class="mb-3">
             <p class="text-xs font-mono uppercase text-caena-gold"><i class="fa-solid fa-users"></i> Responsáveis na Equipe</p>
-            <p class="text-[10px] text-slate-400 mt-1">Defina o líder de cada função. Lembre-se: ter um responsável principal não impede que a equipe toda se ajude nas etapas!</p>
+            <p class="text-[10px] text-slate-400 mt-1">Defina o líder de cada área (mas todos devem ajudar em tudo).</p>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div><label class="block text-[11px] font-bold text-slate-300">Eng. de Prompt (Fala com IA)</label><input type="text" id="rolePrompt" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
-            <div><label class="block text-[11px] font-bold text-slate-300">Líder de Hardware (Protoboard)</label><input type="text" id="roleHardware" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
-            <div><label class="block text-[11px] font-bold text-slate-300">Piloto do Código (Digita o C++)</label><input type="text" id="roleCode" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
-            <div><label class="block text-[11px] font-bold text-slate-300">Testador / Debugger (Testa)</label><input type="text" id="roleTester" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
+            <div><label class="block text-[11px] font-bold text-slate-300">Eng. de Prompt (IA)</label><input type="text" id="rolePrompt" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
+            <div><label class="block text-[11px] font-bold text-slate-300">Líder de Hardware</label><input type="text" id="roleHardware" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
+            <div><label class="block text-[11px] font-bold text-slate-300">Piloto do Código</label><input type="text" id="roleCode" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
+            <div><label class="block text-[11px] font-bold text-slate-300">Testador / Debugger</label><input type="text" id="roleTester" class="w-full rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white" /></div>
           </div>
         </div>
         
         <div>
-          <label class="block text-xs font-mono text-slate-300 mb-2">Componentes Utilizados</label>
-          <div id="modalComponentsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs mb-2"></div>
+          <div class="flex items-center justify-between mb-2">
+             <label class="block text-xs font-mono text-slate-300">Componentes e Quantidades</label>
+             <span class="text-[9px] text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">Defina o nº de unidades necessárias</span>
+          </div>
+          <div id="modalComponentsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs mb-3"></div>
           <div class="flex gap-2">
-            <input type="text" id="newComponentInput" placeholder="Outro componente? Digite..." class="flex-1 rounded-lg bg-caena-surface border border-caena-border px-3 py-1.5 text-xs text-white focus:outline-none focus:border-caena-orange">
-            <button type="button" onclick="addNewComponent()" class="px-3 py-1.5 rounded-lg bg-caena-orange/20 text-caena-gold hover:bg-caena-orange hover:text-slate-900 transition text-xs font-bold">Adicionar</button>
+            <input type="text" id="newComponentInput" placeholder="Outro componente? Digite..." class="flex-1 rounded-lg bg-caena-surface border border-caena-border px-3 py-2 text-xs text-white focus:outline-none focus:border-caena-orange">
+            <button type="button" onclick="addNewComponent()" class="px-4 py-2 rounded-lg bg-caena-orange/20 text-caena-gold hover:bg-caena-orange hover:text-slate-900 transition text-xs font-bold">Adicionar à lista</button>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div><label class="block text-xs font-mono text-slate-300 mb-1">Link Tinkercad</label><input type="url" id="modalTinkercadUrl" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
-          <div><label class="block text-xs font-mono text-slate-300 mb-1">Link Código C++</label><input type="url" id="modalCodeUrl" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-3">
+             <div><label class="block text-xs font-mono text-slate-300 mb-1">Link Tinkercad</label><input type="url" id="modalTinkercadUrl" placeholder="Opcional" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
+             <div><label class="block text-xs font-mono text-slate-300 mb-1">Link Código C++ (Codeshare)</label><input type="url" id="modalCodeUrl" placeholder="Opcional" class="w-full rounded-xl bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
+          </div>
+          <div class="space-y-3 p-3 rounded-xl bg-blue-900/20 border border-blue-500/30">
+             <div class="flex items-center gap-2 mb-2 text-blue-300 text-xs font-mono font-bold"><i class="fa-solid fa-cloud-arrow-up"></i> Documentação (Drive)</div>
+             <div><label class="block text-[11px] text-slate-300 mb-1">URL da Imagem do Protótipo (Drive/Imgur)</label><input type="url" id="modalImageUrl" placeholder="Link direto para a foto .jpg/.png" class="w-full rounded-lg bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
+             <div><label class="block text-[11px] text-slate-300 mb-1">Pasta Google Drive da Equipe</label><input type="url" id="modalDriveUrl" placeholder="Link da pasta partilhada" class="w-full rounded-lg bg-caena-bg border border-caena-border px-3 py-2 text-xs text-white" /></div>
+          </div>
         </div>
-        <div class="flex justify-end gap-3 pt-4 border-t border-white/10"><button type="button" onclick="closeTeamModal()" class="px-4 py-2.5 rounded-xl bg-white/5 text-xs text-slate-300">Cancelar</button><button type="submit" class="gradient-tech text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs sm:text-sm">Salvar</button></div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-white/10"><button type="button" onclick="closeTeamModal()" class="px-4 py-2.5 rounded-xl bg-white/5 text-xs text-slate-300">Cancelar</button><button type="submit" class="gradient-tech text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs sm:text-sm">Salvar Equipe</button></div>
       </form>
     </div>
   </div>
 
   <div id="safetyModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm"><div class="glass-panel rounded-2xl max-w-2xl w-full p-6 border border-emerald-500/40"><h3 class="font-display font-bold text-lg text-white border-b border-white/10 pb-3 mb-3">Guia de Segurança (Ecodesign)</h3><p class="text-sm text-slate-300">1. PROIBIDO usar Cola Quente na placa Arduino, sensores ou motores (Isso destrói os componentes eletrônicos).</p><p class="text-sm text-slate-300 mt-2">2. Cole apenas a estrutura do robô (papelão, palitos). Para fixar a eletrônica, utilize fita crepe, elásticos, abraçadeiras ou encaixes.</p><div class="flex justify-end pt-4 border-t border-white/10 mt-4"><button onclick="closeSafetyModal()" class="gradient-tech text-slate-950 font-bold px-5 py-2 rounded-xl text-xs">Entendido</button></div></div></div>
   <div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm"><div class="glass-panel rounded-2xl max-w-md w-full p-6 border border-white/15"><h3 id="confirmModalTitle" class="font-bold text-white mb-1"></h3><p id="confirmModalMessage" class="text-xs text-slate-300 mb-4"></p><div class="flex justify-end gap-2"><button onclick="closeConfirmModal()" class="px-4 py-2 bg-white/5 text-slate-300 rounded-xl text-xs">Cancelar</button><button id="confirmModalActionBtn" class="px-4 py-2 bg-red-500 text-white rounded-xl text-xs font-bold">Confirmar</button></div></div></div>
-  <div id="backupModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm"><div class="glass-panel rounded-2xl max-w-lg w-full p-6 border border-white/15 max-h-[85vh] flex flex-col"><div class="flex items-center justify-between border-b border-white/10 pb-3"><h3 class="font-display font-bold text-lg text-white">Histórico de Backups Automáticos</h3><button onclick="closeBackupModal()" class="text-slate-300"><i class="fa-solid fa-xmark"></i></button></div><div id="backupList" class="overflow-y-auto pr-2 space-y-2 mt-3 flex-1 min-h-[200px] max-h-[350px]"></div></div></div>
+  
+  <!-- MODAL SENHA PROFESSOR -->
+  <div id="adminModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+    <div class="glass-panel rounded-2xl max-w-sm w-full p-6 border border-slate-500/40 text-center">
+      <div class="w-12 h-12 rounded-full bg-slate-500/20 text-slate-300 flex items-center justify-center mx-auto text-xl mb-3"><i class="fa-solid fa-lock"></i></div>
+      <h3 class="font-display font-bold text-lg text-white mb-2">Acesso Restrito</h3>
+      <p class="text-xs text-slate-400 mb-4">Insira a senha do professor para ativar o modo de avaliação e exclusão.</p>
+      <input type="password" id="adminPasswordInput" placeholder="Senha..." class="w-full rounded-xl bg-caena-bg border border-caena-border px-3 py-2 text-sm text-white mb-4 text-center focus:outline-none focus:border-caena-orange" />
+      <div class="flex justify-center gap-2">
+        <button onclick="closeAdminModal()" class="px-4 py-2 bg-white/5 text-slate-300 rounded-xl text-xs">Cancelar</button>
+        <button onclick="verifyAdminPassword()" class="px-4 py-2 bg-slate-500 hover:bg-slate-600 text-white rounded-xl text-xs font-bold transition">Acessar</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, set, push, get, query, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB0S4faPWPLkk9cuXEzJwh_R0DdQgrjw8A",
@@ -474,79 +542,38 @@
 
     const AVAILABLE_COMPONENTS = ['Arduino Uno / Nano', 'Sensor Ultrassônico HC-SR04', 'Sensor DHT11', 'Display LCD 16x2', 'LEDs & Resistores', 'Botão (Pushbutton)', 'Servomotor / Motor DC', 'Buzzer', 'Ecodesign (Papelão/Sucata)'];
     const OFFICIAL_PILLARS = [
-      { 
-        id: 'ideacao', 
-        title: '1. Ideação', 
-        subtitle: 'Problema, empatia e viabilidade',
-        icon: 'fa-lightbulb',
-        accentClass: 'text-caena-gold',
-        borderClass: 'border-caena-gold/30',
-        bgBadge: 'bg-caena-gold/15 text-caena-gold',
-        steps: [
-            {key:'def_problema',label:'Definição do problema', hint:'Qual dor real vamos resolver?'},
-            {key:'brainstorming',label:'Brainstorming de soluções', hint:'Ideias geradas pela equipe e IA'},
-            {key:'viabilidade',label:'Estudo de viabilidade', hint:'É possível construir?'},
-            {key:'escopo',label:'Escopo do projeto', hint:'O que o protótipo fará?'}
-        ] 
-      },
-      { 
-        id: 'circuito', 
-        title: '2. Circuito', 
-        subtitle: 'Eletrônica, Tinkercad e C++',
-        icon: 'fa-microchip',
-        accentClass: 'text-caena-orange',
-        borderClass: 'border-caena-orange/30',
-        bgBadge: 'bg-caena-orange/15 text-caena-orange',
-        steps: [
-            {key:'escolha_comp',label:'Escolha dos componentes', hint:'Sensores e atuadores'},
-            {key:'esquema_eletrico',label:'Esquema elétrico', hint:'Tinkercad simulado'},
-            {key:'montagem_proto',label:'Montagem do protótipo', hint:'Protoboard física'},
-            {key:'prog_calibracao',label:'Programação e calibração', hint:'Código C++'}
-        ] 
-      },
-      { 
-        id: 'design', 
-        title: '3. Design & Ecodesign', 
-        subtitle: 'UX e estrutura sustentável',
-        icon: 'fa-compass-drafting',
-        accentClass: 'text-emerald-400',
-        borderClass: 'border-emerald-500/30',
-        bgBadge: 'bg-emerald-500/15 text-emerald-400',
-        steps: [
-            {key:'ux_design',label:'Design de experiência', hint:'Interação com o usuário'},
-            {key:'modelagem_fisica',label:'Modelagem física', hint:'Ecodesign sem cola na eletrônica'},
-            {key:'identidade_visual',label:'Identidade visual', hint:'Nome, cores e sinalização'},
-            {key:'montagem_final',label:'Montagem final', hint:'Integração na carcaça'}
-        ] 
-      }
+      { id: 'ideacao', title: '1. Ideação', subtitle: 'Problema, empatia e viabilidade', icon: 'fa-lightbulb', accentClass: 'text-caena-gold', borderClass: 'border-caena-gold/30', bgBadge: 'bg-caena-gold/15 text-caena-gold', steps: [{key:'def_problema',label:'Definição do problema', hint:'Qual dor real vamos resolver?'},{key:'brainstorming',label:'Brainstorming de soluções', hint:'Ideias geradas pela equipe e IA'},{key:'viabilidade',label:'Estudo de viabilidade', hint:'É possível construir?'},{key:'escopo',label:'Escopo do projeto', hint:'O que o protótipo fará?'}] },
+      { id: 'circuito', title: '2. Circuito', subtitle: 'Eletrônica, Tinkercad e C++', icon: 'fa-microchip', accentClass: 'text-caena-orange', borderClass: 'border-caena-orange/30', bgBadge: 'bg-caena-orange/15 text-caena-orange', steps: [{key:'escolha_comp',label:'Escolha dos componentes', hint:'Sensores e atuadores'},{key:'esquema_eletrico',label:'Esquema elétrico', hint:'Tinkercad simulado'},{key:'montagem_proto',label:'Montagem do protótipo', hint:'Protoboard física'},{key:'prog_calibracao',label:'Programação e calibração', hint:'Código C++'}] },
+      { id: 'design', title: '3. Design & Ecodesign', subtitle: 'UX e estrutura sustentável', icon: 'fa-compass-drafting', accentClass: 'text-emerald-400', borderClass: 'border-emerald-500/30', bgBadge: 'bg-emerald-500/15 text-emerald-400', steps: [{key:'ux_design',label:'Design de experiência', hint:'Interação com o usuário'},{key:'modelagem_fisica',label:'Modelagem física', hint:'Ecodesign sem cola na eletrônica'},{key:'identidade_visual',label:'Identidade visual', hint:'Nome, cores e sinalização'},{key:'montagem_final',label:'Montagem final', hint:'Integração na carcaça'}] }
     ];
 
-    const state = { teams: [], selectedTeamId: null, viewMode: 'detail', searchQuery: '', globalDoubtFilter: false, teamLogFilter: 'all' };
-    window.state = state; // Torna o estado acessível globalmente (resolve o bug do botão de edição)
+    const state = { teams: [], selectedTeamId: null, viewMode: 'detail', searchQuery: '', globalDoubtFilter: false, teamLogFilter: 'all', isAdmin: false };
+    window.state = state; 
     
-    let isUserTyping = false, pendingRender = false, lastBackupTime = 0, isInitialLoad = true;
+    let isUserTyping = false, pendingRender = false, isInitialLoad = true;
 
     window.addEventListener('focusin', (e) => { if (['TEXTAREA', 'INPUT', 'SELECT'].includes(e.target.tagName)) isUserTyping = true; });
     window.addEventListener('focusout', (e) => { if (['TEXTAREA', 'INPUT', 'SELECT'].includes(e.target.tagName)) { setTimeout(() => { isUserTyping = false; if (pendingRender) { renderAll(); pendingRender = false; } }, 150); } });
 
-    function saveState(action = "Atualização", forceBackup = false) {
+    function saveState() {
       set(ref(db, 'projetos_caena/equipes'), state.teams).catch(() => showToast('Erro de conexão ao salvar na nuvem.', 'error'));
-      const now = Date.now();
-      if (forceBackup || now - lastBackupTime > 2 * 60 * 1000) { 
-        lastBackupTime = now;
-        push(ref(db, 'projetos_caena/backups'), { timestamp: now, dateStr: new Date().toLocaleString('pt-BR'), action: action, data: state.teams || [] });
-      }
     }
 
     onValue(ref(db, 'projetos_caena/equipes'), (snapshot) => {
       const data = snapshot.val();
       state.teams = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-      if(state.teams.length > 0 && !state.teams.some(t => t.id === state.selectedTeamId)) state.selectedTeamId = state.teams[0].id;
+      if(state.teams.length > 0 && (!state.selectedTeamId || !state.teams.some(t => t.id === state.selectedTeamId))) state.selectedTeamId = state.teams[0].id;
       if (isInitialLoad) {
         renderAll(); isInitialLoad = false;
         setTimeout(() => { const l = document.getElementById('globalLoader'); if(l) { l.style.opacity = '0'; setTimeout(()=>l.remove(), 500); } }, 300);
       } else { if (isUserTyping) pendingRender = true; else renderAll(); }
+    }, (error) => {
+      console.error("Erro Firebase:", error);
+      showToast('Erro de conexão ou permissão na nuvem.', 'error');
+      const l = document.getElementById('globalLoader'); if(l) { l.style.opacity = '0'; setTimeout(()=>l.remove(), 500); }
     });
+
+    setTimeout(() => { const l = document.getElementById('globalLoader'); if(l && l.style.opacity !== '0') { l.style.opacity = '0'; setTimeout(()=>l.remove(), 500); } }, 6000);
 
     function escapeHtml(str) { return str ? String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]) : ''; }
     
@@ -582,27 +609,50 @@
       const val = input.value.trim();
       if (!val) return;
       const grid = document.getElementById('modalComponentsGrid');
-      const label = document.createElement('label');
-      label.className = "flex items-center gap-2 p-2 rounded-lg bg-caena-bg border border-white/10 cursor-pointer";
-      label.innerHTML = `<input type="checkbox" name="teamComponent" value="${escapeHtml(val)}" checked class="accent-caena-orange"><span class="text-slate-200 truncate">${escapeHtml(val)}</span>`;
-      grid.appendChild(label);
+      
+      const div = document.createElement('div');
+      div.className = "flex items-center justify-between p-2 rounded-lg bg-caena-bg border border-white/10 relative group component-item";
+      div.innerHTML = `
+        <label class="flex items-center gap-2 cursor-pointer flex-1 min-w-0">
+            <input type="checkbox" value="${escapeHtml(val)}" checked onchange="this.closest('.component-item').querySelector('input[type=number]').disabled = !this.checked" class="accent-caena-orange shrink-0">
+            <span class="text-slate-200 truncate pr-2 text-[11px]">${escapeHtml(val)}</span>
+        </label>
+        <div class="flex items-center gap-1 shrink-0">
+            <input type="number" min="1" max="99" value="1" class="w-12 rounded bg-caena-surface border border-caena-border px-1 py-0.5 text-[10px] text-center text-white focus:border-caena-orange outline-none transition-opacity">
+            <button type="button" onclick="this.closest('.component-item').remove()" class="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity ml-1" title="Remover"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      `;
+      grid.appendChild(div);
       input.value = '';
     };
 
     window.handleSaveTeam = (e) => {
       e.preventDefault();
       const id = document.getElementById('modalTeamId').value || 'team-' + Date.now();
+      
+      const componentsToSave = [];
+      document.querySelectorAll('.component-item').forEach(el => {
+          const cb = el.querySelector('input[type="checkbox"]');
+          if (cb && cb.checked) {
+              const qtyInput = el.querySelector('input[type="number"]');
+              componentsToSave.push({ name: cb.value, qty: parseInt(qtyInput.value) || 1 });
+          }
+      });
+
       const t = {
         id, teamName: document.getElementById('modalTeamName').value, projectName: document.getElementById('modalProjectName').value, problemDescription: document.getElementById('modalProjectProblem').value, points: id.startsWith('team-')?0:(state.teams.find(x=>x.id===id).points||0),
         roles: { prompt: document.getElementById('rolePrompt').value, hardware: document.getElementById('roleHardware').value, code: document.getElementById('roleCode').value, tester: document.getElementById('roleTester').value },
-        components: Array.from(document.querySelectorAll('input[name="teamComponent"]:checked')).map(el=>el.value),
+        components: componentsToSave,
         tinkercadUrl: document.getElementById('modalTinkercadUrl').value, codeUrl: document.getElementById('modalCodeUrl').value,
+        imageUrl: document.getElementById('modalImageUrl').value, driveUrl: document.getElementById('modalDriveUrl').value,
         steps: id.startsWith('team-')?OFFICIAL_PILLARS.reduce((a,p)=>{p.steps.forEach(s=>a[s.key]={status:'pending',notes:'',score:0});return a;},{}):state.teams.find(x=>x.id===id).steps,
         logs: id.startsWith('team-')?[]:state.teams.find(x=>x.id===id).logs
       };
       if(id.startsWith('team-') && !document.getElementById('modalTeamId').value) { state.teams.push(t); state.selectedTeamId=id; } else { state.teams[state.teams.findIndex(x=>x.id===id)] = t; }
-      saveState("Cadastro Equipe", true); closeTeamModal(); showToast('Equipe salva!');
+      saveState(); closeTeamModal(); showToast('Equipe salva!');
     };
+
+    window.toggleLogForm = () => { const f = document.getElementById('classLogForm'); f.classList.toggle('hidden'); if(!f.classList.contains('hidden')){ window.setDefaultLogDate(); f.scrollIntoView({behavior: 'smooth'}); } };
 
     window.handleSaveClassLog = (e) => {
       e.preventDefault();
@@ -612,46 +662,148 @@
       if(!team.logs) team.logs = [];
       const idx = team.logs.findIndex(l=>l.id===logId);
       if(idx > -1) team.logs[idx] = log; else team.logs.unshift(log);
-      saveState("Diário", true); resetClassLogForm(); showToast('Diário salvo!');
+      saveState(); resetClassLogForm(); document.getElementById('classLogForm').classList.add('hidden'); showToast('Diário salvo!');
     };
 
     window.handleStepStatusChange = (key, val) => { const t = state.teams.find(x=>x.id===state.selectedTeamId); if(t){ if(!t.steps)t.steps={}; if(!t.steps[key])t.steps[key]={}; t.steps[key].status=val; saveState(); } };
     let notesDebounceTimers = {};
     window.handleStepNotesInput = (key, val) => { const t = state.teams.find(x=>x.id===state.selectedTeamId); if(t){ if(!t.steps)t.steps={}; if(!t.steps[key])t.steps[key]={}; t.steps[key].notes=val; saveState(); const i = document.getElementById(`saveIndicator_${key}`); if(i){ i.classList.remove('opacity-0'); clearTimeout(notesDebounceTimers[key]); notesDebounceTimers[key] = setTimeout(()=>i.classList.add('opacity-0'),1600); } } };
-    window.handleStepScoreInput = (key, val) => { const t = state.teams.find(x=>x.id===state.selectedTeamId); if(t){ if(!t.steps)t.steps={}; if(!t.steps[key])t.steps[key]={}; let num = parseInt(val)||0; if(num<0)num=0; if(num>10)num=10; t.steps[key].score = num; document.getElementById(`scoreInput_${key}`).value=num; saveState(); if(state.viewMode==='overview') renderRanking(); } };
+    window.handleStepScoreInput = (key, val) => { 
+        if(!state.isAdmin) { showToast('Apenas o professor pode atribuir notas.','error'); renderActiveTeamWorkspace(); return; }
+        const t = state.teams.find(x=>x.id===state.selectedTeamId); if(t){ if(!t.steps)t.steps={}; if(!t.steps[key])t.steps[key]={}; let num = parseInt(val)||0; if(num<0)num=0; if(num>10)num=10; t.steps[key].score = num; document.getElementById(`scoreInput_${key}`).value=num; saveState(); if(state.viewMode==='overview') renderRanking(); } 
+    };
     
     window.toggleDoubtResolved = (id) => { const t = state.teams.find(x=>x.id===state.selectedTeamId); if(t){ const l=t.logs.find(x=>x.id===id); if(l){l.hasOpenDoubt=!l.hasOpenDoubt; saveState();} } };
     window.saveProfessorReply = (id, txt) => { const t = state.teams.find(x=>x.id===state.selectedTeamId); if(t){ const l=t.logs.find(x=>x.id===id); if(l){l.professorReply=txt.trim(); saveState(); showToast('Dica salva!');} } };
     
     window.selectTeam = (id) => { state.selectedTeamId = id; renderAll(); };
-    window.setViewMode = (mode) => { state.viewMode = mode; document.getElementById('classOverviewSection').classList.toggle('hidden', mode !== 'overview'); document.getElementById('activeTeamWorkspace').classList.toggle('hidden', mode === 'overview'); renderAll(); };
+    window.setViewMode = (mode) => { 
+        state.viewMode = mode; 
+        document.getElementById('classOverviewSection').classList.toggle('hidden', mode !== 'overview'); 
+        document.getElementById('activeTeamWorkspace').classList.toggle('hidden', mode !== 'detail'); 
+        document.getElementById('inventorySection').classList.toggle('hidden', mode !== 'inventory');
+        renderAll(); 
+    };
     window.handleSearchTeams = (q) => { state.searchQuery = q.toLowerCase(); document.getElementById('clearSearchBtn').classList.toggle('hidden', !q); renderAll(); };
     window.clearTeamSearch = () => { document.getElementById('teamSearchInput').value=''; handleSearchTeams(''); };
     window.toggleGlobalDoubtFilter = () => { state.globalDoubtFilter = !state.globalDoubtFilter; renderAll(); };
     window.setTeamLogFilter = (f) => { state.teamLogFilter = f; renderActiveTeamWorkspace(); };
     window.resetClassLogForm = () => { document.getElementById('editingLogId').value=''; document.getElementById('logAdvancesInput').value=''; document.getElementById('logDoubtsInput').value=''; document.getElementById('logNextStepsInput').value=''; document.getElementById('logSubmitBtnText').innerText='Salvar Registro'; window.setDefaultLogDate(); };
-    window.editClassLog = (id) => { const l=state.teams.find(t=>t.id===state.selectedTeamId)?.logs?.find(x=>x.id===id); if(l){ document.getElementById('editingLogId').value=l.id; document.getElementById('logLessonSelect').value=l.lesson; document.getElementById('logDateInput').value=l.date; document.getElementById('logAdvancesInput').value=l.advances; document.getElementById('logDoubtsInput').value=l.doubts; document.getElementById('logNextStepsInput').value=l.nextSteps; document.getElementById('classLogForm').scrollIntoView(); } };
-    window.confirmDeleteClassLog = (id) => { openConfirmModal('Excluir?', 'Deseja remover este registro?', () => { const t=state.teams.find(x=>x.id===state.selectedTeamId); if(t){ t.logs=t.logs.filter(l=>l.id!==id); saveState("Apagou log", true); renderAll(); } }); };
-    window.confirmDeleteTeam = (id) => { if(state.teams.length<=1)return showToast('Mantenha 1 equipe no mínimo','error'); openConfirmModal('Apagar Equipe?', 'Certeza que deseja excluir o projeto e todo o histórico?', () => { state.teams=state.teams.filter(t=>t.id!==id); state.selectedTeamId=state.teams[0].id; saveState("Apagou equipe", true); renderAll(); }); };
-    window.openTeamModal = (id=null) => { const t = id?state.teams.find(x=>x.id===id):null; document.getElementById('modalTeamId').value=t?t.id:''; document.getElementById('modalTeamName').value=t?t.teamName:''; document.getElementById('modalProjectName').value=t?t.projectName:''; document.getElementById('modalProjectProblem').value=t?t.problemDescription:''; document.getElementById('rolePrompt').value=t?.roles?.prompt||''; document.getElementById('roleHardware').value=t?.roles?.hardware||''; document.getElementById('roleCode').value=t?.roles?.code||''; document.getElementById('roleTester').value=t?.roles?.tester||''; document.getElementById('modalTinkercadUrl').value=t?.tinkercadUrl||''; document.getElementById('modalCodeUrl').value=t?.codeUrl||''; const sc=t?.components||AVAILABLE_COMPONENTS.slice(0,3); const allComps=[...new Set([...AVAILABLE_COMPONENTS,...sc])]; document.getElementById('modalComponentsGrid').innerHTML=allComps.map(c=>`<label class="flex items-center gap-2 p-2 rounded-lg bg-caena-bg border border-white/10 cursor-pointer"><input type="checkbox" name="teamComponent" value="${escapeHtml(c)}" ${sc.includes(c)?'checked':''} class="accent-caena-orange"><span class="text-slate-200 truncate">${escapeHtml(c)}</span></label>`).join(''); document.getElementById('teamModal').classList.remove('hidden'); document.getElementById('teamModal').classList.add('flex'); };
+    window.editClassLog = (id) => { const l=state.teams.find(t=>t.id===state.selectedTeamId)?.logs?.find(x=>x.id===id); if(l){ document.getElementById('editingLogId').value=l.id; document.getElementById('logLessonSelect').value=l.lesson; document.getElementById('logDateInput').value=l.date; document.getElementById('logAdvancesInput').value=l.advances; document.getElementById('logDoubtsInput').value=l.doubts; document.getElementById('logNextStepsInput').value=l.nextSteps; document.getElementById('classLogForm').classList.remove('hidden'); document.getElementById('classLogForm').scrollIntoView(); } };
+    window.confirmDeleteClassLog = (id) => { openConfirmModal('Excluir?', 'Deseja remover este registro?', () => { const t=state.teams.find(x=>x.id===state.selectedTeamId); if(t){ t.logs=t.logs.filter(l=>l.id!==id); saveState(); renderAll(); } }); };
+    window.confirmDeleteTeam = (id) => { 
+        if(!state.isAdmin) return showToast('Apenas o professor pode excluir equipes.', 'error');
+        if(state.teams.length<=1)return showToast('Mantenha 1 equipe no mínimo','error'); 
+        openConfirmModal('Apagar Equipe?', 'Certeza que deseja excluir o projeto e todo o histórico?', () => { state.teams=state.teams.filter(t=>t.id!==id); state.selectedTeamId=state.teams[0].id; saveState(); renderAll(); }); 
+    };
+    window.openTeamModal = (id=null) => { 
+        const t = id?state.teams.find(x=>x.id===id):null; 
+        document.getElementById('modalTeamId').value=t?t.id:''; 
+        document.getElementById('modalTeamName').value=t?t.teamName:''; 
+        document.getElementById('modalProjectName').value=t?t.projectName:''; 
+        document.getElementById('modalProjectProblem').value=t?t.problemDescription:''; 
+        document.getElementById('rolePrompt').value=t?.roles?.prompt||''; 
+        document.getElementById('roleHardware').value=t?.roles?.hardware||''; 
+        document.getElementById('roleCode').value=t?.roles?.code||''; 
+        document.getElementById('roleTester').value=t?.roles?.tester||''; 
+        document.getElementById('modalTinkercadUrl').value=t?.tinkercadUrl||''; 
+        document.getElementById('modalCodeUrl').value=t?.codeUrl||''; 
+        document.getElementById('modalImageUrl').value=t?.imageUrl||''; 
+        document.getElementById('modalDriveUrl').value=t?.driveUrl||''; 
+        
+        const savedComps = t?.components || AVAILABLE_COMPONENTS.slice(0,3).map(c => ({name: c, qty: 1})); 
+        const normalizedSaved = savedComps.map(c => typeof c === 'string' ? {name: c, qty: 1} : c);
+        const savedNames = normalizedSaved.map(c => c.name);
+        
+        const allCompsNames = [...new Set([...AVAILABLE_COMPONENTS, ...savedNames])]; 
+        
+        document.getElementById('modalComponentsGrid').innerHTML = allCompsNames.map(c => {
+            const isCustom = !AVAILABLE_COMPONENTS.includes(c);
+            const compData = normalizedSaved.find(x => x.name === c);
+            const isChecked = !!compData;
+            const qty = compData ? compData.qty : 1;
+            
+            const deleteBtn = isCustom ? `<button type="button" onclick="this.closest('.component-item').remove()" class="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity ml-1" title="Remover"><i class="fa-solid fa-xmark"></i></button>` : '';
+            
+            return `
+            <div class="flex items-center justify-between p-2 rounded-lg bg-caena-bg border border-white/10 relative group component-item">
+                <label class="flex items-center gap-2 cursor-pointer flex-1 min-w-0">
+                    <input type="checkbox" value="${escapeHtml(c)}" ${isChecked?'checked':''} onchange="this.closest('.component-item').querySelector('input[type=number]').disabled = !this.checked" class="accent-caena-orange shrink-0">
+                    <span class="text-slate-200 truncate pr-2 text-[11px]">${escapeHtml(c)}</span>
+                </label>
+                <div class="flex items-center gap-1 shrink-0">
+                    <input type="number" min="1" max="99" value="${qty}" ${!isChecked?'disabled':''} class="w-12 rounded bg-caena-surface border border-caena-border px-1 py-0.5 text-[10px] text-center text-white focus:border-caena-orange outline-none disabled:opacity-30 transition-opacity">
+                    ${deleteBtn}
+                </div>
+            </div>`;
+        }).join(''); 
+        
+        document.getElementById('teamModal').classList.remove('hidden'); 
+        document.getElementById('teamModal').classList.add('flex'); 
+    };
     window.closeTeamModal = () => { document.getElementById('teamModal').classList.add('hidden'); document.getElementById('teamModal').classList.remove('flex'); };
     window.openSafetyModal = () => { document.getElementById('safetyModal').classList.remove('hidden'); document.getElementById('safetyModal').classList.add('flex'); };
     window.closeSafetyModal = () => { document.getElementById('safetyModal').classList.add('hidden'); document.getElementById('safetyModal').classList.remove('flex'); };
     
-    window.adjustTeamPoints = (d) => { const team = state.teams.find(t => t.id === state.selectedTeamId); if(team) { team.points = (team.points || 0) + d; saveState(); if(state.viewMode==='overview') renderRanking(); else {document.getElementById('activeTeamPointsExtra').innerText = team.points || 0; document.getElementById('activeTeamPointsTotal').innerText = calculateMetrics(team).rankingScore + ' pts';} } };
+    window.adjustTeamPoints = (d) => { 
+        if(!state.isAdmin) return showToast('Apenas o professor pode alterar pontos.', 'error');
+        const team = state.teams.find(t => t.id === state.selectedTeamId); if(team) { team.points = (team.points || 0) + d; saveState(); if(state.viewMode==='overview') renderRanking(); else {document.getElementById('activeTeamPointsExtra').innerText = team.points || 0; document.getElementById('activeTeamPointsTotal').innerText = calculateMetrics(team).rankingScore + ' pts';} } 
+    };
 
     let confCb=null; window.openConfirmModal = (t,m,cb) => { document.getElementById('confirmModalTitle').innerText=t; document.getElementById('confirmModalMessage').innerText=m; confCb=cb; document.getElementById('confirmModal').classList.remove('hidden'); document.getElementById('confirmModal').classList.add('flex'); }; window.closeConfirmModal = () => { document.getElementById('confirmModal').classList.add('hidden'); document.getElementById('confirmModal').classList.remove('flex'); confCb=null; }; document.getElementById('confirmModalActionBtn').addEventListener('click', ()=>{if(confCb)confCb();closeConfirmModal();});
     
-    window.openBackupModal = async () => { document.getElementById('backupModal').classList.remove('hidden'); document.getElementById('backupModal').classList.add('flex'); const L = document.getElementById('backupList'); L.innerHTML='<p class="text-slate-400 text-sm">Carregando backups da nuvem...</p>'; try{ const q = query(ref(db, 'projetos_caena/backups'), limitToLast(10)); const sn = await get(q); const bks=[]; sn.forEach(c=>bks.push({id:c.key,...c.val()})); bks.reverse(); if(!bks.length)return L.innerHTML='<p class="text-slate-400">Nenhum backup.</p>'; L.innerHTML=bks.map(b=>`<div class="flex justify-between items-center bg-white/5 p-3 rounded mb-2"><div><p class="font-bold text-white text-sm">${b.dateStr}</p><p class="text-xs text-caena-gold uppercase">${b.action}</p></div><button onclick="restoreBackup('${b.id}')" class="bg-caena-orange text-slate-900 text-xs font-bold px-3 py-1 rounded">Restaurar</button></div>`).join(''); }catch(e){L.innerHTML='Erro ao carregar.'} };
-    window.closeBackupModal = () => { document.getElementById('backupModal').classList.add('hidden'); document.getElementById('backupModal').classList.remove('flex'); };
-    window.restoreBackup = (id) => { openConfirmModal('Restaurar Versão?', 'Substituirá os dados atuais pelo backup.', async () => { try{ const sn = await get(ref(db, `projetos_caena/backups/${id}/data`)); if(sn.val()){ state.teams=sn.val(); if(state.teams.length)state.selectedTeamId=state.teams[0].id; saveState('Restauração', true); closeBackupModal(); renderAll(); showToast('Restaurado!'); } }catch(e){showToast('Erro','error')} }); };
-
     window.copyTinkercadCode = () => { navigator.clipboard.writeText('MRX RNT M63'); showToast('Código copiado!'); };
     window.showToast = (msg, type='success') => { const c=document.getElementById('toastContainer'); const t=document.createElement('div'); const ic=type==='error'?'fa-triangle-exclamation text-red-400':'fa-check-circle text-emerald-400'; t.className=`glass-panel rounded-xl px-4 py-3 border ${type==='error'?'border-red-500/40':'border-emerald-500/40'} flex items-center gap-3 text-sm text-white transition-all`; t.innerHTML=`<i class="fa-solid ${ic}"></i><span>${escapeHtml(msg)}</span>`; c.appendChild(t); setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),250);},3000); };
 
+    // Admin Mode Logic
+    window.toggleAdminMode = () => {
+        if(state.isAdmin) { state.isAdmin = false; showToast('Modo Professor desativado.'); renderAll(); } 
+        else { document.getElementById('adminPasswordInput').value = ''; document.getElementById('adminModal').classList.remove('hidden'); document.getElementById('adminModal').classList.add('flex'); document.getElementById('adminPasswordInput').focus(); }
+    };
+    window.closeAdminModal = () => { document.getElementById('adminModal').classList.add('hidden'); document.getElementById('adminModal').classList.remove('flex'); };
+    window.verifyAdminPassword = () => {
+        if(document.getElementById('adminPasswordInput').value === 'caena2026') { state.isAdmin = true; closeAdminModal(); showToast('Modo Professor ativo!'); renderAll(); } 
+        else { showToast('Senha incorreta.', 'error'); }
+    };
+    function updateAdminUI() {
+        const btn = document.getElementById('btnAdminMode');
+        if(state.isAdmin) { btn.classList.remove('bg-slate-500/10', 'border-slate-500/30', 'text-slate-300'); btn.classList.add('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-400'); btn.innerHTML = '<i class="fa-solid fa-unlock"></i><span class="hidden sm:inline">Modo Professor</span>'; } 
+        else { btn.classList.add('bg-slate-500/10', 'border-slate-500/30', 'text-slate-300'); btn.classList.remove('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-400'); btn.innerHTML = '<i class="fa-solid fa-lock"></i><span class="hidden sm:inline">Modo Professor</span>'; }
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('hidden', !state.isAdmin));
+    }
+
+    // Countdown Logic Updated (Days & Weeks)
+    function updateCountdown() {
+        const deadline = new Date("2026-11-26T23:59:59").getTime();
+        const now = new Date().getTime();
+        const t = deadline - now;
+        
+        if (t < 0) {
+             document.getElementById("countdownTimer").innerHTML = "PRAZO ENCERRADO!";
+             document.getElementById("classCountdown").innerHTML = "";
+             return;
+        }
+        
+        const days = Math.floor(t / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const weeks = Math.ceil(days / 7);
+        
+        document.getElementById("countdownTimer").innerHTML = `${days}d ${hours}h restantes`;
+        document.getElementById("classCountdown").innerHTML = `~ ${weeks} aulas rest.`;
+    }
+    setInterval(updateCountdown, 1000); updateCountdown();
+
     function getFilteredAndRankedTeams() {
       const rankedTeams = [...state.teams].sort((a,b) => calculateMetrics(b).rankingScore - calculateMetrics(a).rankingScore);
-      return rankedTeams.filter(t => { const m = calculateMetrics(t); if(state.globalDoubtFilter && !m.openDoubts) return false; if(state.searchQuery) return (t.teamName+' '+t.projectName+' '+(t.components||[]).join(' ')).toLowerCase().includes(state.searchQuery); return true; });
+      return rankedTeams.filter(t => { 
+          const m = calculateMetrics(t); 
+          if(state.globalDoubtFilter && !m.openDoubts) return false; 
+          if(state.searchQuery) {
+              const compNames = (t.components||[]).map(c => typeof c === 'string' ? c : c.name).join(' ');
+              return (t.teamName+' '+t.projectName+' '+compNames).toLowerCase().includes(state.searchQuery); 
+          }
+          return true; 
+      });
     }
 
     function renderAll() {
@@ -667,23 +819,90 @@
       document.getElementById('teamSelectorContainer').innerHTML = filtered.map(t => { const m = calculateMetrics(t); const sel = t.id===state.selectedTeamId; return `<div onclick="selectTeam('${t.id}')" class="glass-card rounded-xl p-3 cursor-pointer ${sel?'team-tab-active':''}"><div class="flex justify-between text-[11px] font-mono text-caena-gold mb-1"><b>${escapeHtml(t.teamName)}</b>${m.openDoubts?`<span class="bg-red-500/20 text-red-400 px-1 rounded"><i class="fa-solid fa-hand"></i> ${m.openDoubts}</span>`:''}</div><h3 class="text-sm font-bold text-white truncate">${escapeHtml(t.projectName)}</h3><div class="flex justify-between items-end mt-2"><div class="flex-1 mr-3 h-1 bg-caena-bg rounded"><div class="h-full bg-caena-orange" style="width:${m.totalPct}%"></div></div><span class="text-[10px] font-bold text-caena-gold">★ ${m.rankingScore}</span></div></div>`; }).join('');
 
       if(state.viewMode==='overview') renderRanking(); 
+      else if(state.viewMode==='inventory') renderInventory();
       else renderActiveTeamWorkspace();
+      
+      updateAdminUI();
     }
 
     function renderRanking() {
       const rankedTeams = [...state.teams].sort((a,b) => calculateMetrics(b).rankingScore - calculateMetrics(a).rankingScore);
-      const rankHtml = rankedTeams.map((t, idx) => {
+      document.getElementById('rankingContainer').innerHTML = rankedTeams.map((t, idx) => {
         const m = calculateMetrics(t);
-        let rankClass = "bg-white/5 border-white/10";
-        let rankIcon = `<span class="text-slate-400 font-bold">${idx+1}º</span>`;
+        let rankClass = "bg-white/5 border-white/10", rankIcon = `<span class="text-slate-400 font-bold">${idx+1}º</span>`;
         if(idx===0){ rankClass="bg-caena-gold/20 border-caena-gold shadow-lg shadow-caena-gold/20 scale-105 z-10"; rankIcon=`<i class="fa-solid fa-trophy text-caena-gold text-xl"></i>`; }
         else if(idx===1){ rankClass="bg-slate-300/20 border-slate-300"; rankIcon=`<i class="fa-solid fa-medal text-slate-300 text-lg"></i>`; }
         else if(idx===2){ rankClass="bg-orange-400/20 border-orange-400"; rankIcon=`<i class="fa-solid fa-medal text-orange-400 text-lg"></i>`; }
         return `<div onclick="selectTeam('${t.id}');setViewMode('detail')" class="glass-card p-4 rounded-xl border ${rankClass} flex flex-col justify-between cursor-pointer hover:border-caena-orange transition"><div class="flex justify-between items-start mb-2">${rankIcon}<div class="text-right"><span class="text-xl font-display font-bold text-white block leading-none">${m.rankingScore}</span><span class="text-[9px] text-slate-300 uppercase">Pontos</span></div></div><div><p class="text-xs text-caena-gold font-bold truncate">${escapeHtml(t.teamName)}</p><p class="text-[11px] text-slate-300 truncate">${escapeHtml(t.projectName)}</p></div></div>`;
       }).join('');
-      document.getElementById('rankingContainer').innerHTML = rankHtml;
       document.getElementById('overviewGridContainer').innerHTML = getFilteredAndRankedTeams().map(t => { const m = calculateMetrics(t); return `<div class="glass-card p-4 rounded-xl border border-white/10"><h3 class="text-caena-gold font-bold text-xs font-mono">${escapeHtml(t.teamName)}</h3><p class="text-white text-base font-bold truncate">${escapeHtml(t.projectName)}</p><div class="mt-3 text-xs bg-caena-bg/50 p-2 rounded flex justify-between"><span>Progresso: ${m.totalPct}%</span><span class="text-caena-gold font-bold">★ ${m.rankingScore} pts</span></div><button onclick="selectTeam('${t.id}');setViewMode('detail')" class="w-full mt-3 bg-caena-orange/20 hover:bg-caena-orange text-caena-gold hover:text-slate-900 transition p-2 rounded text-xs font-bold">Abrir Bancada</button></div>`; }).join('');
     }
+
+    // Inventory Updated for Object/Quantity format
+    function renderInventory() {
+        const inventory = {};
+        state.teams.forEach(team => {
+            if(team.components) {
+                team.components.forEach(comp => {
+                    const name = typeof comp === 'string' ? comp : comp.name;
+                    const qty = typeof comp === 'string' ? 1 : (comp.qty || 1);
+                    
+                    if(!inventory[name]) inventory[name] = { totalQty: 0, teams: [] };
+                    inventory[name].totalQty += qty;
+                    inventory[name].teams.push({ name: team.projectName || team.teamName, qty });
+                });
+            }
+        });
+
+        const sortedComps = Object.keys(inventory).sort((a, b) => inventory[b].totalQty - inventory[a].totalQty);
+        
+        if(sortedComps.length === 0) {
+            document.getElementById('inventoryContainer').innerHTML = `<div class="col-span-full text-slate-400 text-sm">Nenhum componente registado.</div>`;
+            return;
+        }
+
+        document.getElementById('inventoryContainer').innerHTML = sortedComps.map(name => {
+            return `
+            <div class="glass-card p-4 rounded-xl border border-emerald-500/20 flex flex-col gap-2">
+                <div class="flex items-center justify-between border-b border-white/10 pb-2">
+                   <span class="text-sm font-bold text-white">${escapeHtml(name)}</span>
+                   <span class="text-lg font-display font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded" title="Total Necessário">${inventory[name].totalQty}</span>
+                </div>
+                <div>
+                   <p class="text-[10px] text-slate-400 uppercase mb-1">Requisitado por (Projeto):</p>
+                   <div class="flex flex-wrap gap-1.5">
+                      ${inventory[name].teams.map(t => `<span class="text-[10px] text-slate-300 bg-white/5 border border-white/10 px-2 py-0.5 rounded flex items-center gap-1">${escapeHtml(t.name)} <strong class="text-caena-orange">x${t.qty}</strong></span>`).join('')}
+                   </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+    }
+    
+    window.exportInventoryTXT = () => {
+        let txt = "Inventário de Componentes - Robótica CAENA\n===========================================\n\n";
+        const inventory = {};
+        state.teams.forEach(team => { 
+            if(team.components) { 
+                team.components.forEach(c => { 
+                    const name = typeof c === 'string' ? c : c.name;
+                    const qty = typeof c === 'string' ? 1 : (c.qty || 1);
+                    if(!inventory[name]) inventory[name] = { totalQty: 0, teams: [] };
+                    inventory[name].totalQty += qty;
+                    inventory[name].teams.push({ name: team.projectName || team.teamName, qty });
+                }); 
+            } 
+        });
+        
+        Object.keys(inventory).sort().forEach(name => { 
+            txt += `${name} (Total: ${inventory[name].totalQty})\n`; 
+            inventory[name].teams.forEach(t => txt += ` - ${t.name} (x${t.qty})\n`); 
+            txt += `\n`; 
+        });
+        
+        const blob = new Blob([txt], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `Inventario_CAENA_${new Date().toISOString().slice(0,10)}.txt`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    };
 
     function renderActiveTeamWorkspace() {
       const team = state.teams.find(x=>x.id===state.selectedTeamId); if(!team) return;
@@ -700,16 +919,33 @@
       document.getElementById('pillarPctDesign').innerText = m.pillarScores.design+'%';
       document.getElementById('activeTeamPointsTotal').innerText = m.rankingScore + ' pts';
       document.getElementById('activeTeamPointsExtra').innerText = team.points || 0;
-      document.getElementById('activeTeamComponents').innerHTML = (team.components||[]).map(c=>`<span class="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] text-slate-300">${escapeHtml(c)}</span>`).join('');
-      document.getElementById('activeTeamLinks').innerHTML = [team.tinkercadUrl?`<a href="${escapeHtml(team.tinkercadUrl)}" target="_blank" class="px-2 py-1 bg-caena-gold/20 hover:bg-caena-gold text-caena-gold hover:text-slate-900 transition text-xs font-bold rounded"><i class="fa-solid fa-cube"></i> Tinkercad</a>`:'', team.codeUrl?`<a href="${escapeHtml(team.codeUrl)}" target="_blank" class="px-2 py-1 bg-caena-orange/20 hover:bg-caena-orange text-caena-orange hover:text-slate-900 transition text-xs font-bold rounded"><i class="fa-solid fa-code"></i> Código C++</a>`:''].join('');
+      
+      // Render components with quantities safely
+      const compsList = (team.components || []).map(c => {
+          const name = typeof c === 'string' ? c : c.name;
+          const qty = typeof c === 'string' ? 1 : (c.qty || 1);
+          return `<span class="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] text-slate-300 flex items-center gap-1">${escapeHtml(name)} <span class="bg-caena-orange/20 text-caena-orange px-1 rounded font-bold">x${qty}</span></span>`;
+      }).join('');
+      document.getElementById('activeTeamComponents').innerHTML = compsList;
+      
+      // Image & Links Updates
+      const imgEl = document.getElementById('activeTeamImage');
+      if(team.imageUrl && team.imageUrl.trim() !== '') { imgEl.src = team.imageUrl; } 
+      else { imgEl.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' fill='%23131F42'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' fill='%2394A3B8'%3ESem imagem do protótipo%3C/text%3E%3C/svg%3E"; }
+
+      document.getElementById('activeTeamLinks').innerHTML = [
+        team.tinkercadUrl?`<a href="${escapeHtml(team.tinkercadUrl)}" target="_blank" class="px-2 py-1 bg-caena-gold/20 hover:bg-caena-gold text-caena-gold hover:text-slate-900 transition text-xs font-bold rounded"><i class="fa-solid fa-cube"></i> Tinkercad</a>`:'', 
+        team.codeUrl?`<a href="${escapeHtml(team.codeUrl)}" target="_blank" class="px-2 py-1 bg-caena-orange/20 hover:bg-caena-orange text-caena-orange hover:text-slate-900 transition text-xs font-bold rounded"><i class="fa-solid fa-code"></i> Código C++</a>`:'',
+        team.driveUrl?`<a href="${escapeHtml(team.driveUrl)}" target="_blank" class="px-2 py-1 bg-blue-500/20 hover:bg-blue-500 text-blue-300 hover:text-slate-900 transition text-xs font-bold rounded"><i class="fa-brands fa-google-drive"></i> Drive da Equipe</a>`:''
+      ].join('');
 
       const r = team.roles||{};
       document.getElementById('activeTeamRolesGrid').innerHTML = [
-        {k:'Eng. de Prompt',n:r.prompt||'-',d:'Usa IA p/ soluções',c:'text-purple-400',ic:'fa-wand-magic-sparkles'},
-        {k:'Líder de Hardware',n:r.hardware||'-',d:'Fiação protoboard',c:'text-caena-orange',ic:'fa-plug-circle-bolt'},
-        {k:'Piloto do Código',n:r.code||'-',d:'Arduino IDE e Upload',c:'text-caena-gold',ic:'fa-terminal'},
-        {k:'Testador / Debugger',n:r.tester||'-',d:'Validação e testes',c:'text-emerald-400',ic:'fa-magnifying-glass'}
-      ].map(x=>`<div class="bg-white/5 p-2.5 rounded-xl flex items-center gap-3 border border-white/10"><div class="w-9 h-9 rounded bg-caena-surface border border-white/5 flex justify-center items-center ${x.c}"><i class="fa-solid ${x.ic}"></i></div><div class="min-w-0"><p class="text-[10px] font-mono text-slate-400 uppercase">${x.k}</p><p class="text-xs font-bold text-white truncate">${escapeHtml(x.n)}</p><p class="text-[9px] text-slate-500 truncate">${x.d}</p></div></div>`).join('');
+        {k:'Eng. de Prompt',n:r.prompt||'-',c:'text-purple-400',ic:'fa-wand-magic-sparkles'},
+        {k:'Líder de Hardware',n:r.hardware||'-',c:'text-caena-orange',ic:'fa-plug-circle-bolt'},
+        {k:'Piloto do Código',n:r.code||'-',c:'text-caena-gold',ic:'fa-terminal'},
+        {k:'Testador / Debugger',n:r.tester||'-',c:'text-emerald-400',ic:'fa-magnifying-glass'}
+      ].map(x=>`<div class="bg-white/5 p-2.5 rounded-xl flex items-center gap-3 border border-white/10"><div class="w-9 h-9 rounded bg-caena-surface border border-white/5 flex justify-center items-center ${x.c}"><i class="fa-solid ${x.ic}"></i></div><div class="min-w-0"><p class="text-[10px] font-mono text-slate-400 uppercase">${x.k}</p><p class="text-xs font-bold text-white truncate">${escapeHtml(x.n)}</p></div></div>`).join('');
 
       document.getElementById('pillarsContainer').innerHTML = OFFICIAL_PILLARS.map(p => `
         <div class="glass-panel p-4 sm:p-5 rounded-2xl border-t-4 ${p.id==='ideacao'?'border-caena-gold':p.id==='circuito'?'border-caena-orange':'border-emerald-400'}">
@@ -725,8 +961,8 @@
             const d=(team.steps&&team.steps[s.key])||{status:'pending',notes:'',score:0}; 
             let badgeStyle = 'bg-slate-500/20 text-slate-300 border-slate-500/40';
             let cardStyle = 'border-white/5';
-            if(d.status === 'completed') { badgeStyle = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'; cardStyle = 'border-emerald-500/30'; }
-            if(d.status === 'in_progress') { badgeStyle = 'bg-caena-gold/20 text-caena-gold border-caena-gold/40'; cardStyle = 'border-caena-gold/30'; }
+            if(d.status === 'completed') { badgeStyle = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'; cardStyle = 'border-emerald-500/30 bg-emerald-950/10'; }
+            if(d.status === 'in_progress') { badgeStyle = 'bg-caena-gold/20 text-caena-gold border-caena-gold/40'; cardStyle = 'border-caena-gold/30 bg-amber-950/10'; }
             return `
             <div class="bg-caena-bg/80 p-3.5 rounded-xl border ${cardStyle} transition">
               <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2.5">
@@ -735,7 +971,7 @@
                   <p class="text-[10px] text-slate-400">${s.hint}</p>
                 </div>
                 <div class="flex items-center gap-1.5 shrink-0">
-                  <input type="number" id="scoreInput_${s.key}" onblur="handleStepScoreInput('${s.key}',this.value)" value="${d.score||0}" min="0" max="10" class="w-12 bg-caena-surface border ${cardStyle} text-white text-xs text-center rounded p-1 focus:border-caena-gold focus:outline-none" title="Nota desta etapa (0 a 10)">
+                  <input type="number" id="scoreInput_${s.key}" onblur="handleStepScoreInput('${s.key}',this.value)" value="${d.score||0}" min="0" max="10" ${!state.isAdmin ? 'readonly title="Apenas prof."' : 'title="Nota (0-10)"'} class="w-12 bg-caena-surface border ${cardStyle} text-white text-xs text-center rounded p-1 focus:border-caena-gold focus:outline-none ${!state.isAdmin ? 'opacity-50 cursor-not-allowed' : ''}">
                   <select onchange="handleStepStatusChange('${s.key}',this.value)" class="text-[11px] font-mono font-semibold rounded p-1 border ${badgeStyle} bg-caena-surface focus:outline-none cursor-pointer">
                     <option value="pending" ${d.status==='pending'?'selected':''}>⏳ Pendente</option>
                     <option value="in_progress" ${d.status==='in_progress'?'selected':''}>⚡ Andamento</option>
@@ -748,7 +984,7 @@
                   <span class="flex items-center gap-1"><i class="fa-regular fa-comment-dots text-caena-gold"></i> Notas da etapa:</span>
                   <span id="saveIndicator_${s.key}" class="text-emerald-400 opacity-0 transition">Salvo ✓</span>
                 </div>
-                <textarea onblur="handleStepNotesInput('${s.key}',this.value)" placeholder="Descreva os progressos e definições desta sub-etapa..." class="w-full bg-caena-surface/50 border border-white/5 text-[11px] text-slate-200 p-2.5 rounded-lg focus:border-caena-gold focus:outline-none resize-y">${escapeHtml(d.notes)}</textarea>
+                <textarea onblur="handleStepNotesInput('${s.key}',this.value)" class="w-full bg-caena-surface/50 border border-white/5 text-[11px] text-slate-200 p-2.5 rounded-lg focus:border-caena-gold focus:outline-none resize-y">${escapeHtml(d.notes)}</textarea>
               </div>
             </div>`; 
           }).join('')}
@@ -757,7 +993,7 @@
 
       const logs = (team.logs||[]).filter(l=>state.teamLogFilter==='all' || (l.hasOpenDoubt && l.doubts));
       document.getElementById('teamLogsCountBadge').innerText = logs.length + ' registros';
-      document.getElementById('teamLogsTimeline').innerHTML = logs.map(l => `<div class="glass-card p-4 rounded-xl border ${l.hasOpenDoubt&&l.doubts?'border-red-500/50 shadow-lg shadow-red-500/10':'border-white/10'} mb-3"><div class="flex flex-wrap justify-between items-center pb-2 border-b border-white/10 mb-2 gap-2"><div class="flex gap-2 text-xs"><span class="bg-caena-orange/20 text-caena-gold font-bold px-2 py-1 rounded">${escapeHtml(l.lesson)}</span><span class="text-slate-300 px-2 py-1 border border-white/10 rounded">${l.date.split('-').reverse().join('/')}</span>${l.hasOpenDoubt&&l.doubts?'<span class="bg-red-500 text-white px-2 py-1 rounded font-bold animate-pulse"><i class="fa-solid fa-hand mr-1"></i> Dúvida</span>':''}</div><div class="flex gap-1">${l.doubts?`<button onclick="toggleDoubtResolved('${l.id}')" class="text-[10px] px-2 py-1 rounded font-bold transition ${l.hasOpenDoubt?'bg-emerald-500 hover:bg-emerald-600 text-slate-900':'bg-white/10 hover:bg-white/20 text-slate-300'}"><i class="fa-solid ${l.hasOpenDoubt?'fa-check':'fa-rotate-left'}"></i></button>`:''}<button onclick="editClassLog('${l.id}')" class="px-2 py-1 bg-white/5 hover:bg-white/15 text-slate-300 rounded transition"><i class="fa-solid fa-pen text-[10px]"></i></button><button onclick="confirmDeleteClassLog('${l.id}')" class="px-2 py-1 bg-red-500/10 hover:bg-red-500/25 text-red-400 rounded transition"><i class="fa-solid fa-trash text-[10px]"></i></button></div></div><div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs"><div class="bg-emerald-950/20 p-2.5 rounded border border-emerald-500/20"><b class="text-emerald-400 block mb-1">Avanços</b><p class="text-slate-200 whitespace-pre-wrap">${escapeHtml(l.advances)}</p></div><div class="${l.hasOpenDoubt&&l.doubts?'bg-red-950/30 border-red-500/40':'bg-white/5 border-white/5'} p-2.5 rounded border flex flex-col justify-between"><b class="${l.hasOpenDoubt&&l.doubts?'text-red-400':'text-slate-400'} block mb-1">Dúvidas</b><p class="text-slate-200 mb-2 whitespace-pre-wrap">${escapeHtml(l.doubts)||'<span class="text-slate-500 italic">Nenhuma</span>'}</p><input type="text" onchange="saveProfessorReply('${l.id}',this.value)" value="${escapeHtml(l.professorReply||'')}" placeholder="Orientação do Prof..." class="w-full bg-caena-bg p-1.5 rounded text-caena-gold text-[10px] border border-white/10 focus:border-caena-gold"/></div><div class="bg-amber-950/20 p-2.5 rounded border border-caena-gold/20"><b class="text-caena-gold block mb-1">Próximos Passos</b><p class="text-slate-200 whitespace-pre-wrap">${escapeHtml(l.nextSteps)}</p></div></div></div>`).join('');
+      document.getElementById('teamLogsTimeline').innerHTML = logs.map(l => `<div class="glass-card p-4 rounded-xl border ${l.hasOpenDoubt&&l.doubts?'border-red-500/50 shadow-lg shadow-red-500/10':'border-white/10'} mb-3"><div class="flex flex-wrap justify-between items-center pb-2 border-b border-white/10 mb-2 gap-2"><div class="flex gap-2 text-xs"><span class="bg-caena-orange/20 text-caena-gold font-bold px-2 py-1 rounded">${escapeHtml(l.lesson)}</span><span class="text-slate-300 px-2 py-1 border border-white/10 rounded">${l.date.split('-').reverse().join('/')}</span>${l.hasOpenDoubt&&l.doubts?'<span class="bg-red-500 text-white px-2 py-1 rounded font-bold animate-pulse"><i class="fa-solid fa-hand mr-1"></i> Dúvida</span>':''}</div><div class="flex gap-1">${l.doubts?`<button onclick="toggleDoubtResolved('${l.id}')" class="text-[10px] px-2 py-1 rounded font-bold transition ${l.hasOpenDoubt?'bg-emerald-500 hover:bg-emerald-600 text-slate-900':'bg-white/10 hover:bg-white/20 text-slate-300'}"><i class="fa-solid ${l.hasOpenDoubt?'fa-check':'fa-rotate-left'}"></i></button>`:''}<button onclick="editClassLog('${l.id}')" class="px-2 py-1 bg-white/5 hover:bg-white/15 text-slate-300 rounded transition"><i class="fa-solid fa-pen text-[10px]"></i></button><button onclick="confirmDeleteClassLog('${l.id}')" title="Excluir registro (Apenas Prof.)" class="admin-only px-2 py-1 bg-red-500/10 hover:bg-red-500/25 text-red-400 rounded transition hidden"><i class="fa-solid fa-trash text-[10px]"></i></button></div></div><div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs"><div class="bg-emerald-950/20 p-2.5 rounded border border-emerald-500/20"><b class="text-emerald-400 block mb-1">Avanços</b><p class="text-slate-200 whitespace-pre-wrap">${escapeHtml(l.advances)}</p></div><div class="${l.hasOpenDoubt&&l.doubts?'bg-red-950/30 border-red-500/40':'bg-white/5 border-white/5'} p-2.5 rounded border flex flex-col justify-between"><b class="${l.hasOpenDoubt&&l.doubts?'text-red-400':'text-slate-400'} block mb-1">Dúvidas</b><p class="text-slate-200 mb-2 whitespace-pre-wrap">${escapeHtml(l.doubts)||'<span class="text-slate-500 italic">Nenhuma</span>'}</p><input type="text" onchange="saveProfessorReply('${l.id}',this.value)" value="${escapeHtml(l.professorReply||'')}" placeholder="Orientação do Prof..." class="w-full bg-caena-bg p-1.5 rounded text-caena-gold text-[10px] border border-white/10 focus:border-caena-gold ${!state.isAdmin ? 'opacity-50 cursor-not-allowed' : ''}" ${!state.isAdmin ? 'readonly title="Apenas prof."' : ''}/></div><div class="bg-amber-950/20 p-2.5 rounded border border-caena-gold/20"><b class="text-caena-gold block mb-1">Próximos Passos</b><p class="text-slate-200 whitespace-pre-wrap">${escapeHtml(l.nextSteps)}</p></div></div></div>`).join('');
     }
   </script>
 </body>
