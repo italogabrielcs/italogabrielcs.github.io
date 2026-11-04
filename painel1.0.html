@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Display Bahia</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    /* Esconde a barra de rolagem visualmente, mas mantém o scroll no toque do tablet */
+    .scroll-invisivel::-webkit-scrollbar { display: none; }
+    .scroll-invisivel { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-[#113826] text-white h-screen w-screen overflow-hidden p-4 md:p-8 box-border flex font-sans" onload="initApp()">
+  
+  <!-- Container Principal -->
+  <div class="flex flex-col md:flex-row w-full h-full gap-4 md:gap-8">
+
+    <!-- COLUNA ESQUERDA: Relógio e Clima -->
+    <div class="flex flex-col justify-between w-full md:w-5/12 h-full py-4">
+      
+      <!-- Relógio -->
+      <div>
+        <h1 id="time" class="text-7xl md:text-9xl font-bold tracking-tighter">--:--</h1>
+        <p id="date" class="text-xl md:text-3xl font-light text-gray-300 mt-2">Carregando data...</p>
+      </div>
+
+      <!-- Clima -->
+      <div class="bg-[#1a4a38] rounded-3xl p-6 flex items-center gap-6 w-fit mt-8 md:mt-0 shadow-lg">
+        <div id="weather-icon" class="text-5xl md:text-6xl">☁️</div>
+        <div>
+          <div class="text-3xl md:text-4xl font-bold flex items-start gap-1">
+            <span id="temp">--</span>°C
+          </div>
+          <div id="weather-desc" class="text-sm md:text-base text-gray-300 capitalize">Buscando...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUNA DIREITA: Agenda e Radar -->
+    <div class="flex flex-col w-full md:w-7/12 h-full gap-4 md:gap-6">
+      
+      <!-- 1. Agenda -->
+      <div class="flex-1 flex flex-col min-h-0 bg-[#1a4a38] rounded-3xl p-6 shadow-lg">
+        <!-- Cabeçalho da Agenda -->
+        <div class="flex justify-between items-center mb-6 shrink-0">
+          <h2 class="text-lg md:text-xl font-bold flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            Agenda do Dia
+          </h2>
+          <button id="auth-btn" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-semibold transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.761H12.545z"/></svg>
+            CONECTAR
+          </button>
+        </div>
+
+        <!-- Lista de Eventos -->
+        <div id="events-list" class="flex-1 overflow-y-auto scroll-invisivel flex flex-col gap-3">
+          <div class="text-gray-300 text-center mt-10">Clique em conectar para ver seus eventos.</div>
+        </div>
+      </div>
+
+      <!-- 2. Radar de Voos -->
+      <div class="h-48 md:h-64 shrink-0 bg-[#1a4a38] rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between shadow-lg">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400 z-10 shrink-0">Radar Baiano</h2>
+        
+        <div id="flight-data" class="flex-1 flex flex-col justify-center relative z-10 w-full mt-2">
+           <div class="text-sm text-yellow-400 flex items-center gap-2">
+             <span class="animate-spin text-xl">⏳</span> Carregando radares...
+           </div>
+        </div>
+        
+        <svg class="absolute -bottom-8 -right-8 w-48 h-48 text-white/5 transform -rotate-45 pointer-events-none" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+      </div>
+      
+    </div>
+  </div>
+
+  <script>
+    // ================= CONFIGURAÇÕES =================
+    const GOOGLE_CLIENT_ID = '947990189967-ijeruej0es5u1jfmckru897qchr98q0v.apps.googleusercontent.com';
+    const AIRLABS_API_KEY = '98192069-4fcb-4243-8b78-cb1bc0ac0ef2';
+    // =================================================
+
+    function initApp() {
+      updateTime();
+      setInterval(updateTime, 1000);
+      
+      fetchWeather();
+      setInterval(fetchWeather, 30 * 60 * 1000); // 30 min
+      
+      initGoogleAuth();
+      
+      fetchFlights();
+      setInterval(fetchFlights, 2 * 60 * 1000); // 2 min para poupar a cota gratuita
+    }
+
+    // ==== 1. RELÓGIO ====
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('time').innerText = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('date').innerText = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+    }
+
+    // ==== 2. CLIMA (Open-Meteo Gratuito para Salvador) ====
+    async function fetchWeather() {
+      try {
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-12.9711&longitude=-38.5108&current_weather=true');
+        const data = await res.json();
+        document.getElementById('temp').innerText = Math.round(data.current_weather.temperature);
+        document.getElementById('weather-desc').innerText = `Vento: ${data.current_weather.windspeed} km/h`;
+      } catch (e) {
+        document.getElementById('weather-desc').innerText = "Erro no clima";
+      }
+    }
+
+    // ==== 3. GOOGLE CALENDAR ====
+    let tokenClient;
+    let accessToken = null;
+
+    function initGoogleAuth() {
+      try {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID,
+          scope: 'https://www.googleapis.com/auth/calendar.readonly',
+          callback: (response) => {
+            if (response.error) {
+              console.error('Erro Auth:', response);
+              return;
+            }
+            accessToken = response.access_token;
+            document.getElementById('auth-btn').innerText = 'ATUALIZAR';
+            document.getElementById('auth-btn').classList.replace('bg-white/10', 'bg-green-600');
+            fetchEvents();
+          },
+        });
+
+        document.getElementById('auth-btn').onclick = () => {
+          tokenClient.requestAccessToken({ prompt: 'consent' });
+        };
+      } catch (e) {
+        console.error("GSI não carregou", e);
+      }
+    }
+
+    async function fetchEvents() {
+      if (!accessToken) return;
+      
+      const timeMin = new Date();
+      timeMin.setHours(0,0,0,0);
+      const timeMax = new Date();
+      timeMax.setHours(23,59,59,999);
+
+      try {
+        const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${timeMin.toISOString()}&timeMax=${timeMax.toISOString()}&singleEvents=true&orderBy=startTime`, {
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        const data = await res.json();
+        
+        const list = document.getElementById('events-list');
+        list.innerHTML = '';
+        
+        if (!data.items || data.items.length === 0) {
+          list.innerHTML = '<div class="text-gray-300 text-center mt-4">Nenhum evento para hoje! 🎉</div>';
+          return;
+        }
+        
+        data.items.forEach(event => {
+          const start = event.start.dateTime || event.start.date;
+          const timeString = new Date(start).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+          list.innerHTML += `
+            <div class="bg-black/20 p-4 rounded-xl flex items-center gap-4 border border-white/5">
+              <div class="bg-white/10 px-3 py-2 rounded-lg text-sm font-bold shrink-0">${timeString}</div>
+              <div class="font-semibold text-sm md:text-base truncate w-full">${event.summary}</div>
+            </div>`;
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // ==== 4. RADAR DE VOOS (AirLabs c/ Horários) ====
+    async function fetchFlights() {
+      const flightDataEl = document.getElementById('flight-data');
+      const bbox = "-13.5,-39.0,-12.0,-37.0"; // Bahia Litoral
+      const ts = Date.now();
+      
+      const urlDireta = `https://airlabs.co/api/v9/flights?api_key=${AIRLABS_API_KEY}&bbox=${bbox}&_t=${ts}`;
+      
+      try {
+        let flights = [];
+        let locationLabel = "No Espaço Aéreo Baiano";
+        let responseData;
+
+        // 1. Tenta conexao direta
+        try {
+          const resDirect = await fetch(urlDireta);
+          responseData = await resDirect.json();
+        } catch(e) {
+          // Se falhar o CORS, usa o proxy confiavel
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(urlDireta)}`;
+          const resProxy = await fetch(proxyUrl);
+          responseData = await resProxy.json();
+        }
+        
+        flights = responseData.response || [];
+
+        // Fallback para Brasil se a Bahia estiver vazia
+        if (flights.length === 0) {
+          const fallbackUrl = `https://airlabs.co/api/v9/flights?api_key=${AIRLABS_API_KEY}&flag=BR&_t=${ts}`;
+          try {
+            const resFB = await fetch(fallbackUrl);
+            responseData = await resFB.json();
+          } catch(e) {
+            const fbProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(fallbackUrl)}`;
+            const resFBProxy = await fetch(fbProxyUrl);
+            responseData = await resFBProxy.json();
+          }
+          flights = responseData.response || [];
+          locationLabel = "Em Rota no Brasil (Bahia Livre)";
+        }
+
+        if (flights.length > 0) {
+          const flight = flights[0]; // Pega o primeiro aviao
+          const flightCode = flight.flight_iata || flight.flight_icao;
+          
+          // Valores Padrao (N/A)
+          let origin = 'N/A';
+          let dest = 'N/A';
+          let depTime = '--:--';
+          let arrTime = '--:--';
+          let progress = 50; // meio da barra
+          
+          // 2. Busca Cronograma (Schedules) usando o codigo do voo
+          if (flightCode) {
+            const schedUrl = `https://airlabs.co/api/v9/schedules?api_key=${AIRLABS_API_KEY}&flight_iata=${flight.flight_iata || ''}&flight_icao=${flight.flight_icao || ''}`;
+            try {
+              let schedRes = await fetch(schedUrl).catch(async () => {
+                 return await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(schedUrl)}`);
+              });
+              let schedData = await schedRes.json();
+              let schedInfo = schedData.response ? schedData.response[0] : null;
+              
+              if (schedInfo) {
+                origin = schedInfo.dep_iata || origin;
+                dest = schedInfo.arr_iata || dest;
+                
+                // Calcula progresso se tiver horários
+                if (schedInfo.dep_time_ts && schedInfo.arr_time_ts) {
+                  const nowTs = Math.floor(Date.now() / 1000);
+                  const totalDuration = schedInfo.arr_time_ts - schedInfo.dep_time_ts;
+                  const elapsed = nowTs - schedInfo.dep_time_ts;
+                  
+                  if (totalDuration > 0) {
+                    progress = Math.max(5, Math.min(95, (elapsed / totalDuration) * 100));
+                  }
+                  
+                  // Formata horas
+                  const dTime = new Date(schedInfo.dep_time_ts * 1000);
+                  const aTime = new Date(schedInfo.arr_time_ts * 1000);
+                  depTime = dTime.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                  arrTime = aTime.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                }
+              }
+            } catch(err) {
+              console.log("Sem tabela de horário para este voo.");
+            }
+          }
+
+          // 3. Monta o visual "Boarding Pass" atualizado para ficar flexível no tablet
+          flightDataEl.innerHTML = `
+            <div class="flex items-center gap-2 text-xs md:text-sm text-yellow-400 font-semibold mb-2">
+              <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> ${locationLabel}
+            </div>
+            
+            <div class="flex flex-col w-full px-2">
+              <!-- Cidades -->
+              <div class="flex justify-between items-end w-full mb-1">
+                <div class="text-2xl md:text-3xl font-bold tracking-widest text-white">${origin}</div>
+                <div class="text-xs md:text-sm text-gray-400 font-bold mb-1">${flightCode || flight.reg_number}</div>
+                <div class="text-2xl md:text-3xl font-bold tracking-widest text-white">${dest}</div>
+              </div>
+              
+              <!-- Linha de Progresso do Avião -->
+              <div class="relative w-full h-8 flex items-center">
+                <div class="absolute w-full h-[2px] border-b-2 border-dashed border-gray-500"></div>
+                <div class="absolute text-xl transform -translate-y-1" style="left: ${progress}%; transition: left 2s ease-out;">
+                  ✈️
+                </div>
+              </div>
+              
+              <!-- Horários -->
+              <div class="flex justify-between items-center w-full mt-1 text-sm md:text-base font-medium text-gray-300">
+                <div>${depTime}</div>
+                <div>${arrTime}</div>
+              </div>
+            </div>
+          `;
+        } else {
+          flightDataEl.innerHTML = `
+            <div class="text-sm text-gray-400 flex flex-col items-center gap-2">
+              <svg class="w-8 h-8 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              Céu limpo. Aguardando voo...
+            </div>`;
+        }
+      } catch (e) {
+        flightDataEl.innerHTML = `<div class="text-sm text-red-400">Erro na conexão do Radar.</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
