@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAM Studio Teatral - Prof. Italo Gabriel</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            console: {
+              950: '#090a0f',
+              900: '#11131b',
+              850: '#161924',
+              800: '#1e2230',
+              700: '#2d3348',
+              600: '#434b66',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['Georgia', 'Cambria', 'serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090a0f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2d3348;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #434b66;
+    }
+
+    /* Range input styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 14px;
+      width: 14px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+      margin-top: -4px;
+      box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: #1e2230;
+      border-radius: 4px;
+    }
+    
+    /* Pulsação ativa */
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); }
+      50% { box-shadow: 0 0 25px rgba(244, 63, 94, 0.8); }
+    }
+    .playing-pulse {
+      animation: pulseGlow 1.5s infinite;
+    }
+  </style>
+</head>
+
+<body class="bg-console-950 text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200">
+
+  <!-- CABEÇALHO / MASTER BAR -->
+  <header class="bg-console-900 border-b border-zinc-800/80 px-4 py-3 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-[1700px] mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Identificação & Autoria -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-900/30 border border-cyan-400/30">
+          <i data-lucide="sliders" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-black tracking-wider uppercase bg-gradient-to-r from-cyan-300 via-indigo-200 to-amber-300 bg-clip-text text-transparent">
+              SAM Studio Teatral
+            </h1>
+            <span class="text-[10px] bg-cyan-950 text-cyan-400 border border-cyan-800/60 px-1.5 py-0.5 rounded font-mono uppercase tracking-widest font-semibold">Pro v2.5</span>
+          </div>
+          <p class="text-xs text-zinc-400 flex items-center gap-1.5 mt-0.5">
+            <i data-lucide="award" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>Projeto & Autoria: <strong class="text-amber-300 font-semibold">Prof. Italo Gabriel de Sonoplastia</strong></span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Controles Gerais Master & Pânico -->
+      <div class="flex items-center flex-wrap gap-2.5 sm:gap-4">
+        <!-- Master Volume -->
+        <div class="flex items-center gap-2 bg-console-950/80 px-3 py-1.5 rounded-xl border border-zinc-800">
+          <i data-lucide="volume-2" class="w-4 h-4 text-cyan-400"></i>
+          <span class="text-xs font-semibold text-zinc-300 uppercase hidden sm:inline">Master</span>
+          <input type="range" id="masterVolume" min="0" max="1" step="0.01" value="0.85" class="w-20 sm:w-28 accent-cyan-400">
+          <span id="masterVolLabel" class="text-xs font-mono text-cyan-400 w-8 text-right font-semibold">85%</span>
+        </div>
+
+        <!-- Fade Out Rápido da Trilha -->
+        <button id="btnFadeOutTrilha" class="flex items-center gap-1.5 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-xl text-xs font-semibold border border-zinc-700 transition active:scale-95" title="Diminui o volume da trilha suavemente até o silêncio">
+          <i data-lucide="trending-down" class="w-4 h-4 text-amber-400"></i>
+          <span>Fade Out (3s)</span>
+        </button>
+
+        <!-- Botão Pânico / Corte Geral -->
+        <button id="btnPanic" class="flex items-center gap-1.5 px-3.5 py-2 bg-rose-600/90 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-rose-950/50 border border-rose-400/40 transition active:scale-95" title="Silencia tudo imediatamente (Atalho: ESC)">
+          <i data-lucide="octagon-alert" class="w-4 h-4"></i>
+          <span>PÂNICO (ESC)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- BARRA DE SINAIS DE CHAMADA / CAMPAINHA DO TEATRO (PRÉ-ESPETÁCULO) -->
+  <section class="bg-console-900/90 border-b border-amber-500/20 px-4 py-2.5 bg-gradient-to-r from-amber-950/30 via-console-900 to-indigo-950/30">
+    <div class="max-w-[1700px] mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="p-1.5 rounded-lg bg-amber-500/20 text-amber-400">
+          <i data-lucide="bell-ring" class="w-4 h-4"></i>
+        </span>
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Campainha de Teatro (Sinais do Espetáculo)</span>
+          <p class="text-[10px] text-zinc-400">Avisos sonoros para plateia antes de abrir as cortinas</p>
+        </div>
+      </div>
+
+      <div class="flex items-center flex-wrap gap-2">
+        <!-- 1º Sinal -->
+        <button id="btnSignal1" onclick="playTheaterChime(1)" class="group flex items-center gap-2 px-3 py-1.5 bg-zinc-800 hover:bg-amber-600/30 text-zinc-200 hover:text-amber-200 rounded-lg text-xs font-semibold border border-zinc-700 hover:border-amber-500/50 transition active:scale-95">
+          <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-[10px] font-mono font-bold group-hover:bg-amber-500 group-hover:text-black transition">1</span>
+          <span>1º Sinal (1 toque longo)</span>
+          <i data-lucide="bell" class="w-3.5 h-3.5 opacity-70"></i>
+        </button>
+
+        <!-- 2º Sinal -->
+        <button id="btnSignal2" onclick="playTheaterChime(2)" class="group flex items-center gap-2 px-3 py-1.5 bg-zinc-800 hover:bg-amber-600/30 text-zinc-200 hover:text-amber-200 rounded-lg text-xs font-semibold border border-zinc-700 hover:border-amber-500/50 transition active:scale-95">
+          <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-[10px] font-mono font-bold group-hover:bg-amber-500 group-hover:text-black transition">2</span>
+          <span>2º Sinal (2 toques)</span>
+          <i data-lucide="bell-ring" class="w-3.5 h-3.5 opacity-70"></i>
+        </button>
+
+        <!-- 3º Sinal -->
+        <button id="btnSignal3" onclick="playTheaterChime(3)" class="group flex items-center gap-2 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500 text-amber-200 hover:text-black rounded-lg text-xs font-bold border border-amber-500/40 transition active:scale-95 shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-amber-400 text-black flex items-center justify-center text-[10px] font-mono font-bold">3</span>
+          <span>3º Sinal (3 toques - Abrem as cortinas)</span>
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+        </button>
+
+        <!-- Cigarra Cênica Contínua -->
+        <button onclick="playTheaterBuzzerBurst()" class="flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg text-xs font-medium border border-zinc-700 transition" title="Toque seco de campainha/cigarra clássica de teatro">
+          <i data-lucide="radio" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>Cigarra / Buzzer Cênico</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAINEL CENTRAL DE OPERAÇÃO -->
+  <main class="flex-1 p-3 sm:p-5 grid grid-cols-1 xl:grid-cols-12 gap-5 max-w-[1700px] w-full mx-auto">
+    
+    <!-- COLUNA 1: ROTEIRO TEATRAL / TELEPROMPTER COM ROLAGEM AUTOMÁTICA (5 COLUNAS) -->
+    <section class="xl:col-span-5 flex flex-col bg-console-900 rounded-2xl border border-zinc-800/90 p-4 shadow-xl">
+      <div class="flex flex-wrap items-center justify-between pb-3 mb-3 border-b border-zinc-800 gap-2">
+        <div class="flex items-center gap-2">
+          <span class="p-1.5 rounded-lg bg-amber-500/20 text-amber-400">
+            <i data-lucide="scroll-text" class="w-5 h-5"></i>
+          </span>
+          <div>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-amber-300">Roteiro & Deixas Cênicas</h2>
+            <p class="text-[11px] text-zinc-400">Texto paralelo com auto-rolagem e marcações de som</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-1.5">
+          <label class="cursor-pointer inline-flex items-center gap-1.5 text-xs bg-amber-600/20 hover:bg-amber-600/40 text-amber-200 px-2.5 py-1.5 rounded-lg border border-amber-500/30 transition font-medium" title="Carregar arquivo de texto (.txt ou .md)">
+            <i data-lucide="file-up" class="w-3.5 h-3.5"></i>
+            <span>Importar Roteiro</span>
+            <input type="file" id="uploadScriptTextInput" accept=".txt,.text,.md" class="hidden">
+          </label>
+          <button id="btnResetScriptText" class="text-zinc-400 hover:text-zinc-200 p-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg border border-zinc-700 transition" title="Restaurar roteiro de exemplo">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Controle do Teleprompter / Auto-scroll & Legibilidade -->
+      <div class="bg-console-950 border border-zinc-800/90 rounded-xl p-2.5 mb-3 flex flex-wrap items-center justify-between gap-2.5">
+        <!-- Controles de Rolagem Automática -->
+        <div class="flex items-center gap-2">
+          <button id="btnToggleAutoScroll" class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-xs font-semibold transition active:scale-95">
+            <i id="autoScrollIcon" data-lucide="play" class="w-3.5 h-3.5"></i>
+            <span id="autoScrollText">Rolar Sozinho</span>
+          </button>
+          
+          <div class="flex items-center gap-1.5 bg-zinc-900 px-2.5 py-1 rounded-lg border border-zinc-800">
+            <span class="text-[10px] uppercase font-bold text-zinc-400">Velocidade:</span>
+            <input type="range" id="scrollSpeedRange" min="1" max="10" value="3" class="w-16 h-1 bg-zinc-700 rounded-lg accent-amber-400 cursor-pointer">
+            <span id="scrollSpeedLabel" class="text-xs font-mono font-bold text-amber-400 w-5 text-right">3x</span>
+          </div>
+        </div>
+
+        <!-- Ajustes de Tipografia / Legibilidade -->
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] uppercase font-bold text-zinc-400">Fonte:</span>
+          <div class="flex items-center rounded-lg bg-zinc-900 border border-zinc-800 overflow-hidden">
+            <button id="btnFontDec" class="px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800 transition" title="Diminuir texto">A-</button>
+            <span id="fontSizeDisplay" class="px-1.5 text-[11px] font-mono text-amber-400">16px</span>
+            <button id="btnFontInc" class="px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800 transition" title="Aumentar texto">A+</button>
+          </div>
+          <button id="btnFontFamilyToggle" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-[11px] text-zinc-300 rounded-lg border border-zinc-800 transition font-medium" title="Alternar entre fonte Sans e Serifada cênica">
+            Serif
+          </button>
+        </div>
+      </div>
+
+      <!-- Container de Leitura do Roteiro (Com Rolagem Suave e Tipografia Cênica) -->
+      <div id="scriptScrollArea" class="flex-1 min-h-[480px] max-h-[580px] bg-console-950 rounded-xl border border-zinc-800 p-5 overflow-y-auto relative select-text focus:outline-none focus:border-amber-500/50" contenteditable="true" spellcheck="false">
+        <div id="scriptContent" class="space-y-4 font-sans text-base leading-relaxed text-zinc-200 transition-all duration-150">
+          
+          <!-- Cabeçalho da Peça -->
+          <div class="text-center pb-4 border-b border-zinc-800">
+            <h3 class="text-xl font-black text-amber-400 tracking-wide uppercase">ROTEIRO TEATRAL — INDICAÇÕES DE LUZ E SOM</h3>
+            <p class="text-xs text-zinc-400 uppercase tracking-widest mt-1">Adaptação Técnica & Sonoplastia: Prof. Italo Gabriel</p>
+            <div class="mt-2 text-[11px] bg-amber-500/10 text-amber-300 border border-amber-500/20 px-3 py-1.5 rounded-lg text-left inline-block">
+              <strong>Orientação do Diretor:</strong> Usar as indicações como referência para o iluminador e o operador de som, adaptando ao equipamento disponível. Não é necessário reproduzir efeitos complexos.
+            </div>
+          </div>
+
+          <!-- BLOCO GERAL INICIAL -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 my-2">
+            <div class="p-2.5 bg-amber-950/30 border-l-4 border-amber-500 rounded-r-lg text-xs">
+              <strong class="text-amber-400 font-bold block mb-0.5">💡 LUZ:</strong>
+              Luz mais baixa e fechada em Nora, deixando o restante do palco mais escuro. Clima de tensão e decisão.
+            </div>
+            <div class="p-2.5 bg-cyan-950/40 border-l-4 border-cyan-500 rounded-r-lg text-xs">
+              <strong class="text-cyan-400 font-bold block mb-0.5">🔊 SOM:</strong>
+              Trilha instrumental discreta e tensa na entrada. A voz gravada de Torvald deve entrar com clareza, como previsto no roteiro.
+            </div>
+          </div>
+
+          <!-- CENA 1 -->
+          <div class="pt-2 border-t border-zinc-800">
+            <h4 class="text-base font-bold text-amber-400 mb-2">Cena 1 — Nora</h4>
+            <p class="text-xs italic text-zinc-400 mb-2">(Nora entra na sala, está inquieta, andando de um lado para o outro.)</p>
+            
+            <div class="space-y-2">
+              <div class="pl-3 border-l-2 border-zinc-700">
+                <span class="font-bold text-cyan-300 text-xs">TORVALD HELMER (voz gravada de Enzo):</span>
+                <p class="text-sm text-zinc-300 mt-0.5">O que está acontecendo c vc? Está tão inquieta, parece uma barata tonta.</p>
+              </div>
+
+              <div class="pl-3 border-l-2 border-amber-600/70">
+                <span class="font-bold text-amber-300 text-xs">NORA:</span>
+                <p class="text-sm text-zinc-300 mt-0.5">Estou indo embora, cansei das suas humilhações, da sua falta de respeito. Fiz algumas coisas irregulares pensando em te beneficiar, precisei muito de dinheiro para cuidar da sua saúde. Vc não me agradeceu. Estou sendo criticada....</p>
+                <p class="text-sm text-zinc-200 font-semibold mt-1">Adeus! Cansei de ser sua bonequinha.....</p>
+              </div>
+            </div>
+
+            <div class="my-2 p-2 bg-amber-950/20 border-l-4 border-amber-500/80 rounded-r text-xs text-amber-200">
+              💡 <strong>LUZ:</strong> Diminuir a luz na saída de Nora e mudar de forma simples para a próxima cena.
+            </div>
+            <p class="text-xs italic text-zinc-400 pl-3">(Nora pega a mala e sai.)</p>
+          </div>
+
+          <!-- CENA 2 -->
+          <div class="pt-3 border-t border-zinc-800">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+              <div class="p-2 bg-amber-950/30 border-l-4 border-amber-500 rounded-r text-xs">
+                💡 <strong>LUZ:</strong> Luz de casa, mais quente e clara, iluminando principalmente Amélia e Jurandir.
+              </div>
+              <div class="p-2 bg-cyan-950/40 border-l-4 border-cyan-500 rounded-r text-xs">
+                🔊 <strong>SOM:</strong> Manter a cena quase sem trilha. O diálogo deve ser o destaque.
+              </div>
+            </div>
+
+            <h4 class="text-base font-bold text-amber-400 mb-2">Cena 2 — Amélia e Jurandir</h4>
+            <p class="text-xs italic text-zinc-400 mb-2">(Cena congelada e descongela quando Nora sai. Amélia está lavando os pés de Jurandir.)</p>
+
+            <div class="space-y-2">
+              <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Jurandir meu amor, está bom?</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Ta bom o que? Você não sabe fazer nada, você é uma inútil.</div>
+              <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Vou colocar seu café.</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Você já deveria ter colocado a porcaria do meu café, você é uma inútil mesmo.</div>
+              <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Calma amor, vou tocar um piano para alegrar seu dia.</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Para Amélia, para de inventa coisa, eu só quero tomar meu café, me deixa em paz.</div>
+            </div>
+
+            <div class="my-2.5 p-2 bg-purple-950/40 border-l-4 border-purple-400 rounded-r text-xs text-purple-200">
+              🔊 <strong>[SOM: PAD 1 - PIANO SUAVE]</strong> &rarr; Entrar som de piano simples e suave, como se Amélia estivesse tocando. <strong>Cortar quando Jurandir interromper.</strong>
+            </div>
+
+            <p class="text-xs italic text-zinc-400 pl-3">(Amélia tenta tocar o piano (som), mas Jurandir interrompe bruscamente.)</p>
+
+            <div class="mt-2 space-y-2">
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Mulher você não entendeu que eu quero só tomar meu café em paz? Para com essa coisa feia, não sabe nem tocar.</div>
+            </div>
+            <p class="text-xs italic text-zinc-400 mt-2 pl-3">(Jurandir sai, arremessa o pão na direção dela e sai bufando.)</p>
+          </div>
+
+          <!-- CENA 3 -->
+          <div class="pt-3 border-t border-zinc-800">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+              <div class="p-2 bg-amber-950/30 border-l-4 border-amber-500 rounded-r text-xs">
+                💡 <strong>LUZ:</strong> Luz mais branca/neutra para representar o escritório. Pode ser um pouco mais fria que a luz da casa.
+              </div>
+              <div class="p-2 bg-cyan-950/40 border-l-4 border-cyan-500 rounded-r text-xs">
+                🔊 <strong>SOM:</strong> Som ambiente muito discreto de escritório, se houver possibilidade.
+              </div>
+            </div>
+
+            <h4 class="text-base font-bold text-amber-400 mb-2">Cena 3 — Jurandir e Antônio</h4>
+
+            <div class="p-2.5 bg-indigo-950/40 border-l-4 border-indigo-400 rounded-r text-xs text-indigo-200 mb-3">
+              🔊 <strong>[SOM - AVE MARIA (PAD 2)]:</strong> Jurandir reclama que Amélia estava cantando Ave Maria. Para reforçar a lembrança da cena anterior, pode entrar por poucos segundos um trecho instrumental ou uma voz distante cantando Ave Maria, em volume baixo, e sair assim que o diálogo avançar.
+            </div>
+
+            <p class="text-xs italic text-zinc-400 mb-2">(Jurandir chega agitado no escritório com o celular na mão jogando falando para Antônio.)</p>
+
+            <div class="space-y-2">
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Não aguento mais, aquela mulher chata, sabe o que ela fez agora? Cantando avemaria, dizendo ela que sabe cantar.</div>
+              <div><strong class="text-emerald-300 text-xs">ANTÔNIO:</strong> Jurandiiir!!! (tom de alerta) você deveria valorizar mais sua mulher, você é muito ingrato, você só vai dar valor quando perder.</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Que nada, eu tenho Madalena. Mas o que eu to precisando mesmo é daquele dinheiro que falei pra você.</div>
+              <div><strong class="text-emerald-300 text-xs">ANTÔNIO:</strong> Depois não adianta chorar pelo leite derramado. Jurandir, eu posso até te emprestar mas vamos ter que oficializar isso. Com garantias!</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Pode deixar que eu não vou atrasar nenhuma divida que eu tenho com você.</div>
+            </div>
+
+            <p class="text-xs italic text-zinc-400 my-2 pl-3">(Antônio fica segundos em silêncio, abre a gaveta e tira um documento.)</p>
+
+            <div class="space-y-2">
+              <div><strong class="text-emerald-300 text-xs">ANTÔNIO:</strong> Então se você diz, eu consigo um empréstimo para você.</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Quanto?</div>
+              <div><strong class="text-emerald-300 text-xs">ANTÔNIO:</strong> O suficiente para você tentar mais uma vez. (Apontando para o documento) Você assina aqui!</div>
+            </div>
+
+            <div class="my-2.5 p-2 bg-yellow-950/40 border-l-4 border-yellow-400 rounded-r text-xs text-yellow-200">
+              🔊 <strong>[SOM: PAD 3 - NOTIFICAÇÃO DE APOSTA / CELULAR]:</strong> Tocar claramente a notificação de aposta do celular no momento indicado no roteiro.
+            </div>
+
+            <p class="text-xs italic text-zinc-400 pl-3">(Jurandir olha para o documento. Hesita por um instante. O celular apita com uma notificação de aposta.)</p>
+
+            <div class="mt-2 space-y-2">
+              <div><strong class="text-emerald-300 text-xs">ANTÔNIO:</strong> Você confia em mim?</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Confio. <em>(Assina.)</em></div>
+              <div><strong class="text-emerald-300 text-xs">ANTÔNIO:</strong> Pronto, agora é só ganhar.</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Eu vou ganhar. Hoje eu saio daqui milionário.</div>
+            </div>
+
+            <!-- MONÓLOGO DE ANTÔNIO -->
+            <div class="mt-3 p-3 bg-zinc-900/90 border-l-4 border-emerald-500 rounded-r-lg">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-bold text-emerald-400 text-xs uppercase tracking-wider">Monólogo de Antônio</span>
+                <span class="text-[10px] text-zinc-400">💡 Luz destacando Antônio | 🔊 Trilha grave e discreta</span>
+              </div>
+              <p class="text-xs italic text-zinc-400 mb-2">(A cena congela. O amigo observa Jurandir. Fala com calma.)</p>
+              <div class="text-sm text-zinc-200 space-y-2 font-serif">
+                <p>Sabe qual é a coisa engraçada sobre dinheiro? Você sempre achou que dinheiro era poder. Queria mandar, decidir, ser respeitado. E eu deixei você acreditar nisso.</p>
+                <p>Uma aposta. Um empréstimo. Uma dívida. “É só uma fase.” Mas dívida não é fase. É escolha.</p>
+                <p class="italic text-zinc-400">(Pausa.)</p>
+                <p>Você queria tudo sem pagar o preço. Queria uma casa onde sua palavra fosse lei. Mas correu tanto atrás do presente que acabou construindo o próprio passado.</p>
+                <p class="italic text-zinc-400">(Olha para Amélia)</p>
+                <p>Você confundiu silêncio com respeito. Achou que, porque ela ficou, ela não podia ir embora. Mas até quem está parado pode estar partindo.</p>
+                <p class="italic text-zinc-400">(Ergue o documento.)</p>
+                <p>E agora chegou a conta. Você assinou. Escolheu. Apostou. Perdeu. E dessa vez não tem ninguém para culpar. Só você... e tudo aquilo que fez.</p>
+                <p class="italic text-zinc-400">(Pausa.)</p>
+                <p>Eu sempre soube que dinheiro era uma dívida. Você achava que era poder. Agora vai descobrir a diferença.</p>
+              </div>
+              <p class="text-xs italic text-zinc-400 mt-2">(Antônio sai.)</p>
+            </div>
+          </div>
+
+          <!-- CENA 4 -->
+          <div class="pt-3 border-t border-zinc-800">
+            <div class="p-2 bg-amber-950/30 border-l-4 border-amber-500 rounded-r text-xs mb-2">
+              💡 <strong>LUZ:</strong> No escritório, manter a mesma luz branca/neutra da cena anterior. Quando a ação passar para outro espaço, mudar apenas o necessário para diferenciar os ambientes.
+            </div>
+
+            <h4 class="text-base font-bold text-amber-400 mb-2">Cena 4 — O Segredo</h4>
+            <p class="text-xs italic text-zinc-400 mb-2">(Jurandir está no escritório. Ele trabalha, mas demonstra estar inquieto, envolvido também com o vício em jogos. Pega o celular e liga para Madalena.)</p>
+
+            <div class="space-y-2">
+              <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Alô?</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Madalena?</div>
+              <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Oi, Jurandir.</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Onde você está?</div>
+              <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Estou em casa. Por quê?</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Quero te ver. Vamos sair hoje?</div>
+              <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Hoje?</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Sim. Eu estou saindo do escritório daqui a pouco. A gente se encontra.</div>
+              <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Você não consegue ficar um dia sem me chamar para sair?</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Não quando é você, meu amor.</div>
+              <p class="text-xs italic text-zinc-400 pl-3">(Madalena sorri.)</p>
+              <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Está bem. Depois você me liga.</div>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Combinado. <em>(Desligam.)</em></div>
+            </div>
+
+            <div class="my-2.5 p-2 bg-blue-950/40 border-l-4 border-blue-400 rounded-r text-xs text-blue-200">
+              🔊 <strong>[SOM: PAD 4 - TOQUE DE TELEFONE]:</strong> Toque de telefone para a segunda ligação.
+            </div>
+
+            <p class="text-xs italic text-zinc-400 pl-3">(Madalena ainda está com o celular na mão. Antes que consiga guardá-lo, o telefone toca novamente.)</p>
+
+            <div class="mt-2 space-y-2">
+              <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Alô?</div>
+              <div><strong class="text-amber-300 text-xs">NORA:</strong> Madalena? Sou eu!</div>
+              <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Oi, Nora.</div>
+              <div><strong class="text-amber-300 text-xs">NORA:</strong> Lembra que eu falei da minha irmã?</div>
+              <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Lembro.</div>
+              <div><strong class="text-amber-300 text-xs">NORA:</strong> Quero que você venha comigo conhecê-la.</div>
+              <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Agora?</div>
+              <div><strong class="text-amber-300 text-xs">NORA:</strong> Agora. Por favor.</div>
+              <p class="text-xs italic text-zinc-400 pl-3">(Madalena pensa por um instante.)</p>
+              <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Está bem. Eu vou. <em>(Desliga.)</em></div>
+            </div>
+
+            <!-- MONÓLOGO NORA 1 -->
+            <div class="mt-3 p-3 bg-zinc-900/90 border-l-4 border-amber-500 rounded-r-lg">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-bold text-amber-400 text-xs uppercase tracking-wider">Monólogo de Nora</span>
+                <span class="text-[10px] text-zinc-400">💡 Luz concentrada em Nora | 🔊 Trilha instrumental suave e emocional</span>
+              </div>
+              <div class="text-sm text-zinc-200 space-y-2 font-serif">
+                <p>Fico pensando o que há de errado na relação entre duas mulheres que se amam?</p>
+                <p>Depois que me separei, fui taxada de puta, vadia, e outros adjetivos, afastada dos meus filhos, não era uma boa referência p eles. Conheci alguns homens que diziam me amar, mas no primeiro aborrecimento, me ameaçavam, mas nunca me calei, enfrentava, com tesoura em punho, dizia: não venha, vc pode sair ferido.</p>
+                <p>Outras histórias aconteceram, Lauro: um homem apaixonante, carinhoso, envolvente, durou 10 anos. Um dia cansei daquele homem lindo, mentiroso, gastador, mulherengo e jogador de pôquer. Um traste. Tomei uma decisão: não quero mais ninguém na minha vida. Foi quando apareceu Madalena. Um amor diferente que me fez renascer.</p>
+              </div>
+            </div>
+
+            <!-- CASA DA IRMÃ DE NORA -->
+            <div class="mt-4 pt-3 border-t border-zinc-800">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                <div class="p-2 bg-amber-950/30 border-l-4 border-amber-500 rounded-r text-xs">
+                  💡 <strong>LUZ:</strong> Voltar para uma luz mais quente, indicando a casa de Amélia. Não precisa mudar cores durante o diálogo.
+                </div>
+                <div class="p-2 bg-cyan-950/40 border-l-4 border-cyan-500 rounded-r text-xs">
+                  🔊 <strong>SOM:</strong> Ambiente de casa em silêncio. Priorizar as falas.
+                </div>
+              </div>
+
+              <h5 class="text-sm font-bold text-amber-300 uppercase tracking-wide mb-1">CASA DA IRMÃ DE NORA</h5>
+              <p class="text-xs italic text-zinc-400 mb-2">(Luzes mudam. Nora e Madalena chegam à casa da irmã. O ambiente é simples e antigo. A irmã de Nora observa Madalena com curiosidade.)</p>
+
+              <div class="space-y-2">
+                <div><strong class="text-amber-300 text-xs">NORA:</strong> Minha irmã, essa é Madalena.</div>
+                <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Prazer em conhecer você.</div>
+                <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Prazer.</div>
+                <p class="text-xs italic text-zinc-400 pl-3">(Nora percebe que Amélia está olhando para o celular.)</p>
+                <div><strong class="text-amber-300 text-xs">NORA:</strong> Você nunca teve um desses?</div>
+                <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Um desses o quê?</div>
+                <div><strong class="text-amber-300 text-xs">NORA:</strong> Um celular.</div>
+                <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Celular?</div>
+                <p class="text-xs italic text-zinc-400 pl-3">(Nora entrega o aparelho a Amélia.)</p>
+                <div><strong class="text-amber-300 text-xs">NORA:</strong> É. Com isso você pode falar com as pessoas mesmo estando longe.</div>
+                <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> E como isso funciona?</div>
+                <div><strong class="text-amber-300 text-xs">NORA:</strong> Tem muita coisa que você ainda não conhece.</div>
+                <p class="text-xs italic text-zinc-400 pl-3">(Amélia observa o celular, desconfiada.)</p>
+                <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Isso é coisa moderna demais.</div>
+                <div><strong class="text-amber-300 text-xs">NORA:</strong> É só um celular.</div>
+                <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Jurandir não gosta dessas coisas.</div>
+                <div><strong class="text-violet-300 text-xs">MADALENA:</strong> E você? Gosta?</div>
+                <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Eu nem sei se gosto. Nunca tive.</div>
+                <p class="text-xs italic text-zinc-400 pl-3">(Pausa.)</p>
+                <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Você nunca sai daqui?</div>
+                <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Não muito.</div>
+                <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Nunca vai a lugar nenhum?</div>
+                <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Jurandir acha melhor eu ficar em casa.</div>
+                <p class="text-xs italic text-zinc-400 pl-3">(Madalena olha para Nora, incomodada.)</p>
+                <div><strong class="text-amber-300 text-xs">NORA:</strong> É por isso que eu queria que você conhecesse minha irmã.</div>
+                <p class="text-xs italic text-zinc-400 pl-3">(Amélia continua falando sobre como vive isolada. Madalena demonstra surpresa e indignação.)</p>
+                <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Eu não preciso dessas coisas de fora. Tenho minha casa, meu marido…</div>
+              </div>
+
+              <div class="my-2.5 p-2 bg-rose-950/40 border-l-4 border-rose-400 rounded-r text-xs text-rose-200">
+                🔊 <strong>[SOM: PAD 5 - PORTA ABRINDO / MAÇANETA]:</strong> Som de porta ou maçaneta antes da entrada de Jurandir.
+              </div>
+
+              <p class="text-xs italic text-zinc-400 pl-3">(Nesse momento, ouve-se a porta.)</p>
+
+              <div class="mt-2 space-y-2">
+                <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Nora?!</div>
+                <p class="text-xs italic text-zinc-400 pl-3">(Jurandir entra furioso. Ele está tão concentrado na presença de Nora que não percebe Madalena.)</p>
+                <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Quem deixou Nora entrar aqui?</div>
+                <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Jurandir, ela é minha irmã!</div>
+                <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Eu sei muito bem quem ela é! Eu já disse que não quero essa mulher aqui!</div>
+                <div><strong class="text-amber-300 text-xs">NORA:</strong> Eu só vim visitar minha irmã.</div>
+                <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> E eu já falei que não quero você dentro da minha casa!</div>
+                <p class="text-xs italic text-zinc-400 pl-3">(Madalena permanece em silêncio. Jurandir passa por ela sem enxergá-la, tomado pela raiva.)</p>
+              </div>
+
+              <!-- MONÓLOGO MADALENA -->
+              <div class="mt-3 p-3 bg-zinc-900/90 border-l-4 border-violet-500 rounded-r-lg">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="font-bold text-violet-400 text-xs uppercase tracking-wider">Monólogo de Madalena (CONGELA)</span>
+                  <span class="text-[10px] text-zinc-400">💡 Madalena iluminada | 🔊 Trilha discreta e reflexiva</span>
+                </div>
+                <div class="text-sm text-zinc-200 space-y-2 font-serif">
+                  <p>Eu já sofri muito por causa de homem. Já acreditei em promessa. Já aceitei controle achando que era cuidado. Já deixei homem achar que podia decidir por mim.</p>
+                  <p>Mas eu aprendi. Hoje eu quero liberdade. Quero escolher quem eu amo. Quero estar com quem me respeita.</p>
+                  <p>E se eu encontrei felicidade ao lado de uma mulher… qual é o problema? Por que o amor precisa seguir a regra que alguém inventou?</p>
+                  <p>Eu não quero mais sofrer por homem. Homem, pra mim, hoje, é diversão. É dinheiro. É quando eu quero. Porque meu coração… esse eu não entrego mais para qualquer um.</p>
+                  <p class="italic text-zinc-400">(Madalena olha discretamente para Jurandir, que continua de costas.)</p>
+                  <p class="font-semibold text-violet-300">Ou pelo menos… é o que eu digo.</p>
+                </div>
+              </div>
+
+              <div class="my-2 p-2 bg-amber-950/20 border-l-4 border-amber-500 rounded-r text-xs">
+                💡 <strong>LUZ:</strong> Voltar para a mesma luz da casa. <em>(DESCONGELA)</em>
+              </div>
+
+              <div class="space-y-2">
+                <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> Eu estou falando com você, Nora!</div>
+                <div><strong class="text-amber-300 text-xs">NORA:</strong> E eu estou falando com a minha irmã!</div>
+                <p class="text-xs italic text-zinc-400 pl-3">(Madalena permanece calada, escondendo o que realmente existe entre ela e Jurandir.)</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- CENA 5 -->
+          <div class="pt-3 border-t border-zinc-800">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+              <div class="p-2 bg-amber-950/30 border-l-4 border-amber-500 rounded-r text-xs">
+                💡 <strong>LUZ:</strong> Manter a luz da casa, mas um pouco mais baixa, criando um clima mais pesado.
+              </div>
+              <div class="p-2 bg-cyan-950/40 border-l-4 border-cyan-500 rounded-r text-xs">
+                🔊 <strong>SOM:</strong> Sem música no começo. Valorizar a chegada de Antônio e as falas.
+              </div>
+            </div>
+
+            <h4 class="text-base font-bold text-amber-400 mb-2">Cena 5 — A Cobrança</h4>
+
+            <div class="my-2.5 p-2 bg-rose-950/40 border-l-4 border-rose-500 rounded-r text-xs text-rose-200">
+              🔊 <strong>[SOM: PAD 6 - BATIDAS FIRMES NA PORTA]:</strong> Antônio bate na porta de Jurandir para cobrar a dívida.
+            </div>
+
+            <div class="space-y-2">
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> <em>(para Amélia)</em> Vai abrir a porta sua serviçal.</div>
+              <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Calma Jurandir, eu já vou, pra que isso? Antônio?</div>
+              <div><strong class="text-emerald-300 text-xs">ANTÔNIO:</strong> Boa tarde Dona Amélia, Jurandir está?</div>
+              <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> Sim, pode entrar.</div>
+              <p class="text-xs italic text-zinc-400 pl-3">(Antônio entra e olha para Jurandir)</p>
+              <div><strong class="text-emerald-300 text-xs">ANTÔNIO:</strong> Eu te avisei Jurandir, mais cedo ou mais tarde você ia perder tudo.</div>
+              <p class="text-xs italic text-zinc-400 pl-3">(Antônio entrega o documento na mão de Amélia)</p>
+              <div><strong class="text-pink-300 text-xs">AMÉLIA:</strong> O que é isso? Madalena, você pode ler pra mim?</div>
+              <p class="text-xs italic text-zinc-400 pl-3">(Jurandir já presume o que aquele papel pode ser)</p>
+              <div><strong class="text-rose-400 text-xs">JURANDIR:</strong> MADALENA??? Você aqui? Isso é um complô. Antônio, nós somos amigos, me dê mais um tempo.</div>
+              <div><strong class="text-violet-300 text-xs">MADALENA:</strong> Amélia, aqui diz que essa casa pertence a Antônio.</div>
+            </div>
+
+            <!-- MONÓLOGO DE ANTÔNIO NA COBRANÇA -->
+            <div class="mt-3 p-3 bg-zinc-900/90 border-l-4 border-emerald-500 rounded-r-lg">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-bold text-emerald-400 text-xs uppercase tracking-wider">Monólogo de Antônio</span>
+                <span class="text-[10px] text-zinc-400">💡 Baixar um pouco a luz geral | 🔊 Trilha grave e discreta</span>
+              </div>
+              <div class="text-sm text-zinc-200 space-y-2 font-serif">
+                <p>Você queria tudo sem pagar o preço. Queria uma casa onde sua palavra fosse lei. Mas correu tanto atrás do presente que acabou construindo o próprio passado.</p>
+                <p class="italic text-zinc-400">(Olha para Amélia)</p>
+                <p>Você confundiu silêncio com respeito. Achou que, porque ela ficou, ela não podia ir embora. Mas até quem está parado pode estar partindo.</p>
+                <p class="italic text-zinc-400">(Ergue o documento.)</p>
+                <p>E agora chegou a conta. Você assinou. Escolheu. Apostou. Perdeu. E dessa vez não tem ninguém para culpar. Só você... e tudo aquilo que fez.</p>
+                <p class="italic text-zinc-400">(Pausa.)</p>
+                <p>Eu sempre soube que dinheiro era uma dívida. Você achava que era poder. Agora vai descobrir a diferença.</p>
+              </div>
+            </div>
+
+            <div class="mt-2 space-y-2">
+              <div><strong class="text-emerald-300 text-xs">ANTÔNIO:</strong> Nem mais um tempo Jurandir, Negócios é Negócio, amizade a parte. Você tem 24 horas pra sair daqui.</div>
+              <div><strong class="text-amber-300 text-xs">AMÉLIA E NORA:</strong> Como assim? Essa casa era dos nossos pais.</div>
+            </div>
+
+            <!-- MONÓLOGO DE AMÉLIA -->
+            <div class="mt-3 p-3 bg-zinc-900/90 border-l-4 border-pink-500 rounded-r-lg">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-bold text-pink-300 text-xs uppercase tracking-wider">Monólogo de Amélia</span>
+                <span class="text-[10px] text-zinc-400">💡 Luz concentrada em Amélia | 🔊 Trilha suave e tensa + [SFX CORRENTES]</span>
+              </div>
+              <div class="text-sm text-zinc-200 space-y-2 font-serif">
+                <p>Três passos... Apenas três passos me separam daquela janela, mas eu não consigo mexer o braço.</p>
+                <p>Quando olho para a cortina, não vejo pano. Vejo grades de ferro grosso subindo até o teto.</p>
+                <p>Se eu abrir a porta para olhar a rua, a casa desaba sobre mim. Eu não posso olhar. Não posso ver o mundo lá fora.</p>
+                <p>Olha para os meus pés... Eu vejo correntes pesadas presas nos meus tornozelos, enraizadas no chão.</p>
+                <p>Eu não trabalho, nunca tive nada meu. Para comer, beber, vestir esse pano velho... eu dependo totalmente dele.</p>
+                <p>Vivo debaixo dos pés de um homem machista que simplesmente não respeita a minha vontade. Para ele, a minha opinião não existe.</p>
+                <p class="italic text-amber-200 font-sans">"De tanto ficar presa no escuro, até da rua eu passei a ter medo."</p>
+                <p>A rua virou um monstro. Se hoje me abrissem a porta, eu não saberia dar um passo. A luz me cegaria.</p>
+                <p>O medo de viver me prendeu mais do que a tranca. Daqui a pouco ele chega... e eu preciso fingir que este silêncio é a minha vida.</p>
+              </div>
+            </div>
+
+            <div class="mt-2 space-y-2">
+              <div><strong class="text-emerald-300 text-xs">ANTÔNIO:</strong> Não Amélia, essa casa é minha e você também!!!</div>
+            </div>
+
+            <div class="my-2 p-2 bg-amber-950/20 border-l-4 border-amber-500 rounded-r text-xs">
+              💡 <strong>LUZ:</strong> Apagar ou baixar bastante a luz dos demais e deixar somente Jurandir iluminado. <em>(Todos menos Jurandir saem)</em>
+            </div>
+          </div>
+
+          <!-- MONÓLOGO FINAL DE JURANDIR -->
+          <div class="pt-3 border-t border-zinc-800">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+              <div class="p-2 bg-amber-950/30 border-l-4 border-amber-500 rounded-r text-xs">
+                💡 <strong>LUZ:</strong> Luz baixa e concentrada em Jurandir durante todo o monólogo. Não precisa fazer várias mudanças.
+              </div>
+              <div class="p-2 bg-cyan-950/40 border-l-4 border-cyan-500 rounded-r text-xs">
+                🔊 <strong>SOM:</strong> Sons do jogo no celular apenas nos momentos em que Jurandir joga. Nos trechos mais emocionais, deixar silêncio.
+              </div>
+            </div>
+
+            <h4 class="text-base font-bold text-rose-400 mb-2">MONÓLOGO FINAL — JURANDIR</h4>
+            <p class="text-xs italic text-zinc-400 mb-2">(Jurandir está bebendo. Senta-se, pega o celular e abre o Tigrinho. Ri sozinho.)</p>
+
+            <div class="text-sm text-zinc-200 space-y-2 font-serif pl-3 border-l-2 border-rose-700/60">
+              <p><strong class="font-sans text-rose-300 text-xs">JURANDIR:</strong> Sabe qual é a pior parte? Eu achei que ia ficar rico. <em>(ri)</em></p>
+              <p>Eu tinha uma casa… tinha dinheiro… tinha minha mulher do meu lado… tinha uma empresa. Eu tinha tudo.</p>
+              <p>Aí eu descobri as bets. No começo era só brincadeira. Cem reais aqui… duzentos ali… <em>“É só pra se divertir, Jurandir.”</em> (Pensando alto)</p>
+              <p class="italic text-zinc-400">(Pausa, olhando para o celular)</p>
+              <p>Até que eu ganhei. <em>(Para o Público)</em> E aquele primeiro dinheiro que eu ganhei… acabou comigo.</p>
+              <p>Comecei a apostar o salário. Depois o dinheiro da empresa. Depois fiz empréstimo. Perdi a casa.</p>
+              <p class="italic text-zinc-400">(Começa a ficar emocionado)</p>
+              <p>E eu menti, Mentia pra ela… mentia pros meus amigos… mentia pra mim mesmo. <em>(ri nervoso)</em> Até as ações da empresa eu coloquei nisso. Tudo por causa de uma promessa: <em>“Na próxima eu recupero.”</em></p>
+              <p class="italic text-zinc-400">(Silêncio)</p>
+              <p>Como recupera o que foi perdido?</p>
+              <p class="italic text-zinc-400">(Olha novamente para o celular)</p>
+              <p>Mas ainda dá tempo… Só mais uma. Só mais uma rodada. Talvez eu consiga recuperar a casa e Amélia.</p>
+              <p class="italic text-rose-300 font-sans font-semibold">(Começa a jogar desesperadamente)</p>
+            </div>
+
+            <div class="my-2.5 p-2 bg-yellow-950/40 border-l-4 border-yellow-500 rounded-r text-xs text-yellow-200">
+              🔊 <strong>[SOM: PAD 7 - TIGRINHO / JOGO & PERDA]:</strong> Efeito do jogo/aposta aumentando a tensão e, em seguida, som de perda.
+            </div>
+
+            <div class="text-sm text-zinc-200 space-y-2 pl-3 border-l-2 border-rose-700/60">
+              <p><strong class="font-sans text-rose-300 text-xs">JURANDIR:</strong> Vai… vai… Dá bônus! Dá bônus, BANANA!!!</p>
+              <p class="italic text-zinc-400">(Pausa. Olha para a tela. A expressão muda.)</p>
+              <p class="text-rose-400 font-bold">Perdi. De novo.</p>
+              <p class="italic text-zinc-400">(Olha para o público, com lágrimas)</p>
+              <p>Eu passei a minha vida tentando ganhar dinheiro… e perdi a minha vida tentando ganhar dinheiro.</p>
+              <p class="italic text-zinc-400">(Levanta o celular)</p>
+              <p class="text-base font-bold text-white uppercase">Quer saber? CHEGA!!! EU NÃO QUERO MAIS JOGAR!</p>
+            </div>
+
+            <div class="my-2.5 p-2 bg-red-950/40 border-l-4 border-red-500 rounded-r text-xs text-red-200">
+              🔊 <strong>[SOM: PAD 8 - CELULAR QUEBRANDO NO CHÃO]:</strong> Reforçar o som do celular caindo/quebrando apenas se o objeto de cena não produzir som suficiente.
+            </div>
+
+            <p class="text-xs italic text-zinc-400 pl-3">(Arremessa o celular no chão. Fica parado, respirando pesado. Olha para o celular quebrado no chão.)</p>
+            <p class="text-sm italic text-zinc-300 pl-3"><em>Jurandir (fala baixo):</em> …Eu só queria minha vida de volta.</p>
+
+            <!-- FINAL DA PEÇA -->
+            <div class="mt-4 p-3.5 bg-gradient-to-r from-amber-950/50 via-zinc-900 to-indigo-950/50 border-2 border-amber-500/60 rounded-xl">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-bold text-amber-400 text-sm uppercase tracking-wider flex items-center gap-1.5">
+                  <i data-lucide="music-2" class="w-4 h-4"></i> FINAL DA PEÇA
+                </span>
+                <span class="text-xs font-mono text-zinc-400">Canção: "Ai, que saudade da Amélia"</span>
+              </div>
+              <div class="text-xs text-zinc-300 space-y-1.5 mb-3">
+                <p>💡 <strong>LUZ:</strong> Na música final, abrir um pouco a luz para receber a equipe que volta ao palco. Terminar com luz geral no elenco e depois apagar suavemente.</p>
+                <p>🔊 <strong>SOM - FINAL:</strong> Entrada da canção <em>“Ai, meu Deus, que saudade da Amélia”</em> (Trilha 3), com a equipe voltando e repetindo duas vezes.</p>
+              </div>
+              <p class="text-xs italic text-zinc-400 mb-2">(Jurandir sente a solidão embriagado, começa a cantar. Equipe volta cantando e repete duas vezes)</p>
+              <div class="p-3 bg-black/40 rounded-lg text-amber-200 font-serif italic text-sm text-center border border-amber-500/20">
+                “Ai, meu Deus, que saudade da Amélia<br>
+                Aquilo sim é que era mulher<br>
+                Amélia não tinha a menor vaidade<br>
+                Amélia é que era mulher de verdade.”
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Barra de Status do Roteiro -->
+      <div class="mt-2.5 pt-2 border-t border-zinc-800 flex items-center justify-between text-[11px] text-zinc-500">
+        <span id="scriptStatusText">Pronto para leitura e ensaio</span>
+        <span class="text-amber-400 font-medium flex items-center gap-1">
+          <i data-lucide="eye" class="w-3.5 h-3.5"></i> Modo Leitura Cênica
+        </span>
+      </div>
+    </section>
+
+    <!-- COLUNA 2: TRILHA SONORA CONTÍNUA (BGM / AMBIÊNCIA) (3 COLUNAS) -->
+    <section class="xl:col-span-3 flex flex-col bg-console-900 rounded-2xl border border-zinc-800/90 p-4 shadow-xl">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-zinc-800">
+        <div class="flex items-center gap-2">
+          <span class="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-400">
+            <i data-lucide="disc" class="w-5 h-5"></i>
+          </span>
+          <div>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-cyan-300">Trilha de Fundo</h2>
+            <p class="text-[11px] text-zinc-400">Músicas & Ambiências Contínuas</p>
+          </div>
+        </div>
+        <label class="cursor-pointer inline-flex items-center gap-1 text-xs bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-200 px-2.5 py-1.5 rounded-lg border border-cyan-500/30 transition font-medium" title="Fazer upload de múltiplos arquivos MP3/WAV">
+          <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+          <span>Upar Trilhas</span>
+          <input type="file" id="uploadMusicInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac" multiple class="hidden">
+        </label>
+      </div>
+
+      <!-- Player Principal de Trilha -->
+      <div class="bg-console-950 rounded-xl border border-zinc-800 p-4 space-y-3.5">
+        <div>
+          <span class="text-[10px] uppercase font-bold text-cyan-400 tracking-wider">Trilha Selecionada:</span>
+          <h3 id="currentTrackTitle" class="text-sm font-bold text-white truncate mt-0.5">Carregando repertório...</h3>
+        </div>
+
+        <!-- Barra de Progresso do Áudio -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px] font-mono text-zinc-400">
+            <span id="currentTimeLabel">00:00</span>
+            <span id="durationLabel">00:00</span>
+          </div>
+          <div id="progressBarContainer" class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden cursor-pointer">
+            <div id="progressBar" class="bg-cyan-400 h-full w-0 transition-all duration-100"></div>
+          </div>
+        </div>
+
+        <!-- Controles de Transporte (Play, Stop, Loop) -->
+        <div class="flex items-center justify-between pt-1">
+          <div class="flex items-center gap-2">
+            <button id="btnPlayPauseMusic" class="w-11 h-11 rounded-full bg-cyan-500 hover:bg-cyan-400 text-zinc-950 flex items-center justify-center shadow-lg shadow-cyan-900/40 transition active:scale-95" title="Reproduzir / Pausar (Atalho: Espaço)">
+              <i id="playMusicIcon" data-lucide="play" class="w-5 h-5 fill-current"></i>
+            </button>
+            <button id="btnStopMusic" class="w-9 h-9 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center transition active:scale-95" title="Parar e voltar ao início">
+              <i data-lucide="square" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="btnLoopMusic" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-zinc-200 transition flex items-center gap-1.5" title="Repetir trilha sem parar">
+              <i data-lucide="repeat" class="w-3.5 h-3.5"></i>
+              <span id="loopLabel">Loop: Off</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Volume da Trilha -->
+        <div class="flex items-center gap-2 pt-2 border-t border-zinc-800/80">
+          <i data-lucide="volume-1" class="w-4 h-4 text-zinc-400"></i>
+          <input type="range" id="musicVolume" min="0" max="1" step="0.01" value="0.75" class="w-full accent-cyan-400">
+          <span id="musicVolLabel" class="text-xs font-mono text-zinc-400 w-8 text-right font-semibold">75%</span>
+        </div>
+      </div>
+
+      <!-- Lista de Trilhas Disponíveis -->
+      <div class="mt-4 flex-1 flex flex-col">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+            <span>Repertório Cênico</span>
+            <span class="text-[10px] text-zinc-500" id="musicCountLabel">0 faixas</span>
+          </h3>
+          <div class="flex items-center gap-1">
+            <button id="btnClearDefaultTracks" onclick="clearDefaultTracks()" class="text-[10px] text-zinc-400 hover:text-amber-300 px-1.5 py-0.5 rounded bg-zinc-800/80 hover:bg-zinc-700 transition" title="Remover apenas as 3 trilhas padrão de exemplo">
+              Limpar Exemplos
+            </button>
+            <button id="btnClearAllTracks" onclick="clearAllTracks()" class="text-[10px] text-zinc-400 hover:text-rose-400 px-1.5 py-0.5 rounded bg-zinc-800/80 hover:bg-zinc-700 transition" title="Remover todas as faixas da lista">
+              Limpar Tudo
+            </button>
+          </div>
+        </div>
+        <div id="musicPlaylist" class="space-y-1.5 overflow-y-auto max-h-[300px] pr-1">
+          <!-- Injetado dinamicamente via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- COLUNA 3: BANCO DE EFEITOS SONOROS (SFX PADS) (4 COLUNAS) -->
+    <section class="xl:col-span-4 flex flex-col bg-console-900 rounded-2xl border border-zinc-800/90 p-4 shadow-xl">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-zinc-800">
+        <div class="flex items-center gap-2">
+          <span class="p-1.5 rounded-lg bg-purple-500/20 text-purple-400">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+          </span>
+          <div>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-purple-300">Efeitos Sonoros (SFX)</h2>
+            <p class="text-[11px] text-zinc-400">Disparo instantâneo com função de toggle para parar</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+          <label class="cursor-pointer inline-flex items-center gap-1 text-xs bg-purple-600/20 hover:bg-purple-600/40 text-purple-200 px-2.5 py-1.5 rounded-lg border border-purple-500/30 transition font-medium" title="Carregar arquivo de som (.mp3, .wav)">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Add Sons</span>
+            <input type="file" id="uploadSfxInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac" multiple class="hidden">
+          </label>
+          <button id="btnClearDefaultSfx" onclick="clearDefaultSfx()" class="px-2 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-amber-300 text-xs rounded-lg border border-zinc-700 transition" title="Remover apenas os 9 efeitos de exemplo da peça">
+            Limpar Exemplos
+          </button>
+          <button id="btnStopAllSfx" class="px-2.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded-lg border border-zinc-700 font-semibold transition" title="Parar todos os efeitos sonoros">
+            Parar SFX
+          </button>
+        </div>
+      </div>
+
+      <div class="text-[11px] text-zinc-400 bg-zinc-950/80 p-2 rounded-lg border border-zinc-800 mb-3 flex items-center justify-between">
+        <span class="flex items-center gap-1">
+          <i data-lucide="info" class="w-3.5 h-3.5 text-purple-400"></i>
+          <span>Clique no som para <strong>Tocar</strong> ou <strong>Parar</strong> na mesma hora.</span>
+        </span>
+        <span class="font-mono text-zinc-400 font-bold">Teclas: [1] a [9]</span>
+      </div>
+
+      <!-- Grid de Pads de Efeito Sonoro -->
+      <div id="sfxGrid" class="grid grid-cols-2 gap-3 overflow-y-auto max-h-[500px] pr-1">
+        <!-- Injetado dinamicamente via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- RODAPÉ & STATUS -->
+  <footer class="bg-console-900 border-t border-zinc-800/80 px-4 py-2.5 text-xs text-zinc-400">
+    <div class="max-w-[1700px] mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-4">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span class="text-emerald-300 font-medium">Web Audio Engine Ativo</span>
+        </span>
+        <span class="hidden md:inline text-zinc-600">•</span>
+        <span class="hidden md:inline text-zinc-400">Atalhos: <kbd class="px-1.5 py-0.5 bg-zinc-800 rounded font-mono text-[10px] text-zinc-300">Espaço</kbd> Trilha | <kbd class="px-1.5 py-0.5 bg-zinc-800 rounded font-mono text-[10px] text-zinc-300">1..9</kbd> SFX | <kbd class="px-1.5 py-0.5 bg-zinc-800 rounded font-mono text-[10px] text-zinc-300">ESC</kbd> Pânico</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="activeSoundsBadge" class="bg-zinc-800 px-2 py-0.5 rounded text-[11px] text-zinc-300 font-mono">0 áudios ativos</span>
+        <span class="text-zinc-500 text-[11px]">| Curadoria Cênica: Prof. Italo Gabriel</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mensagem Toast Flutuante -->
+  <div id="toast" class="fixed bottom-12 right-6 bg-zinc-900 text-zinc-100 border border-zinc-700 px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50 flex items-center gap-2">
+    <i data-lucide="bell" class="w-4 h-4 text-cyan-400"></i>
+    <span id="toastMsg">Notificação</span>
+  </div>
+
+  <script>
+    // ==========================================
+    // WEB AUDIO ENGINE & STATE
+    // ==========================================
+    let audioCtx = null;
+    let masterGain = null;
+
+    function initAudioEngine() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = parseFloat(document.getElementById('masterVolume').value || 0.85);
+        masterGain.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Gerador de Som Sintético WAV para Sons Padrão e Campainha
+    function createSineToneBuffer(freq, duration, type = 'sine', decay = 0.5) {
+      const sampleRate = 22050;
+      const numSamples = Math.floor(sampleRate * duration);
+      const buffer = new Float32Array(numSamples);
+      for (let i = 0; i < numSamples; i++) {
+        const t = i / sampleRate;
+        const env = Math.exp(-t / decay);
+        buffer[i] = Math.sin(2 * Math.PI * freq * t) * env * 0.7;
+      }
+      return audioBufferToWavBlob(buffer, sampleRate);
+    }
+
+    function audioBufferToWavBlob(samples, sampleRate) {
+      const buffer = new ArrayBuffer(44 + samples.length * 2);
+      const view = new DataView(buffer);
+      const writeString = (offset, str) => {
+        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+      };
+      writeString(0, 'RIFF');
+      view.setUint32(4, 36 + samples.length * 2, true);
+      writeString(8, 'WAVE');
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true); // PCM
+      view.setUint16(22, 1, true); // Mono
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeString(36, 'data');
+      view.setUint32(40, samples.length * 2, true);
+
+      let offset = 44;
+      for (let i = 0; i < samples.length; i++, offset += 2) {
+        const s = Math.max(-1, Math.min(1, samples[i]));
+        view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+      return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    // ==========================================
+    // CAMPAINHA DE TEATRO (SINAIS DE AVISO)
+    // ==========================================
+    // Cigarra eletromecânica clássica de teatro (estilo campainha de porta ruidosa / buzzer teatral)
+    function triggerBuzzerPulse(startTime, duration = 1.3) {
+      const now = startTime;
+
+      // 1. Tom fundamental ruidoso (onda dente-de-serra + pulso)
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const noiseNode = audioCtx.createBufferSource();
+      const buzzerGain = audioCtx.createGain();
+
+      // Frequência típica de campainha de porta / cigarra de 60Hz com ressonância metálica
+      osc1.type = 'sawtooth';
+      osc1.frequency.setValueAtTime(140, now);
+
+      osc2.type = 'square';
+      osc2.frequency.setValueAtTime(280, now);
+
+      // Gerar ruído branco percussivo para dar a textura mecânica e áspera de campainha antiga
+      const noiseBuffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * duration), audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < noiseBuffer.length; i++) {
+        output[i] = (Math.random() * 2 - 1) * 0.25;
+      }
+      noiseNode.buffer = noiseBuffer;
+
+      // Filtro passa-faixa para destacar o timbre de caixa metálica de campainha
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(950, now);
+      filter.Q.setValueAtTime(2.5, now);
+
+      // Envelope seco e ruidoso
+      buzzerGain.gain.setValueAtTime(0.0001, now);
+      buzzerGain.gain.linearRampToValueAtTime(0.45, now + 0.02);
+      buzzerGain.gain.setValueAtTime(0.45, now + duration - 0.05);
+      buzzerGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      // Conexões
+      osc1.connect(filter);
+      osc2.connect(filter);
+      noiseNode.connect(filter);
+
+      filter.connect(buzzerGain);
+      buzzerGain.connect(masterGain);
+
+      osc1.start(now);
+      osc2.start(now);
+      noiseNode.start(now);
+
+      osc1.stop(now + duration + 0.05);
+      osc2.stop(now + duration + 0.05);
+      noiseNode.stop(now + duration + 0.05);
+    }
+
+    function playTheaterChime(signalNumber) {
+      initAudioEngine();
+      const now = audioCtx.currentTime;
+
+      // 1º Sinal: 1 toque longo e marcante de 2 segundos
+      // 2º Sinal: 2 toques médios (1.2s cada)
+      // 3º Sinal: 3 toques tradicionais rápidos (0.9s cada)
+      if (signalNumber === 1) {
+        triggerBuzzerPulse(now, 2.0);
+        showToast('🚨 1º SINAL: 1 toque longo de campainha (15 min)!');
+      } else if (signalNumber === 2) {
+        triggerBuzzerPulse(now, 1.2);
+        triggerBuzzerPulse(now + 1.6, 1.2);
+        showToast('🚨 2º SINAL: 2 toques de campainha (5 min)!');
+      } else if (signalNumber === 3) {
+        triggerBuzzerPulse(now, 0.9);
+        triggerBuzzerPulse(now + 1.2, 0.9);
+        triggerBuzzerPulse(now + 2.4, 1.4);
+        showToast('🚨 3º SINAL: 3 toques! Início imediato do espetáculo!');
+      }
+    }
+
+    function playTheaterBuzzerBurst() {
+      initAudioEngine();
+      triggerBuzzerPulse(audioCtx.currentTime, 1.5);
+      showToast('Campainha / Cigarra Cênica disparada!');
+    }
+
+    function playTheaterGong() {
+      playTheaterBuzzerBurst();
+    }
+
+    function playTheaterGong() {
+      initAudioEngine();
+      const now = audioCtx.currentTime;
+      // Gongo cênico grave com modulação de baixa frequência
+      const freqs = [110, 147, 220, 330];
+      freqs.forEach(freq => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(0.35, now + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 4.5);
+
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.start(now);
+        osc.stop(now + 4.6);
+      });
+      showToast('Gongo Cênico Acionado!');
+    }
+
+    // ==========================================
+    // REPOSITÓRIO E PLAYER DE TRILHA SONORA
+    // ==========================================
+    let musicPlaylist = [];
+    let currentTrackIndex = 0;
+    let musicAudio = new Audio();
+    let musicGainNode = null;
+    let isMusicPlaying = false;
+    let isMusicLoop = false;
+
+    function renderMusicPlaylist() {
+      const playlistContainer = document.getElementById('musicPlaylist');
+      const countLabel = document.getElementById('musicCountLabel');
+      if (!playlistContainer) return;
+
+      countLabel.textContent = `${musicPlaylist.length} faixa${musicPlaylist.length === 1 ? '' : 's'}`;
+      playlistContainer.innerHTML = '';
+
+      if (musicPlaylist.length === 0) {
+        playlistContainer.innerHTML = `
+          <div class="p-4 text-center border border-dashed border-zinc-800 rounded-xl text-zinc-500 text-xs">
+            Nenhuma trilha carregada. Use <strong>"Upar Trilhas"</strong> para adicionar seus áudios.
+          </div>
+        `;
+        return;
+      }
+
+      musicPlaylist.forEach((track, idx) => {
+        const isCurrent = idx === currentTrackIndex;
+        const item = document.createElement('div');
+        item.className = `flex items-center justify-between p-2 rounded-xl border text-xs cursor-pointer transition select-none ${
+          isCurrent 
+            ? 'bg-cyan-950/60 border-cyan-500/50 text-cyan-200 shadow-sm' 
+            : 'bg-zinc-950/50 hover:bg-zinc-800/60 border-zinc-800 text-zinc-300'
+        }`;
+
+        item.innerHTML = `
+          <div class="flex items-center gap-2 truncate mr-2" onclick="selectTrack(${idx}); playMusic();">
+            <span class="w-5 h-5 rounded-full flex items-center justify-center font-mono text-[10px] ${
+              isCurrent ? 'bg-cyan-500 text-black font-bold' : 'bg-zinc-800 text-zinc-400'
+            }">
+              ${isCurrent && isMusicPlaying ? '▶' : idx + 1}
+            </span>
+            <span class="truncate font-medium">${track.name}</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="font-mono text-[10px] text-zinc-500">${track.duration || '--:--'}</span>
+            <button onclick="event.stopPropagation(); removeTrack(${idx});" class="text-zinc-500 hover:text-rose-400 p-1 rounded transition" title="Excluir faixa">
+              ✕
+            </button>
+          </div>
+        `;
+        playlistContainer.appendChild(item);
+      });
+      lucide.createIcons();
+    }
+
+    function removeTrack(index) {
+      if (index === currentTrackIndex && isMusicPlaying) {
+        stopMusic();
+      }
+      musicPlaylist.splice(index, 1);
+      if (currentTrackIndex >= musicPlaylist.length) {
+        currentTrackIndex = Math.max(0, musicPlaylist.length - 1);
+      }
+      if (musicPlaylist.length > 0) {
+        selectTrack(currentTrackIndex);
+      } else {
+        musicAudio.src = '';
+        document.getElementById('currentTrackTitle').textContent = 'Nenhuma trilha disponível';
+        document.getElementById('durationLabel').textContent = '00:00';
+        document.getElementById('currentTimeLabel').textContent = '00:00';
+        document.getElementById('progressBar').style.width = '0%';
+      }
+      renderMusicPlaylist();
+    }
+
+    function clearDefaultTracks() {
+      const hadPlaying = isMusicPlaying && musicPlaylist[currentTrackIndex] && !musicPlaylist[currentTrackIndex].isCustom;
+      if (hadPlaying) stopMusic();
+      musicPlaylist = musicPlaylist.filter(t => t.isCustom);
+      currentTrackIndex = 0;
+      if (musicPlaylist.length > 0) {
+        selectTrack(0);
+      } else {
+        musicAudio.src = '';
+        document.getElementById('currentTrackTitle').textContent = 'Nenhuma trilha disponível';
+        document.getElementById('durationLabel').textContent = '00:00';
+      }
+      renderMusicPlaylist();
+      showToast('Exemplos de trilha removidos!');
+    }
+
+    function clearAllTracks() {
+      stopMusic();
+      musicPlaylist = [];
+      currentTrackIndex = 0;
+      musicAudio.src = '';
+      document.getElementById('currentTrackTitle').textContent = 'Nenhuma trilha disponível';
+      document.getElementById('durationLabel').textContent = '00:00';
+      document.getElementById('currentTimeLabel').textContent = '00:00';
+      document.getElementById('progressBar').style.width = '0%';
+      renderMusicPlaylist();
+      showToast('Todas as trilhas foram removidas.');
+    }
+
+    function clearDefaultSfx() {
+      // Para apenas os SFX que são de exemplo
+      sfxList.filter(s => !s.isCustom).forEach(s => {
+        if (activeSfxAudios.has(s.id)) {
+          const item = activeSfxAudios.get(s.id);
+          if (item && item.audio) item.audio.pause();
+          activeSfxAudios.delete(s.id);
+        }
+      });
+      sfxList = sfxList.filter(s => s.isCustom);
+      // Reatribuir atalhos (1 a 9) para os sons customizados restantes
+      sfxList.forEach((sfx, idx) => {
+        sfx.key = idx < 9 ? String(idx + 1) : null;
+      });
+      renderSfxGrid();
+      updateActiveSoundsStatus();
+      showToast('Exemplos de efeitos sonoros removidos!');
+    }
+
+    function renderSfxGrid() {
+      const grid = document.getElementById('sfxGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      if (sfxList.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-2 p-6 text-center border border-dashed border-zinc-800 rounded-xl text-zinc-500 text-xs">
+            Nenhum efeito sonoro carregado. Use <strong>"Add Sons"</strong> para incluir seus efeitos.
+          </div>
+        `;
+        return;
+      }
+
+      sfxList.forEach(sfx => {
+        const isPlaying = activeSfxAudios.has(sfx.id);
+        const card = document.createElement('div');
+        card.id = `pad-${sfx.id}`;
+        card.className = `relative p-3 rounded-xl border transition-all duration-150 cursor-pointer flex flex-col justify-between min-h-[92px] select-none bg-gradient-to-br ${sfx.color || 'from-zinc-900 to-zinc-950'} ${
+          isPlaying ? 'ring-2 ring-rose-400 playing-pulse border-rose-500' : 'border-zinc-800 hover:border-zinc-700'
+        }`;
+
+        card.onclick = (e) => {
+          if (e.target.closest('.sfx-delete-btn')) return;
+          togglePlaySfx(sfx.id);
+        };
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-1">
+            <div class="flex items-center gap-1.5">
+              ${sfx.key ? `<span class="px-1.5 py-0.5 rounded bg-black/50 text-[10px] font-mono font-bold text-amber-300 border border-white/10">[${sfx.key}]</span>` : ''}
+              <span id="pad-status-${sfx.id}" class="w-5 h-5 rounded-md flex items-center justify-center bg-black/30">
+                ${isPlaying ? '<i data-lucide="square" class="w-3.5 h-3.5 text-rose-300"></i>' : '<i data-lucide="play" class="w-3.5 h-3.5 text-emerald-300"></i>'}
+              </span>
+            </div>
+            <button class="sfx-delete-btn text-zinc-400 hover:text-rose-400 p-1 rounded hover:bg-black/40 transition" onclick="removeSfx('${sfx.id}')" title="Excluir este efeito">
+              ✕
+            </button>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-white truncate mt-1">${sfx.name}</h4>
+            <span id="pad-label-${sfx.id}" class="text-[10px] ${isPlaying ? 'text-rose-300 font-bold animate-pulse' : 'text-zinc-400'} block mt-0.5">
+              ${isPlaying ? 'Tocando • Clique p/ Parar' : 'Pronto p/ disparar'}
+            </span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function initMusicAudioNode() {
+      initAudioEngine();
+      if (!musicGainNode && audioCtx) {
+        const source = audioCtx.createMediaElementSource(musicAudio);
+        musicGainNode = audioCtx.createGain();
+        const musicVolSlider = document.getElementById('musicVolume');
+        musicGainNode.gain.value = parseFloat(musicVolSlider.value || 0.75);
+        source.connect(musicGainNode);
+        musicGainNode.connect(masterGain);
+      }
+    }
+
+    function formatTime(seconds) {
+      if (isNaN(seconds) || !isFinite(seconds)) return '00:00';
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function selectTrack(index) {
+      if (index < 0 || index >= musicPlaylist.length) return;
+      currentTrackIndex = index;
+      const track = musicPlaylist[index];
+      musicAudio.src = track.url;
+      musicAudio.currentTime = 0;
+      document.getElementById('currentTrackTitle').textContent = track.name;
+      document.getElementById('durationLabel').textContent = track.duration || '00:00';
+      document.getElementById('currentTimeLabel').textContent = '00:00';
+      document.getElementById('progressBar').style.width = '0%';
+      renderMusicPlaylist();
+    }
+
+    function playMusic() {
+      initAudioEngine();
+      initMusicAudioNode();
+      if (!musicAudio.src && musicPlaylist.length > 0) {
+        selectTrack(currentTrackIndex >= 0 ? currentTrackIndex : 0);
+      }
+      musicAudio.play().then(() => {
+        isMusicPlaying = true;
+        updateMusicUiState();
+        updateActiveSoundsStatus();
+      }).catch(err => {
+        console.warn('Erro na reprodução de áudio:', err);
+      });
+    }
+
+    function pauseMusic() {
+      musicAudio.pause();
+      isMusicPlaying = false;
+      updateMusicUiState();
+      updateActiveSoundsStatus();
+    }
+
+    function togglePlayMusic() {
+      if (isMusicPlaying) {
+        pauseMusic();
+      } else {
+        playMusic();
+      }
+    }
+
+    function stopMusic() {
+      musicAudio.pause();
+      musicAudio.currentTime = 0;
+      isMusicPlaying = false;
+      updateMusicUiState();
+      document.getElementById('progressBar').style.width = '0%';
+      document.getElementById('currentTimeLabel').textContent = '00:00';
+      updateActiveSoundsStatus();
+    }
+
+    function fadeOutMusic(durationSeconds = 3) {
+      initMusicAudioNode();
+      if (!isMusicPlaying || !musicGainNode) return;
+      const currTime = audioCtx.currentTime;
+      const currentVol = musicGainNode.gain.value;
+      musicGainNode.gain.cancelScheduledValues(currTime);
+      musicGainNode.gain.setValueAtTime(currentVol, currTime);
+      musicGainNode.gain.linearRampToValueAtTime(0.0001, currTime + durationSeconds);
+
+      showToast(`Fade Out iniciado (${durationSeconds}s)...`);
+      setTimeout(() => {
+        stopMusic();
+        const sliderVol = parseFloat(document.getElementById('musicVolume').value);
+        musicGainNode.gain.setValueAtTime(sliderVol, audioCtx.currentTime);
+      }, durationSeconds * 1000);
+    }
+
+    function updateMusicUiState() {
+      const playIcon = document.getElementById('playMusicIcon');
+      if (isMusicPlaying) {
+        playIcon.setAttribute('data-lucide', 'pause');
+      } else {
+        playIcon.setAttribute('data-lucide', 'play');
+      }
+      lucide.createIcons();
+      renderMusicPlaylist();
+    }
+
+    // Progresso contínuo
+    musicAudio.addEventListener('timeupdate', () => {
+      if (musicAudio.duration) {
+        const pct = (musicAudio.currentTime / musicAudio.duration) * 100;
+        document.getElementById('progressBar').style.width = `${pct}%`;
+        document.getElementById('currentTimeLabel').textContent = formatTime(musicAudio.currentTime);
+      }
+    });
+
+    musicAudio.addEventListener('ended', () => {
+      if (!isMusicLoop) {
+        isMusicPlaying = false;
+        updateMusicUiState();
+        updateActiveSoundsStatus();
+      }
+    });
+
+    document.getElementById('progressBarContainer').addEventListener('click', (e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const pct = clickX / rect.width;
+      if (musicAudio.duration) {
+        musicAudio.currentTime = pct * musicAudio.duration;
+      }
+    });
+
+    // ==========================================
+    // EFEITOS SONOROS (SFX PAD BANK)
+    // ==========================================
+    let sfxList = [];
+    let activeSfxAudios = new Map();
+
+    function togglePlaySfx(sfxId) {
+      initAudioEngine();
+      const sfx = sfxList.find(s => s.id === sfxId);
+      if (!sfx) return;
+
+      // Se o efeito já estiver tocando, corta instantaneamente (Toggle OFF)
+      if (activeSfxAudios.has(sfxId)) {
+        const item = activeSfxAudios.get(sfxId);
+        if (item && item.audio) {
+          item.audio.pause();
+          item.audio.currentTime = 0;
+        }
+        activeSfxAudios.delete(sfxId);
+        updatePadVisual(sfxId, false);
+        updateActiveSoundsStatus();
+        return;
+      }
+
+      // Se não estiver tocando, toca agora (Toggle ON)
+      const audio = new Audio(sfx.url);
+      const source = audioCtx.createMediaElementSource(audio);
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.value = sfx.volume !== undefined ? sfx.volume : 0.8;
+
+      source.connect(gainNode);
+      gainNode.connect(masterGain);
+
+      audio.play().then(() => {
+        activeSfxAudios.set(sfxId, { audio, gainNode });
+        updatePadVisual(sfxId, true);
+        updateActiveSoundsStatus();
+      }).catch(err => {
+        console.warn('Erro ao tocar SFX:', err);
+      });
+
+      audio.onended = () => {
+        activeSfxAudios.delete(sfxId);
+        updatePadVisual(sfxId, false);
+        updateActiveSoundsStatus();
+      };
+    }
+
+    function removeSfx(sfxId) {
+      if (activeSfxAudios.has(sfxId)) {
+        const item = activeSfxAudios.get(sfxId);
+        item.audio.pause();
+        activeSfxAudios.delete(sfxId);
+      }
+      sfxList = sfxList.filter(s => s.id !== sfxId);
+      // Reorganiza os atalhos 1 a 9 para os botões remanescentes
+      sfxList.forEach((sfx, idx) => {
+        sfx.key = idx < 9 ? String(idx + 1) : null;
+      });
+      renderSfxGrid();
+      updateActiveSoundsStatus();
+    }
+
+    function loadDefaultSounds() {
+      // Criação procedural de sons cênicos para o roteiro
+      const pianoBlob = createSineToneBuffer(440, 2.5, 'sine', 0.8);
+      const aveMariaBlob = createSineToneBuffer(392, 3.0, 'sine', 1.2);
+      const notifBlob = createSineToneBuffer(880, 0.4, 'sine', 0.15);
+      const phoneBlob = createSineToneBuffer(750, 1.2, 'square', 0.4);
+      const doorBlob = createSineToneBuffer(120, 0.8, 'sawtooth', 0.5);
+      const knockBlob = createSineToneBuffer(180, 0.35, 'triangle', 0.1);
+      const casinoBlob = createSineToneBuffer(620, 1.8, 'sawtooth', 0.4);
+      const smashBlob = createSineToneBuffer(90, 0.6, 'square', 0.2);
+      const applauseBlob = createSineToneBuffer(300, 3.5, 'sine', 1.0);
+
+      sfxList = [
+        { id: 'sfx_1', key: '1', name: 'Piano Suave (Amélia)', url: URL.createObjectURL(pianoBlob), volume: 0.85, color: 'from-pink-900/60 to-zinc-900', isCustom: false },
+        { id: 'sfx_2', key: '2', name: 'Ave Maria (Lembrança)', url: URL.createObjectURL(aveMariaBlob), volume: 0.8, color: 'from-indigo-900/60 to-zinc-900', isCustom: false },
+        { id: 'sfx_3', key: '3', name: 'Notificação de Aposta', url: URL.createObjectURL(notifBlob), volume: 0.9, color: 'from-amber-900/60 to-zinc-900', isCustom: false },
+        { id: 'sfx_4', key: '4', name: 'Toque de Celular', url: URL.createObjectURL(phoneBlob), volume: 0.85, color: 'from-blue-900/60 to-zinc-900', isCustom: false },
+        { id: 'sfx_5', key: '5', name: 'Porta Abrindo / Maçaneta', url: URL.createObjectURL(doorBlob), volume: 0.8, color: 'from-rose-900/60 to-zinc-900', isCustom: false },
+        { id: 'sfx_6', key: '6', name: 'Batidas na Porta', url: URL.createObjectURL(knockBlob), volume: 0.95, color: 'from-orange-900/60 to-zinc-900', isCustom: false },
+        { id: 'sfx_7', key: '7', name: 'Tigrinho / Perda no Jogo', url: URL.createObjectURL(casinoBlob), volume: 0.85, color: 'from-yellow-900/60 to-zinc-900', isCustom: false },
+        { id: 'sfx_8', key: '8', name: 'Celular Quebrando no Chão', url: URL.createObjectURL(smashBlob), volume: 1.0, color: 'from-red-900/60 to-zinc-900', isCustom: false },
+        { id: 'sfx_9', key: '9', name: 'Aplausos & Fechamento', url: URL.createObjectURL(applauseBlob), volume: 0.8, color: 'from-purple-900/60 to-zinc-900', isCustom: false },
+      ];
+
+      // Trilhas Padrão da Peça
+      const introTrackBlob = createSineToneBuffer(220, 8.0, 'sine', 3.0);
+      const monologoTrackBlob = createSineToneBuffer(164.8, 10.0, 'sine', 4.0);
+      const finalSongBlob = createSineToneBuffer(261.6, 6.0, 'triangle', 2.5);
+
+      musicPlaylist = [
+        { id: 'bgm_1', name: '1. Entrada Tensa de Nora (Trilha)', url: URL.createObjectURL(introTrackBlob), duration: '00:08', isCustom: false },
+        { id: 'bgm_2', name: '2. Monólogos & Tensão (Grave)', url: URL.createObjectURL(monologoTrackBlob), duration: '00:10', isCustom: false },
+        { id: 'bgm_3', name: '3. Canção Final: Saudade da Amélia', url: URL.createObjectURL(finalSongBlob), duration: '00:06', isCustom: false },
+      ];
+
+      renderMusicPlaylist();
+      renderSfxGrid();
+      if (musicPlaylist.length > 0) {
+        selectTrack(0);
+      }
+    }
+
+    function stopAllSfx() {
+      activeSfxAudios.forEach((item, sfxId) => {
+        item.audio.pause();
+        item.audio.currentTime = 0;
+        updatePadVisual(sfxId, false);
+      });
+      activeSfxAudios.clear();
+      updateActiveSoundsStatus();
+      showToast('Todos os SFX foram silenciados.');
+    }
+
+    function panicStopAll() {
+      stopMusic();
+      stopAllSfx();
+      showToast('⚠️ CORTE GERAL EXECUTADO!');
+    }
+
+    function updatePadVisual(id, isPlaying) {
+      const padEl = document.getElementById(`pad-${id}`);
+      if (!padEl) return;
+      const statusIcon = document.getElementById(`pad-status-${id}`);
+      const statusLabel = document.getElementById(`pad-label-${id}`);
+      
+      if (isPlaying) {
+        padEl.classList.add('ring-2', 'ring-rose-400', 'playing-pulse', 'scale-[0.99]');
+        if (statusIcon) {
+          statusIcon.innerHTML = `<i data-lucide="square" class="w-3.5 h-3.5 text-rose-300"></i>`;
+        }
+        if (statusLabel) {
+          statusLabel.textContent = 'Tocando • Clique p/ Parar';
+          statusLabel.className = 'text-[10px] text-rose-300 font-bold block mt-1 animate-pulse';
+        }
+      } else {
+        padEl.classList.remove('ring-2', 'ring-rose-400', 'playing-pulse', 'scale-[0.99]');
+        if (statusIcon) {
+          statusIcon.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5 text-emerald-300"></i>`;
+        }
+        if (statusLabel) {
+          statusLabel.textContent = 'Pronto p/ disparar';
+          statusLabel.className = 'text-[10px] text-white/70 block mt-1';
+        }
+      }
+      lucide.createIcons();
+    }
+
+    function updateActiveSoundsStatus() {
+      let count = activeSfxAudios.size;
+      if (isMusicPlaying) count++;
+      document.getElementById('activeSoundsBadge').textContent = `${count} áudio${count === 1 ? '' : 's'} ativo${count === 1 ? '' : 's'}`;
+    }
+
+    // ==========================================
+    // UPLOAD EM LOTE CORRIGIDO (MÚLTIPLOS ÁUDIOS)
+    // ==========================================
+    const uploadMusicInput = document.getElementById('uploadMusicInput');
+    const uploadSfxInput = document.getElementById('uploadSfxInput');
+
+    // Upload Múltiplo de Trilhas Sonoras
+    uploadMusicInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
+
+      files.forEach((file, i) => {
+        const audioUrl = URL.createObjectURL(file);
+        const cleanName = file.name.replace(/\.[^/.]+$/, "");
+        const trackId = `bgm_custom_${Date.now()}_${i}`;
+
+        const trackObj = {
+          id: trackId,
+          name: cleanName,
+          url: audioUrl,
+          duration: '--:--',
+          isCustom: true
+        };
+
+        // Obter duração em segundo plano sem travar
+        const probe = new Audio(audioUrl);
+        probe.addEventListener('loadedmetadata', () => {
+          trackObj.duration = formatTime(probe.duration);
+          renderMusicPlaylist();
+          if (musicPlaylist[currentTrackIndex]?.id === trackId) {
+            document.getElementById('durationLabel').textContent = trackObj.duration;
+          }
+        }, { once: true });
+
+        musicPlaylist.push(trackObj);
+      });
+
+      renderMusicPlaylist();
+      if (!isMusicPlaying) {
+        selectTrack(musicPlaylist.length - files.length);
+      }
+      showToast(`✅ ${files.length} trilha(s) carregada(s) com sucesso!`);
+      uploadMusicInput.value = '';
+    });
+
+    // Upload Múltiplo de Efeitos Sonoros (SFX)
+    uploadSfxInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
+
+      const gradientPalettes = [
+        'from-purple-900/60 to-zinc-900',
+        'from-blue-900/60 to-zinc-900',
+        'from-emerald-900/60 to-zinc-900',
+        'from-amber-900/60 to-zinc-900',
+        'from-rose-900/60 to-zinc-900',
+        'from-cyan-900/60 to-zinc-900',
+        'from-orange-900/60 to-zinc-900'
+      ];
+
+      files.forEach((file, index) => {
+        const audioUrl = URL.createObjectURL(file);
+        const cleanName = file.name.replace(/\.[^/.]+$/, "");
+        
+        // Atribui atalho numérico disponível (1 a 9)
+        const usedKeys = sfxList.map(s => s.key).filter(Boolean);
+        let assignedKey = null;
+        for (let k = 1; k <= 9; k++) {
+          if (!usedKeys.includes(String(k))) {
+            assignedKey = String(k);
+            break;
+          }
+        }
+
+        sfxList.push({
+          id: `sfx_custom_${Date.now()}_${index}`,
+          key: assignedKey,
+          name: cleanName,
+          url: audioUrl,
+          volume: 0.85,
+          color: gradientPalettes[(sfxList.length + index) % gradientPalettes.length],
+          isCustom: true
+        });
+      });
+
+      renderSfxGrid();
+      showToast(`✅ ${files.length} efeito(s) sonoro(s) adicionado(s) aos pads!`);
+      uploadSfxInput.value = '';
+    });
+
+    // ==========================================
+    // CONTROLES DE TELEPROMPTER & ROTEIRO
+    // ==========================================
+    const scriptScrollArea = document.getElementById('scriptScrollArea');
+    const btnToggleAutoScroll = document.getElementById('btnToggleAutoScroll');
+    const autoScrollIcon = document.getElementById('autoScrollIcon');
+    const autoScrollText = document.getElementById('autoScrollText');
+    const scrollSpeedRange = document.getElementById('scrollSpeedRange');
+    const scrollSpeedLabel = document.getElementById('scrollSpeedLabel');
+    const scriptContent = document.getElementById('scriptContent');
+
+    let isAutoScrolling = false;
+    let scrollInterval = null;
+    let currentFontSize = 16;
+    let isSerif = false;
+
+    function startAutoScroll() {
+      if (isAutoScrolling) return;
+      isAutoScrolling = true;
+      autoScrollIcon.setAttribute('data-lucide', 'pause');
+      autoScrollText.textContent = 'Pausar Rolagem';
+      lucide.createIcons();
+
+      const speedVal = parseInt(scrollSpeedRange.value, 10);
+      const step = Math.max(1, Math.floor(speedVal * 0.7));
+      const intervalMs = Math.max(16, 50 - speedVal * 3);
+
+      scrollInterval = setInterval(() => {
+        if (!scriptScrollArea) return;
+        scriptScrollArea.scrollTop += step;
+        if (scriptScrollArea.scrollTop + scriptScrollArea.clientHeight >= scriptScrollArea.scrollHeight - 5) {
+          stopAutoScroll();
+        }
+      }, intervalMs);
+    }
+
+    function stopAutoScroll() {
+      isAutoScrolling = false;
+      if (scrollInterval) clearInterval(scrollInterval);
+      autoScrollIcon.setAttribute('data-lucide', 'play');
+      autoScrollText.textContent = 'Rolar Sozinho';
+      lucide.createIcons();
+    }
+
+    btnToggleAutoScroll.addEventListener('click', () => {
+      if (isAutoScrolling) {
+        stopAutoScroll();
+      } else {
+        startAutoScroll();
+      }
+    });
+
+    scrollSpeedRange.addEventListener('input', (e) => {
+      scrollSpeedLabel.textContent = `${e.target.value}x`;
+      if (isAutoScrolling) {
+        stopAutoScroll();
+        startAutoScroll();
+      }
+    });
+
+    document.getElementById('btnFontInc').addEventListener('click', () => {
+      if (currentFontSize < 28) {
+        currentFontSize += 2;
+        scriptContent.style.fontSize = `${currentFontSize}px`;
+        document.getElementById('fontSizeDisplay').textContent = `${currentFontSize}px`;
+      }
+    });
+
+    document.getElementById('btnFontDec').addEventListener('click', () => {
+      if (currentFontSize > 12) {
+        currentFontSize -= 2;
+        scriptContent.style.fontSize = `${currentFontSize}px`;
+        document.getElementById('fontSizeDisplay').textContent = `${currentFontSize}px`;
+      }
+    });
+
+    document.getElementById('btnFontFamilyToggle').addEventListener('click', (e) => {
+      isSerif = !isSerif;
+      if (isSerif) {
+        scriptContent.classList.remove('font-sans');
+        scriptContent.classList.add('font-serif');
+        e.target.textContent = 'Sans';
+      } else {
+        scriptContent.classList.remove('font-serif');
+        scriptContent.classList.add('font-sans');
+        e.target.textContent = 'Serif';
+      }
+    });
+
+    // Importar arquivo de texto/roteiro externo
+    const uploadScriptTextInput = document.getElementById('uploadScriptTextInput');
+    uploadScriptTextInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target.result;
+        scriptContent.innerHTML = `<div class="whitespace-pre-wrap font-mono text-sm leading-relaxed">${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>`;
+        showToast('Roteiro importado com sucesso!');
+      };
+      reader.readAsText(file);
+      uploadScriptTextInput.value = '';
+    });
+
+    // ==========================================
+    // CONTROLES DE VOLUME & ATALHOS DE TECLADO
+    // ==========================================
+    // Master Volume
+    document.getElementById('masterVolume').addEventListener('input', (e) => {
+      initAudioEngine();
+      const val = parseFloat(e.target.value);
+      masterGain.gain.value = val;
+      document.getElementById('masterVolLabel').textContent = `${Math.round(val * 100)}%`;
+    });
+
+    // Trilha Volume
+    document.getElementById('musicVolume').addEventListener('input', (e) => {
+      initMusicAudioNode();
+      const val = parseFloat(e.target.value);
+      if (musicGainNode) {
+        musicGainNode.gain.value = val;
+      }
+      document.getElementById('musicVolLabel').textContent = `${Math.round(val * 100)}%`;
+    });
+
+    // Loop da Trilha
+    document.getElementById('btnLoopMusic').addEventListener('click', () => {
+      isMusicLoop = !isMusicLoop;
+      musicAudio.loop = isMusicLoop;
+      const btn = document.getElementById('btnLoopMusic');
+      const label = document.getElementById('loopLabel');
+      if (isMusicLoop) {
+        btn.classList.add('bg-cyan-500/20', 'text-cyan-300', 'border-cyan-500/40');
+        label.textContent = 'Loop: On';
+      } else {
+        btn.classList.remove('bg-cyan-500/20', 'text-cyan-300', 'border-cyan-500/40');
+        label.textContent = 'Loop: Off';
+      }
+    });
+
+    // Botões de Ação
+    document.getElementById('btnPlayPauseMusic').addEventListener('click', togglePlayMusic);
+    document.getElementById('btnStopMusic').addEventListener('click', stopMusic);
+    document.getElementById('btnFadeOutTrilha').addEventListener('click', () => fadeOutMusic(3));
+    document.getElementById('btnStopAllSfx').addEventListener('click', stopAllSfx);
+    document.getElementById('btnPanic').addEventListener('click', panicStopAll);
+
+    // Atalhos do Teclado para Ensaios e Peças
+    window.addEventListener('keydown', (e) => {
+      // Ignora atalhos caso o usuário esteja editando o texto do roteiro
+      if (document.activeElement === scriptScrollArea || document.activeElement.tagName === 'INPUT') {
+        if (e.key === 'Escape') {
+          scriptScrollArea.blur();
+        }
+        return;
+      }
+
+      // Tecla Espaço: Play/Pause Trilha
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlayMusic();
+      }
+
+      // Tecla ESC: Pânico Geral
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        panicStopAll();
+      }
+
+      // Teclas Numéricas 1 a 9: Efeitos Sonoros com Toggle
+      if (e.key >= '1' && e.key <= '9') {
+        const sfx = sfxList.find(s => s.key === e.key);
+        if (sfx) {
+          e.preventDefault();
+          togglePlaySfx(sfx.id);
+        }
+      }
+    });
+
+    // Exibir Toast
+    let toastTimeout = null;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 2400);
+    }
+
+    // Inicialização ao carregar a página
+    window.onload = () => {
+      lucide.createIcons();
+      loadDefaultSounds();
+      // Ativa áudio no primeiro clique do usuário
+      document.body.addEventListener('click', () => initAudioEngine(), { once: true });
+    };
+  </script>
+</body>
+</html>
