@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIÊNCIA DELAS 2026.2 - Resolux Horizontal Projection Mapper (1920x1080)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Inter:wght@400;600;700;900&family=Montserrat:wght@700;800;900&family=Orbitron:wght@700;900&family=Syne:wght@700;800&family=Space+Grotesk:wght@700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #07080b;
+      color: #e2e8f0;
+      user-select: none;
+      overflow-x: hidden;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090a0f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e2538;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f3ff;
+    }
+
+    input[type=range] {
+      accent-color: #00f3ff;
+    }
+
+    .viewport-box {
+      aspect-ratio: 16 / 9;
+      box-shadow: 0 0 60px rgba(0,0,0,0.95), 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .bg-grid {
+      background-size: 32px 32px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col overflow-hidden bg-[#07080c]">
+
+  <!-- TOP BAR / VJ HEADER -->
+  <header class="h-14 border-b border-zinc-800 bg-[#0a0b12] px-4 flex items-center justify-between z-20 shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="h-9 w-9 rounded-lg bg-gradient-to-tr from-cyan-400 via-fuchsia-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg shadow-md shadow-cyan-500/20">
+        <i class="fa-solid fa-atom"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="font-black text-xs sm:text-sm tracking-wider uppercase text-white flex items-center gap-1.5">
+            CIÊNCIA DELAS <span class="text-[10px] bg-fuchsia-950 text-fuchsia-300 px-2 py-0.5 rounded border border-fuchsia-800/60 font-mono">2026.2</span>
+          </h1>
+          <span class="text-[11px] text-zinc-400 font-medium hidden md:inline">| CEEP Isaías Alves &bull; Projeção Mapeada 16:9</span>
+        </div>
+        <div class="flex items-center gap-2 text-[10px] text-cyan-400 font-mono">
+          <span>PROJEÇÃO HORIZONTAL FULL HD (1920x1080)</span>
+          <span class="text-zinc-600">&bull;</span>
+          <select id="resSelect" class="bg-zinc-900 border border-zinc-800 rounded px-1 text-[10px] text-zinc-300 focus:outline-none">
+            <option value="1920x1080" selected>1920x1080 (16:9 Full HD)</option>
+            <option value="1280x720">1280x720 (16:9 HD)</option>
+            <option value="3840x2160">3840x2160 (16:9 4K)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Status & Projector Action Buttons -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <div class="hidden sm:flex items-center gap-2 bg-zinc-900/90 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 font-mono">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="fpsCounter">60 FPS</span>
+      </div>
+
+      <!-- Blackout Emergency Button -->
+      <button id="blackoutBtn" title="Blackout Imediato (Atalho: Tecla B)" class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-bold border border-zinc-700 flex items-center gap-1.5 transition active:scale-95">
+        <i class="fa-solid fa-power-off text-rose-500"></i>
+        <span class="hidden sm:inline">BLACKOUT (B)</span>
+      </button>
+
+      <!-- Open Projector Output Popup (Resolume Style) -->
+      <button id="openOutputBtn" title="Abre saída de vídeo limpa para arrastar ao projetor HDMI" class="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-lg shadow-cyan-600/30 flex items-center gap-1.5 transition active:scale-95">
+        <i class="fa-solid fa-display"></i>
+        <span>SAÍDA HDMI PROJETOR</span>
+      </button>
+
+      <!-- Native Fullscreen of Canvas -->
+      <button id="fsBtn" title="Ecrã Inteiro 16:9 (Atalho: F)" class="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold transition flex items-center">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex overflow-hidden">
+    
+    <!-- LEFT CONTROL DESK (RESOLUME ARENA VJ PANEL) -->
+    <aside class="w-[430px] max-w-[46vw] border-r border-zinc-800/90 bg-[#0a0c13] flex flex-col h-full shrink-0 z-10">
+      
+      <!-- Tabs Navigation -->
+      <div class="flex border-b border-zinc-800 text-[11px] font-bold bg-[#07080d]">
+        <button id="tabBtn-content" onclick="switchTab('content')" class="flex-1 py-3 px-1 border-b-2 border-cyan-500 text-cyan-400 flex items-center justify-center gap-1.5 transition">
+          <i class="fa-solid fa-font"></i> Textos & Decks
+        </button>
+        <button id="tabBtn-logo" onclick="switchTab('logo')" class="flex-1 py-3 px-1 border-b-2 border-transparent text-zinc-400 flex items-center justify-center gap-1.5 hover:bg-zinc-900/60 transition">
+          <i class="fa-solid fa-shield-cat"></i> Logo Feira
+        </button>
+        <button id="tabBtn-fx" onclick="switchTab('fx')" class="flex-1 py-3 px-1 border-b-2 border-transparent text-zinc-400 flex items-center justify-center gap-1.5 hover:bg-zinc-900/60 transition">
+          <i class="fa-solid fa-bolt"></i> Motion FX
+        </button>
+        <button id="tabBtn-mapping" onclick="switchTab('mapping')" class="flex-1 py-3 px-1 border-b-2 border-transparent text-zinc-400 flex items-center justify-center gap-1.5 hover:bg-zinc-900/60 transition">
+          <i class="fa-solid fa-crosshairs"></i> Warp & Grade
+        </button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-5">
+
+        <!-- ================= TAB: TEXTOS & DECKS ================= -->
+        <section id="panel-content" class="space-y-4">
+          <!-- Text Inputs: Title + Subtitle -->
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-300 flex items-center gap-1.5">
+                  <i class="fa-solid fa-heading text-cyan-400"></i> Título Principal / Projeto
+                </label>
+                <span class="text-[10px] text-zinc-500 font-mono">16:9 Destaque</span>
+              </div>
+              <textarea id="textInput" rows="2" class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl p-2.5 text-sm font-black text-white focus:outline-none focus:border-cyan-500 transition resize-none uppercase" placeholder="TÍTULO DO PROJETO">CIÊNCIA DELAS 2026.2</textarea>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-quote-left text-fuchsia-400"></i> Subtítulo / Estande / Alunas
+                </label>
+                <span class="text-[10px] text-zinc-500 font-mono">Linha de Apoio</span>
+              </div>
+              <input id="subtextInput" type="text" class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-2.5 py-2 text-xs font-semibold text-zinc-200 focus:outline-none focus:border-fuchsia-500 transition" value="SEMANA DE CIÊNCIA, TECNOLOGIA & ARTES &bull; CEEP ISAÍAS ALVES">
+            </div>
+          </div>
+
+          <!-- Science Fair Quick Cue Decks (Widescreen 16:9 presets) -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Clipes Rápidos Feira (CUE PRESETS)</label>
+              <span class="text-[10px] text-cyan-400 font-mono">1-CLICK LIVE</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="launchCue('CIÊNCIA DELAS 2026.2', 'SEMANA DE CIÊNCIA, TECNOLOGIA E NEGÓCIOS • CEEP ISAÍAS ALVES', 'bassPulse', 'splitLeft')" class="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-left transition hover:border-cyan-500">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-star text-cyan-400"></i> Abertura Oficial</div>
+                <div class="text-[10px] text-zinc-400">Logo Esq. + Título Dir.</div>
+              </button>
+
+              <button onclick="launchCue('STAND 04: ROBÓTICA & I.A.', 'PROJETO: BRAÇO BIÔNICO AUTOMATIZADO COM SUCATA TECNOLÓGICA', 'strobeGlitch', 'centered')" class="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-left transition hover:border-yellow-500">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-robot text-yellow-400"></i> Stand Robótica</div>
+                <div class="text-[10px] text-zinc-400">Cyber Glitch Central</div>
+              </button>
+
+              <button onclick="launchCue('MULHERES NA CIÊNCIA', 'CEEP ISAÍAS ALVES • SALVADOR / BAHIA • INOVAÇÃO JOVEM', 'cyberGlow', 'splitLeft')" class="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-left transition hover:border-pink-500">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-venus text-pink-400"></i> Tema Mulheres</div>
+                <div class="text-[10px] text-zinc-400">Neon Glow Suave</div>
+              </button>
+
+              <button onclick="launchCue('BIOTECNOLOGIA & SAÚDE', 'ESTUDO DE EXTRATOS VEGETAIS E FITOTERÁPICOS SUSTENTÁVEIS', 'matrixRain', 'splitLeft')" class="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-left transition hover:border-emerald-500">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-dna text-emerald-400"></i> Biotecnologia</div>
+                <div class="text-[10px] text-zinc-400">Chuva de Dados Matrix</div>
+              </button>
+
+              <button onclick="launchCue('FEIRA DE CIÊNCIAS 2026.2', 'VISITAÇÃO ABERTA AOS STANDS E OFICINAS PRÁTICAS NO PÁTIO', 'marqueeScroll', 'centered')" class="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-left transition hover:border-indigo-500">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-arrows-left-right text-indigo-400"></i> Letreiro Contínuo</div>
+                <div class="text-[10px] text-zinc-400">Horizontal Marquee</div>
+              </button>
+
+              <button onclick="launchCue('PALESTRAS & APRESENTAÇÕES', 'AUDITÓRIO PRINCIPAL • SESSÕES DE PITCH E AVALIAÇÃO DE BANCAS', 'typewriter', 'centered')" class="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-left transition hover:border-amber-500">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-terminal text-amber-400"></i> Máquina de Escrever</div>
+                <div class="text-[10px] text-zinc-400">Digitação em Tempo Real</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Layout Arrangement Presets for 16:9 Landscape -->
+          <div class="space-y-1.5">
+            <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Composição Widescreen (16:9)</label>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button onclick="setLayoutPreset('splitLeft')" class="layout-preset-btn py-1.5 px-2 text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded-lg border border-cyan-500 font-semibold text-center transition" data-layout="splitLeft">
+                <i class="fa-solid fa-table-columns block text-sm mb-1 text-cyan-400"></i> Logo + Texto
+              </button>
+              <button onclick="setLayoutPreset('centered')" class="layout-preset-btn py-1.5 px-2 text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded-lg border border-zinc-800 font-semibold text-center transition" data-layout="centered">
+                <i class="fa-solid fa-align-center block text-sm mb-1 text-fuchsia-400"></i> Centralizado
+              </button>
+              <button onclick="setLayoutPreset('textHeavy')" class="layout-preset-btn py-1.5 px-2 text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded-lg border border-zinc-800 font-semibold text-center transition" data-layout="textHeavy">
+                <i class="fa-solid fa-panorama block text-sm mb-1 text-emerald-400"></i> Letreiro Cheio
+              </button>
+            </div>
+          </div>
+
+          <!-- Typography and Font Size -->
+          <div class="space-y-2">
+            <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Tipografia VJ</label>
+            <select id="fontFamily" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-semibold">
+              <option value="'Montserrat', sans-serif" selected>Montserrat 900 (Editorial Pesado)</option>
+              <option value="'Bebas Neue', sans-serif">Bebas Neue (Impacto Widescreen)</option>
+              <option value="'Anton', sans-serif">Anton (Grosso Pôster)</option>
+              <option value="'Orbitron', sans-serif">Orbitron (Cyber / Científico)</option>
+              <option value="'Syne', sans-serif">Syne 800 (Artístico / Moderno)</option>
+              <option value="'JetBrains Mono', monospace">JetBrains Mono (Hacker / Código)</option>
+            </select>
+          </div>
+
+          <!-- Size & Alignment Controls -->
+          <div class="space-y-3 bg-zinc-900/70 p-3 rounded-xl border border-zinc-800">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                  <span>Tamanho Título</span>
+                  <span id="fontSizeVal" class="text-cyan-400 font-mono">115px</span>
+                </div>
+                <input id="fontSize" type="range" min="40" max="220" value="115" class="w-full">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                  <span>Tamanho Subtítulo</span>
+                  <span id="subFontSizeVal" class="text-fuchsia-400 font-mono">36px</span>
+                </div>
+                <input id="subFontSize" type="range" min="18" max="90" value="36" class="w-full accent-fuchsia-500">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                  <span>Posição X do Texto</span>
+                  <span id="textPosXVal" class="text-cyan-400 font-mono">1200px</span>
+                </div>
+                <input id="textPosX" type="range" min="200" max="1800" value="1200" class="w-full">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                  <span>Posição Y do Texto</span>
+                  <span id="textPosYVal" class="text-cyan-400 font-mono">540px</span>
+                </div>
+                <input id="textPosY" type="range" min="150" max="950" value="540" class="w-full">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[10px] text-zinc-400 block mb-1">Alinhamento Texto</label>
+                <div class="flex rounded-lg bg-zinc-900 p-1 border border-zinc-800">
+                  <button id="alignLeft" onclick="setTextAlign('left')" class="flex-1 py-1 rounded bg-zinc-800 text-cyan-400 text-xs font-bold"><i class="fa-solid fa-align-left"></i></button>
+                  <button id="alignCenter" onclick="setTextAlign('center')" class="flex-1 py-1 rounded text-xs text-zinc-400 hover:text-white"><i class="fa-solid fa-align-center"></i></button>
+                  <button id="alignRight" onclick="setTextAlign('right')" class="flex-1 py-1 rounded text-xs text-zinc-400 hover:text-white"><i class="fa-solid fa-align-right"></i></button>
+                </div>
+              </div>
+              <div>
+                <label class="text-[10px] text-zinc-400 block mb-1">Modo de Traço</label>
+                <select id="renderFillMode" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-1.5 text-xs text-zinc-200">
+                  <option value="fill">Preenchimento Sólido</option>
+                  <option value="stroke">Apenas Contorno (Outline)</option>
+                  <option value="both">Sólido + Contorno VJ</option>
+                  <option value="wireframe">Scanline Fatiado</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Color Palettes -->
+          <div class="space-y-2">
+            <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Paleta Neon Científica</label>
+            <div class="grid grid-cols-5 gap-1.5">
+              <button onclick="setPalette('#00f3ff', '#ff007f')" class="h-8 rounded-lg border border-zinc-700 bg-gradient-to-r from-cyan-400 to-pink-500 hover:scale-105 transition" title="Cyber Ciência"></button>
+              <button onclick="setPalette('#ffffff', '#00f3ff')" class="h-8 rounded-lg border border-zinc-700 bg-gradient-to-r from-white to-cyan-400 hover:scale-105 transition" title="Branco Laser VJ"></button>
+              <button onclick="setPalette('#bd00ff', '#00f3ff')" class="h-8 rounded-lg border border-zinc-700 bg-gradient-to-r from-purple-500 to-cyan-400 hover:scale-105 transition" title="Inovação Tech"></button>
+              <button onclick="setPalette('#00ff88', '#00b8ff')" class="h-8 rounded-lg border border-zinc-700 bg-gradient-to-r from-emerald-400 to-sky-500 hover:scale-105 transition" title="Bio & Meio Ambiente"></button>
+              <button onclick="setPalette('#ffaa00', '#ff0033')" class="h-8 rounded-lg border border-zinc-700 bg-gradient-to-r from-amber-400 to-rose-600 hover:scale-105 transition" title="Energia Solar"></button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <div>
+                <label class="text-[10px] text-zinc-400 block mb-1">Cor Primária (Glow / Core)</label>
+                <input id="primaryColor" type="color" value="#00f3ff" class="w-full h-8 rounded-lg bg-zinc-900 border border-zinc-700 cursor-pointer">
+              </div>
+              <div>
+                <label class="text-[10px] text-zinc-400 block mb-1">Cor Secundária (Aberration)</label>
+                <input id="secondaryColor" type="color" value="#ff007f" class="w-full h-8 rounded-lg bg-zinc-900 border border-zinc-700 cursor-pointer">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB: LOGO DA FEIRA ================= -->
+        <section id="panel-logo" class="space-y-4 hidden">
+          <div class="bg-gradient-to-r from-fuchsia-950/60 via-purple-950/40 to-cyan-950/40 border border-fuchsia-800/50 p-3 rounded-xl flex items-center justify-between">
+            <div>
+              <h3 class="text-xs font-black uppercase text-fuchsia-300 flex items-center gap-2">
+                <i class="fa-solid fa-award"></i> Camada do Logotipo 16:9
+              </h3>
+              <p class="text-[10px] text-zinc-400">Emblema oficial ou marca dos estandes</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input id="logoVisibleToggle" type="checkbox" checked class="sr-only peer">
+              <div class="w-9 h-5 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-fuchsia-500"></div>
+            </label>
+          </div>
+
+          <!-- Logo Upload Box / Dropzone -->
+          <div class="space-y-2">
+            <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 flex justify-between">
+              <span>Carregar Arquivo (PNG / JPG / SVG)</span>
+              <span id="logoStatusTag" class="text-fuchsia-400 font-mono text-[10px]">Logo Padrão Ativo</span>
+            </label>
+            <div id="dropZone" class="border-2 border-dashed border-zinc-700 hover:border-fuchsia-500 bg-zinc-900/60 hover:bg-zinc-900 rounded-xl p-3 text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5">
+              <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 text-sm">
+                <i class="fa-solid fa-cloud-arrow-up text-fuchsia-400"></i>
+              </div>
+              <p class="text-xs font-semibold text-zinc-200">Arraste a imagem do logo aqui</p>
+              <p class="text-[10px] text-zinc-400">ou clique para escolher do seu dispositivo</p>
+              <input type="file" id="logoFileInput" accept="image/*" class="hidden">
+            </div>
+
+            <button onclick="restoreDefaultLogo()" class="w-full text-center py-1.5 text-[11px] bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-zinc-800 transition">
+              <i class="fa-solid fa-rotate-left mr-1"></i> Carregar Logo Oficial Ciência Delas 2026.2
+            </button>
+          </div>
+
+          <!-- Logo Horizontal Positioning Presets -->
+          <div class="space-y-1.5">
+            <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Posição Rápida 16:9</label>
+            <div class="grid grid-cols-4 gap-1.5">
+              <button onclick="setLogoPlacement('left')" class="logo-pos-btn py-1.5 text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded border border-zinc-700 font-semibold active" data-pos="left">Esquerda</button>
+              <button onclick="setLogoPlacement('center')" class="logo-pos-btn py-1.5 text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded border border-zinc-800 font-semibold" data-pos="center">Centro</button>
+              <button onclick="setLogoPlacement('right')" class="logo-pos-btn py-1.5 text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded border border-zinc-800 font-semibold" data-pos="right">Direita</button>
+              <button onclick="setLogoPlacement('watermark')" class="logo-pos-btn py-1.5 text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded border border-zinc-800 font-semibold" data-pos="watermark">Marca d'água</button>
+            </div>
+          </div>
+
+          <!-- Logo Motion Mode -->
+          <div class="space-y-2">
+            <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Efeito de Animação do Logo</label>
+            <select id="logoMotionSelect" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-fuchsia-500">
+              <option value="bassPulse">Bass Pulse (Pulso sincronizado com o Kick)</option>
+              <option value="floating">Flutuação Suave (Floating Sine Wave)</option>
+              <option value="glitchRGB">RGB Glitch Aberration (Sci-Fi Strobe)</option>
+              <option value="neonStrobe">Neon Glow Oscilation (Tubo Néon)</option>
+              <option value="slowSpin">Rotação Orbital Suave (360° Slow)</option>
+              <option value="static">Estático Fixo (Clean)</option>
+            </select>
+          </div>
+
+          <!-- Logo Sliders (Size, Coordinates, Opacity, Blend) -->
+          <div class="space-y-3 bg-zinc-900/70 p-3 rounded-xl border border-zinc-800">
+            <div>
+              <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                <span>Escala do Logo (Zoom)</span>
+                <span id="logoScaleVal" class="text-fuchsia-400 font-mono font-bold">110%</span>
+              </div>
+              <input id="logoScale" type="range" min="30" max="250" value="110" class="w-full accent-fuchsia-500">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                  <span>Posição X</span>
+                  <span id="logoPosXVal" class="text-fuchsia-400 font-mono">480px</span>
+                </div>
+                <input id="logoPosX" type="range" min="150" max="1770" value="480" class="w-full accent-fuchsia-500">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                  <span>Posição Y</span>
+                  <span id="logoPosYVal" class="text-fuchsia-400 font-mono">540px</span>
+                </div>
+                <input id="logoPosY" type="range" min="100" max="980" value="540" class="w-full accent-fuchsia-500">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <div>
+                <label class="text-[10px] text-zinc-400 block mb-1">Opacidade</label>
+                <input id="logoOpacity" type="range" min="0.1" max="1" step="0.05" value="1" class="w-full accent-fuchsia-500">
+              </div>
+              <div>
+                <label class="text-[10px] text-zinc-400 block mb-1">Modo de Mistura</label>
+                <select id="logoBlendMode" class="w-full bg-zinc-900 border border-zinc-700 rounded p-1 text-xs text-zinc-200">
+                  <option value="source-over">Normal</option>
+                  <option value="screen" selected>Screen (VJ Clarear)</option>
+                  <option value="lighter">Additive (Lighter)</option>
+                  <option value="overlay">Overlay</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-xs text-zinc-300">Brilho Neon Autoral</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input id="logoMonoNeonToggle" type="checkbox" checked class="sr-only peer">
+                <div class="w-8 h-4 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-fuchsia-500"></div>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB: MOTION FX & ANIMATION ================= -->
+        <section id="panel-fx" class="space-y-4 hidden">
+          <!-- Animation Type -->
+          <div class="space-y-2">
+            <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Motor Cinético Widescreen</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="setMotionMode('bassPulse')" class="fx-mode-btn p-2 rounded-xl border border-cyan-500 bg-zinc-800 text-left transition" data-mode="bassPulse">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-heart-pulse text-cyan-400"></i> Bass Pulse</div>
+                <div class="text-[10px] text-zinc-400">Batida sincronizada ao som</div>
+              </button>
+              <button onclick="setMotionMode('strobeGlitch')" class="fx-mode-btn p-2 rounded-xl border border-zinc-800 bg-zinc-900 text-left hover:border-cyan-500 transition" data-mode="strobeGlitch">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-bolt text-yellow-400"></i> Cyber Glitch</div>
+                <div class="text-[10px] text-zinc-400">Falhas e aberração RGB</div>
+              </button>
+              <button onclick="setMotionMode('marqueeScroll')" class="fx-mode-btn p-2 rounded-xl border border-zinc-800 bg-zinc-900 text-left hover:border-cyan-500 transition" data-mode="marqueeScroll">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-arrows-left-right text-indigo-400"></i> Marquee 16:9</div>
+                <div class="text-[10px] text-zinc-400">Letreiro contínuo horizontal</div>
+              </button>
+              <button onclick="setMotionMode('cyberGlow')" class="fx-mode-btn p-2 rounded-xl border border-zinc-800 bg-zinc-900 text-left hover:border-cyan-500 transition" data-mode="cyberGlow">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-sun text-fuchsia-400"></i> Neon Oscilation</div>
+                <div class="text-[10px] text-zinc-400">Resplendor suave ciano/pink</div>
+              </button>
+              <button onclick="setMotionMode('matrixRain')" class="fx-mode-btn p-2 rounded-xl border border-zinc-800 bg-zinc-900 text-left hover:border-cyan-500 transition" data-mode="matrixRain">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-binary text-emerald-400"></i> Matrix Data Rain</div>
+                <div class="text-[10px] text-zinc-400">Chuva digital de código</div>
+              </button>
+              <button onclick="setMotionMode('typewriter')" class="fx-mode-btn p-2 rounded-xl border border-zinc-800 bg-zinc-900 text-left hover:border-cyan-500 transition" data-mode="typewriter">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-terminal text-amber-400"></i> Typewriter</div>
+                <div class="text-[10px] text-zinc-400">Digitação com cursor</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- BPM / Tempo Master -->
+          <div class="space-y-3 bg-zinc-900/70 p-3 rounded-xl border border-zinc-800">
+            <div class="flex items-center justify-between">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Sincronização Rítmica (BPM Master)</label>
+              <button id="tapBpmBtn" class="px-3 py-1 text-xs bg-cyan-950 border border-cyan-700/80 hover:bg-cyan-900 text-cyan-300 font-bold rounded-lg transition active:scale-95">
+                TAP TEMPO
+              </button>
+            </div>
+            
+            <div>
+              <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                <span>BPM Master da Projeção</span>
+                <span id="bpmVal" class="text-cyan-400 font-mono font-bold">126 BPM</span>
+              </div>
+              <input id="bpmSlider" type="range" min="60" max="180" value="126" class="w-full">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                <span>Multiplicador de Velocidade</span>
+                <span id="speedMultVal" class="text-cyan-400 font-mono">1.0x</span>
+              </div>
+              <input id="speedMultiplier" type="range" min="0.25" max="3.0" step="0.25" value="1.0" class="w-full">
+            </div>
+          </div>
+
+          <!-- Shader & Glow Overdrive -->
+          <div class="space-y-3 bg-zinc-900/70 p-3 rounded-xl border border-zinc-800">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-300">Pós-Processamento e Óptica VJ</h4>
+
+            <div>
+              <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                <span>RGB Aberration Shift (Deslocamento)</span>
+                <span id="rgbShiftVal" class="text-cyan-400 font-mono">16px</span>
+              </div>
+              <input id="rgbShift" type="range" min="0" max="60" value="16" class="w-full">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                <span>Intensidade do Brilho (Glow Bloom)</span>
+                <span id="glowVal" class="text-cyan-400 font-mono">45px</span>
+              </div>
+              <input id="glowIntensity" type="range" min="0" max="90" value="45" class="w-full">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                <span>Frequência do Strobe / Flash</span>
+                <span id="strobeVal" class="text-cyan-400 font-mono">15%</span>
+              </div>
+              <input id="strobeIntensity" type="range" min="0" max="100" value="15" class="w-full">
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-xs text-zinc-300">Linhas de Scanline (Ecrã CRT)</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input id="scanlinesToggle" type="checkbox" checked class="sr-only peer">
+                <div class="w-8 h-4 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-cyan-500"></div>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB: WARP & CALIBRAÇÃO ================= -->
+        <section id="panel-mapping" class="space-y-4 hidden">
+          <div class="bg-cyan-950/40 border border-cyan-800/60 p-3 rounded-xl text-xs text-cyan-200">
+            <i class="fa-solid fa-circle-info mr-1 text-cyan-400"></i>
+            Ajuste fino de ângulo e correção de perspectiva do projetor widescreen na parede ou ecrã do auditório.
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Keystone 3D & Perspectiva</label>
+              <button onclick="resetWarp()" class="text-[11px] text-cyan-400 hover:underline">Restaurar Padrão</button>
+            </div>
+
+            <div class="space-y-3 bg-zinc-900/70 p-3 rounded-xl border border-zinc-800">
+              <div>
+                <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                  <span>Inclinação Vertical (Eixo X)</span>
+                  <span id="rotXVal" class="text-cyan-400 font-mono">0°</span>
+                </div>
+                <input id="rotX" type="range" min="-45" max="45" value="0" class="w-full">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                  <span>Inclinação Horizontal (Eixo Y)</span>
+                  <span id="rotYVal" class="text-cyan-400 font-mono">0°</span>
+                </div>
+                <input id="rotY" type="range" min="-45" max="45" value="0" class="w-full">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                  <span>Rotação do Ecrã (Eixo Z)</span>
+                  <span id="rotZVal" class="text-cyan-400 font-mono">0°</span>
+                </div>
+                <input id="rotZ" type="range" min="-180" max="180" value="0" class="w-full">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs text-zinc-400 mb-1">
+                  <span>Escala / Enquadramento Ótico</span>
+                  <span id="mapScaleVal" class="text-cyan-400 font-mono">1.0</span>
+                </div>
+                <input id="mapScale" type="range" min="0.6" max="1.5" step="0.02" value="1.0" class="w-full">
+              </div>
+            </div>
+
+            <!-- Alignment Test Pattern -->
+            <div class="flex items-center justify-between pt-1">
+              <div>
+                <span class="text-xs text-zinc-200 font-semibold block">Grelha de Teste 16:9 (Calibração)</span>
+                <span class="text-[10px] text-zinc-400">Cruzetas nos cantos e círculos de foco central</span>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input id="testGridToggle" type="checkbox" class="sr-only peer">
+                <div class="w-8 h-4 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-cyan-500"></div>
+              </label>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Action Footer with Recording -->
+      <div class="p-3 bg-[#08090f] border-t border-zinc-800/80 flex items-center gap-2">
+        <button id="recordClipBtn" class="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-rose-950/40 transition active:scale-95">
+          <i class="fa-solid fa-circle text-[10px] animate-pulse"></i>
+          <span id="recordLabel">EXPORTAR VJ LOOP 16:9 (1080p)</span>
+        </button>
+        <button onclick="randomizeMix()" title="Sorteio Rápido de Cena" class="p-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs border border-zinc-700 transition">
+          <i class="fa-solid fa-dice"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- CENTER PREVIEW MONITOR (HORIZONTAL 16:9 WIDESCREEN SIMULATION) -->
+    <section class="flex-1 bg-[#050608] flex flex-col items-center justify-center p-4 relative overflow-hidden bg-grid">
+      
+      <!-- Top Monitor Status Bar -->
+      <div class="absolute top-3 left-6 flex items-center gap-4 text-xs font-mono text-zinc-400 pointer-events-none z-10">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-expand text-cyan-400"></i>
+          <span id="canvasResLabel">1920 &times; 1080 (16:9 NATIVO)</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-atom text-fuchsia-400"></i>
+          <span id="layerStatus">PROJEÇÃO: ATIVA</span>
+        </div>
+      </div>
+
+      <!-- Toast Alert Box -->
+      <div id="toast" class="absolute top-5 z-50 transition-all duration-300 transform -translate-y-12 opacity-0 pointer-events-none px-4 py-2 rounded-xl bg-zinc-900 border border-cyan-500 text-cyan-300 text-xs font-bold shadow-2xl flex items-center gap-2">
+        <i class="fa-solid fa-bolt text-cyan-400"></i>
+        <span id="toastMsg">Mensagem</span>
+      </div>
+
+      <!-- THE 16:9 HORIZONTAL CANVAS CONTAINER -->
+      <div class="relative w-[94%] max-w-[1300px] flex items-center justify-center">
+        <div id="canvasContainer" class="viewport-box w-full bg-black rounded-xl overflow-hidden relative border border-zinc-800 shadow-2xl flex items-center justify-center">
+          
+          <!-- Master Stage Canvas (Fixed 1920x1080 internal resolution) -->
+          <canvas id="stageCanvas" width="1920" height="1080" class="w-full h-full block object-contain pointer-events-none"></canvas>
+          
+          <!-- Alignment Test Grid & Calibration Cross (16:9) -->
+          <div id="testGridOverlay" class="absolute inset-0 pointer-events-none border-2 border-cyan-500/50 hidden">
+            <div class="w-full h-full grid grid-cols-8 grid-rows-4 divide-x divide-y divide-cyan-500/20">
+              <div class="flex items-start p-2 text-[10px] font-mono text-cyan-400 font-bold">0,0</div>
+              <div></div><div></div><div></div><div></div><div></div><div></div>
+              <div class="flex items-start justify-end p-2 text-[10px] font-mono text-cyan-400 font-bold">1920,0</div>
+              
+              <div class="col-span-8 row-span-2 flex flex-col items-center justify-center relative">
+                <!-- Concentric calibration circle -->
+                <div class="w-64 h-64 rounded-full border-2 border-cyan-400/80 flex items-center justify-center">
+                  <div class="w-32 h-32 rounded-full border border-fuchsia-400/80 flex items-center justify-center">
+                    <div class="w-3 h-3 rounded-full bg-cyan-400"></div>
+                  </div>
+                </div>
+                <span class="text-cyan-300 font-mono text-xs font-bold mt-2 bg-black/80 px-2 py-0.5 rounded border border-cyan-500/40">CENTRO ÓPTICO 16:9 (960x540)</span>
+              </div>
+
+              <div class="flex items-end p-2 text-[10px] font-mono text-cyan-400 font-bold">0,1080</div>
+              <div></div><div></div><div></div><div></div><div></div><div></div>
+              <div class="flex items-end justify-end p-2 text-[10px] font-mono text-cyan-400 font-bold">1920,1080</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Shortcuts Bar at bottom -->
+      <div class="absolute bottom-3 flex items-center gap-2 sm:gap-4 bg-zinc-900/90 border border-zinc-800 backdrop-blur-md px-4 py-2 rounded-full shadow-xl text-xs">
+        <span class="text-zinc-400 text-[11px] font-semibold">Atalhos de VJ:</span>
+        <div class="flex items-center gap-1.5"><kbd class="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 font-mono text-[10px] text-zinc-300">Espaço</kbd><span class="text-zinc-500 text-[11px]">Freeze</span></div>
+        <div class="flex items-center gap-1.5"><kbd class="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 font-mono text-[10px] text-zinc-300">B</kbd><span class="text-zinc-500 text-[11px]">Blackout</span></div>
+        <div class="flex items-center gap-1.5"><kbd class="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 font-mono text-[10px] text-zinc-300">F</kbd><span class="text-zinc-500 text-[11px]">Fullscreen</span></div>
+        <div class="flex items-center gap-1.5"><kbd class="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 font-mono text-[10px] text-zinc-300">G</kbd><span class="text-zinc-500 text-[11px]">Grelha 16:9</span></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /* =========================================================
+       CIÊNCIA DELAS 2026.2 - RESOLUX HORIZONTAL ENGINE (16:9)
+       ========================================================= */
+
+    const canvas = document.getElementById('stageCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Master State
+    const state = {
+      // Presentation texts
+      text: "CIÊNCIA DELAS 2026.2",
+      subtext: "SEMANA DE CIÊNCIA, TECNOLOGIA & ARTES • CEEP ISAÍAS ALVES",
+      fontFamily: "'Montserrat', sans-serif",
+      fontSize: 115,
+      subFontSize: 36,
+      textAlign: 'left',
+      renderFillMode: 'fill',
+      textPosX: 1200,
+      textPosY: 540,
+      primaryColor: '#00f3ff',
+      secondaryColor: '#ff007f',
+      
+      // Logo engine
+      logoVisible: true,
+      logoScale: 1.1,
+      logoPosX: 480,
+      logoPosY: 540,
+      logoOpacity: 1.0,
+      logoBlendMode: 'screen',
+      logoMonoNeon: true,
+      logoMotion: 'bassPulse',
+
+      // Motion & VJ FX
+      motionMode: 'bassPulse',
+      bpm: 126,
+      speedMultiplier: 1.0,
+      rgbShift: 16,
+      glowIntensity: 45,
+      strobeIntensity: 15,
+      scanlines: true,
+      
+      // Mapping & Geometry
+      rotX: 0,
+      rotY: 0,
+      rotZ: 0,
+      mapScale: 1.0,
+      blackout: false,
+      isPaused: false
+    };
+
+    const logoImg = new Image();
+    let isCustomLogoLoaded = false;
+
+    // Timing & Engine variables
+    let lastTime = performance.now();
+    let globalPhase = 0;
+    let frameCounter = 0;
+    let fpsTimer = performance.now();
+    let externalWindow = null;
+    let tapTimes = [];
+
+    // Matrix Rain particle columns for 16:9
+    const matrixCols = 48;
+    const matrixDrops = [];
+    for (let i = 0; i < matrixCols; i++) {
+      matrixDrops[i] = Math.floor(Math.random() * -30);
+    }
+
+    // MediaRecorder for loops
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+
+    /* Built-in High-Res Vector SVG for "CIÊNCIA DELAS" */
+    function buildDefaultLogoSVG() {
+      const svgString = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+          <defs>
+            <linearGradient id="gWhiteCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#00f3ff"/>
+            </linearGradient>
+            <filter id="glowFilt">
+              <feGaussianBlur stdDeviation="3.5" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- Orbital rings -->
+          <circle cx="300" cy="220" r="185" fill="none" stroke="url(#gWhiteCyan)" stroke-width="2.5" stroke-dasharray="10 6" opacity="0.6"/>
+          <ellipse cx="300" cy="220" rx="195" ry="75" fill="none" stroke="#ffffff" stroke-width="3" transform="rotate(-30 300 220)" opacity="0.85"/>
+          <ellipse cx="300" cy="220" rx="195" ry="75" fill="none" stroke="#00f3ff" stroke-width="3" transform="rotate(30 300 220)" opacity="0.85"/>
+          <circle cx="145" cy="180" r="8" fill="#00f3ff"/>
+          <circle cx="455" cy="260" r="8" fill="#ff007f"/>
+
+          <!-- Scientist & Woman Silhouette -->
+          <path d="M260,250 C260,200 280,140 330,140 C370,140 390,175 390,210 C390,240 370,270 340,290 C380,310 410,340 430,380 C360,390 310,380 250,370 C240,330 250,290 260,250 Z" fill="#ffffff" opacity="0.95"/>
+          <circle cx="320" cy="160" r="6" fill="#08090d"/>
+          
+          <!-- Circuit & Constellation tracks -->
+          <path d="M410,130 L430,150 L470,150" fill="none" stroke="#fff" stroke-width="3"/>
+          <circle cx="470" cy="150" r="5" fill="#00f3ff"/>
+          <path d="M430,180 L460,180" fill="none" stroke="#fff" stroke-width="2.5"/>
+          <circle cx="460" cy="180" r="4" fill="#fff"/>
+          <path d="M170,130 L150,150 L120,150" fill="none" stroke="#fff" stroke-width="3"/>
+          <circle cx="120" cy="150" r="5" fill="#fff"/>
+
+          <!-- Lab flask & gear/ideas -->
+          <path d="M160,290 L180,330 L140,330 Z" fill="none" stroke="#fff" stroke-width="3"/>
+          <circle cx="160" cy="315" r="3" fill="#00f3ff"/>
+          <path d="M440,310 C440,295 460,295 460,310 C460,325 450,330 450,340 L450,345" fill="none" stroke="#fff" stroke-width="3"/>
+
+          <!-- CIÊNCIA DELAS Typography -->
+          <text x="300" y="445" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="64" fill="#ffffff" text-anchor="middle" letter-spacing="4" filter="url(#glowFilt)">CIÊNCIA</text>
+          <text x="300" y="505" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="60" fill="#00f3ff" text-anchor="middle" letter-spacing="6">DELAS</text>
+          
+          <rect x="70" y="525" width="460" height="2" fill="url(#gWhiteCyan)"/>
+          <circle cx="70" cy="526" r="4" fill="#fff"/>
+          <circle cx="530" cy="526" r="4" fill="#fff"/>
+          
+          <text x="300" y="550" font-family="'Inter', sans-serif" font-weight="700" font-size="14" fill="#ffffff" text-anchor="middle" letter-spacing="2">SEMANA DE CIÊNCIA, TECNOLOGIA &amp; ARTES</text>
+          <text x="300" y="575" font-family="'Inter', sans-serif" font-weight="800" font-size="16" fill="#ff007f" text-anchor="middle" letter-spacing="4">— CEEP ISAÍAS ALVES &bull; 2026.2 —</text>
+        </svg>
+      `;
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+    }
+
+    logoImg.src = buildDefaultLogoSVG();
+
+    function restoreDefaultLogo() {
+      logoImg.src = buildDefaultLogoSVG();
+      isCustomLogoLoaded = false;
+      document.getElementById('logoStatusTag').innerText = "Logo Padrão Ativo";
+      document.getElementById('logoStatusTag').className = "text-fuchsia-400 font-mono text-[10px]";
+      showToast("Logo Oficial Ciência Delas Restaurado");
+    }
+
+    function switchTab(tabId) {
+      ['content', 'logo', 'fx', 'mapping'].forEach(t => {
+        const panel = document.getElementById(`panel-${t}`);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (t === tabId) {
+          panel.classList.remove('hidden');
+          btn.className = "flex-1 py-3 px-1 border-b-2 border-cyan-500 text-cyan-400 font-bold flex items-center justify-center gap-1.5 transition";
+        } else {
+          panel.classList.add('hidden');
+          btn.className = "flex-1 py-3 px-1 border-b-2 border-transparent text-zinc-400 font-bold flex items-center justify-center gap-1.5 hover:bg-zinc-900/60 transition";
+        }
+      });
+    }
+
+    /* Cue preset launchers for 16:9 stage */
+    function launchCue(title, sub, motion, layout) {
+      state.text = title;
+      state.subtext = sub;
+      document.getElementById('textInput').value = title;
+      document.getElementById('subtextInput').value = sub;
+      setMotionMode(motion);
+      if (layout) setLayoutPreset(layout);
+      showToast(`Cue Disparado: ${title.substring(0, 22)}...`);
+    }
+
+    function setLayoutPreset(layout) {
+      document.querySelectorAll('.layout-preset-btn').forEach(b => {
+        const active = b.dataset.layout === layout;
+        b.classList.toggle('border-cyan-500', active);
+        b.classList.toggle('border-zinc-800', !active);
+      });
+
+      if (layout === 'splitLeft') {
+        // Logo on left, text block on right (ideal 16:9 widescreen)
+        state.logoVisible = true;
+        state.logoPosX = 480;
+        state.logoPosY = 540;
+        state.logoScale = 1.1;
+        state.textPosX = 1200;
+        state.textPosY = 540;
+        state.textAlign = 'left';
+        state.fontSize = 115;
+      } else if (layout === 'centered') {
+        // Centered text stack with logo in background watermark or top
+        state.logoVisible = true;
+        state.logoPosX = 960;
+        state.logoPosY = 320;
+        state.logoScale = 0.85;
+        state.textPosX = 960;
+        state.textPosY = 700;
+        state.textAlign = 'center';
+        state.fontSize = 100;
+      } else if (layout === 'textHeavy') {
+        // Huge full-width headline, subtle logo
+        state.logoVisible = true;
+        state.logoPosX = 220;
+        state.logoPosY = 180;
+        state.logoScale = 0.55;
+        state.textPosX = 960;
+        state.textPosY = 540;
+        state.textAlign = 'center';
+        state.fontSize = 145;
+      }
+
+      // Sync UI sliders
+      document.getElementById('logoPosX').value = state.logoPosX;
+      document.getElementById('logoPosY').value = state.logoPosY;
+      document.getElementById('logoScale').value = Math.round(state.logoScale * 100);
+      document.getElementById('logoScaleVal').innerText = `${Math.round(state.logoScale * 100)}%`;
+      document.getElementById('logoPosXVal').innerText = `${state.logoPosX}px`;
+      document.getElementById('logoPosYVal').innerText = `${state.logoPosY}px`;
+      document.getElementById('textPosX').value = state.textPosX;
+      document.getElementById('textPosY').value = state.textPosY;
+      document.getElementById('textPosXVal').innerText = `${state.textPosX}px`;
+      document.getElementById('textPosYVal').innerText = `${state.textPosY}px`;
+      document.getElementById('fontSize').value = state.fontSize;
+      document.getElementById('fontSizeVal').innerText = `${state.fontSize}px`;
+      setTextAlign(state.textAlign);
+    }
+
+    function setLogoPlacement(pos) {
+      if (pos === 'left') {
+        state.logoPosX = 480;
+        state.logoPosY = 540;
+        state.logoScale = 1.1;
+      } else if (pos === 'center') {
+        state.logoPosX = 960;
+        state.logoPosY = 540;
+        state.logoScale = 1.35;
+      } else if (pos === 'right') {
+        state.logoPosX = 1440;
+        state.logoPosY = 540;
+        state.logoScale = 1.1;
+      } else if (pos === 'watermark') {
+        state.logoPosX = 960;
+        state.logoPosY = 540;
+        state.logoScale = 1.8;
+        state.logoOpacity = 0.35;
+        document.getElementById('logoOpacity').value = 0.35;
+      }
+
+      document.getElementById('logoPosX').value = state.logoPosX;
+      document.getElementById('logoPosY').value = state.logoPosY;
+      document.getElementById('logoScale').value = Math.round(state.logoScale * 100);
+      document.getElementById('logoScaleVal').innerText = `${Math.round(state.logoScale * 100)}%`;
+      document.getElementById('logoPosXVal').innerText = `${state.logoPosX}px`;
+      document.getElementById('logoPosYVal').innerText = `${state.logoPosY}px`;
+      showToast(`Logo 16:9: ${pos.toUpperCase()}`);
+    }
+
+    function setTextAlign(align) {
+      state.textAlign = align;
+      ['left', 'center', 'right'].forEach(a => {
+        const btn = document.getElementById(`align${a.charAt(0).toUpperCase() + a.slice(1)}`);
+        if (a === align) {
+          btn.className = "flex-1 py-1 rounded bg-zinc-800 text-cyan-400 text-xs font-bold";
+        } else {
+          btn.className = "flex-1 py-1 rounded text-xs text-zinc-400 hover:text-white";
+        }
+      });
+    }
+
+    function setMotionMode(mode) {
+      state.motionMode = mode;
+      document.querySelectorAll('.fx-mode-btn').forEach(btn => {
+        if (btn.dataset.mode === mode) {
+          btn.classList.add('border-cyan-500', 'bg-zinc-800');
+          btn.classList.remove('border-zinc-800', 'bg-zinc-900');
+        } else {
+          btn.classList.remove('border-cyan-500', 'bg-zinc-800');
+          btn.classList.add('border-zinc-800', 'bg-zinc-900');
+        }
+      });
+    }
+
+    function setPalette(c1, c2) {
+      state.primaryColor = c1;
+      state.secondaryColor = c2;
+      document.getElementById('primaryColor').value = c1;
+      document.getElementById('secondaryColor').value = c2;
+      showToast("Paleta Neon Widescreen Aplicada");
+    }
+
+    function resetWarp() {
+      state.rotX = 0;
+      state.rotY = 0;
+      state.rotZ = 0;
+      state.mapScale = 1.0;
+      document.getElementById('rotX').value = 0;
+      document.getElementById('rotY').value = 0;
+      document.getElementById('rotZ').value = 0;
+      document.getElementById('mapScale').value = 1.0;
+      document.getElementById('rotXVal').innerText = '0°';
+      document.getElementById('rotYVal').innerText = '0°';
+      document.getElementById('rotZVal').innerText = '0°';
+      document.getElementById('mapScaleVal').innerText = '1.0';
+      applyCanvasPerspective();
+      showToast("Geometria 16:9 Restaurada");
+    }
+
+    function applyCanvasPerspective() {
+      const container = document.getElementById('canvasContainer');
+      container.style.transform = `perspective(1200px) scale(${state.mapScale}) rotateX(${state.rotX}deg) rotateY(${state.rotY}deg) rotateZ(${state.rotZ}deg)`;
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.innerText = msg;
+      toast.classList.remove('opacity-0', '-translate-y-12');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(toast._timeout);
+      toast._timeout = setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-12');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 1600);
+    }
+
+    /* File Drag & Drop & Upload */
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('logoFileInput');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleImageFile(file);
+    });
+
+    ['dragenter', 'dragover'].forEach(name => {
+      dropZone.addEventListener(name, (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-fuchsia-400', 'bg-zinc-800/90');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(name => {
+      dropZone.addEventListener(name, (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-fuchsia-400', 'bg-zinc-800/90');
+      });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const file = dt.files[0];
+      if (file && file.type.startsWith('image/')) {
+        handleImageFile(file);
+      } else {
+        showToast("Formato inválido. Envie imagem PNG/JPG/SVG.");
+      }
+    });
+
+    function handleImageFile(file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        logoImg.onload = () => {
+          isCustomLogoLoaded = true;
+          document.getElementById('logoStatusTag').innerText = "Logo Customizado Carregado";
+          document.getElementById('logoStatusTag').className = "text-emerald-400 font-mono text-[10px]";
+          showToast("Logo Carregado no Projetor");
+        };
+        logoImg.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    /* Event Listeners */
+    document.getElementById('resSelect').addEventListener('change', (e) => {
+      const val = e.target.value;
+      const [w, h] = val.split('x').map(Number);
+      canvas.width = w;
+      canvas.height = h;
+      document.getElementById('canvasResLabel').innerText = `${w} × ${h} (16:9)`;
+      showToast(`Resolução ajustada para ${w}x${h}`);
+    });
+
+    document.getElementById('logoVisibleToggle').addEventListener('change', (e) => {
+      state.logoVisible = e.target.checked;
+    });
+    document.getElementById('logoMotionSelect').addEventListener('change', (e) => {
+      state.logoMotion = e.target.value;
+    });
+    document.getElementById('logoScale').addEventListener('input', (e) => {
+      state.logoScale = parseInt(e.target.value) / 100;
+      document.getElementById('logoScaleVal').innerText = `${e.target.value}%`;
+    });
+    document.getElementById('logoPosY').addEventListener('input', (e) => {
+      state.logoPosY = parseInt(e.target.value);
+      document.getElementById('logoPosYVal').innerText = `${state.logoPosY}px`;
+    });
+    document.getElementById('logoPosX').addEventListener('input', (e) => {
+      state.logoPosX = parseInt(e.target.value);
+      document.getElementById('logoPosXVal').innerText = `${state.logoPosX}px`;
+    });
+    document.getElementById('logoOpacity').addEventListener('input', (e) => {
+      state.logoOpacity = parseFloat(e.target.value);
+    });
+    document.getElementById('logoBlendMode').addEventListener('change', (e) => {
+      state.logoBlendMode = e.target.value;
+    });
+    document.getElementById('logoMonoNeonToggle').addEventListener('change', (e) => {
+      state.logoMonoNeon = e.target.checked;
+    });
+
+    document.getElementById('textInput').addEventListener('input', (e) => {
+      state.text = e.target.value;
+    });
+    document.getElementById('subtextInput').addEventListener('input', (e) => {
+      state.subtext = e.target.value;
+    });
+    document.getElementById('fontFamily').addEventListener('change', (e) => {
+      state.fontFamily = e.target.value;
+    });
+    document.getElementById('fontSize').addEventListener('input', (e) => {
+      state.fontSize = parseInt(e.target.value);
+      document.getElementById('fontSizeVal').innerText = `${state.fontSize}px`;
+    });
+    document.getElementById('subFontSize').addEventListener('input', (e) => {
+      state.subFontSize = parseInt(e.target.value);
+      document.getElementById('subFontSizeVal').innerText = `${state.subFontSize}px`;
+    });
+    document.getElementById('textPosX').addEventListener('input', (e) => {
+      state.textPosX = parseInt(e.target.value);
+      document.getElementById('textPosXVal').innerText = `${state.textPosX}px`;
+    });
+    document.getElementById('textPosY').addEventListener('input', (e) => {
+      state.textPosY = parseInt(e.target.value);
+      document.getElementById('textPosYVal').innerText = `${state.textPosY}px`;
+    });
+    document.getElementById('primaryColor').addEventListener('input', (e) => {
+      state.primaryColor = e.target.value;
+    });
+    document.getElementById('secondaryColor').addEventListener('input', (e) => {
+      state.secondaryColor = e.target.value;
+    });
+    document.getElementById('renderFillMode').addEventListener('change', (e) => {
+      state.renderFillMode = e.target.value;
+    });
+
+    document.getElementById('bpmSlider').addEventListener('input', (e) => {
+      state.bpm = parseInt(e.target.value);
+      document.getElementById('bpmVal').innerText = `${state.bpm} BPM`;
+    });
+    document.getElementById('speedMultiplier').addEventListener('input', (e) => {
+      state.speedMultiplier = parseFloat(e.target.value);
+      document.getElementById('speedMultVal').innerText = `${state.speedMultiplier.toFixed(2)}x`;
+    });
+    document.getElementById('rgbShift').addEventListener('input', (e) => {
+      state.rgbShift = parseInt(e.target.value);
+      document.getElementById('rgbShiftVal').innerText = `${state.rgbShift}px`;
+    });
+    document.getElementById('glowIntensity').addEventListener('input', (e) => {
+      state.glowIntensity = parseInt(e.target.value);
+      document.getElementById('glowVal').innerText = `${state.glowIntensity}px`;
+    });
+    document.getElementById('strobeIntensity').addEventListener('input', (e) => {
+      state.strobeIntensity = parseInt(e.target.value);
+      document.getElementById('strobeVal').innerText = `${state.strobeIntensity}%`;
+    });
+    document.getElementById('scanlinesToggle').addEventListener('change', (e) => {
+      state.scanlines = e.target.checked;
+    });
+
+    document.getElementById('rotX').addEventListener('input', (e) => {
+      state.rotX = parseInt(e.target.value);
+      document.getElementById('rotXVal').innerText = `${state.rotX}°`;
+      applyCanvasPerspective();
+    });
+    document.getElementById('rotY').addEventListener('input', (e) => {
+      state.rotY = parseInt(e.target.value);
+      document.getElementById('rotYVal').innerText = `${state.rotY}°`;
+      applyCanvasPerspective();
+    });
+    document.getElementById('rotZ').addEventListener('input', (e) => {
+      state.rotZ = parseInt(e.target.value);
+      document.getElementById('rotZVal').innerText = `${state.rotZ}°`;
+      applyCanvasPerspective();
+    });
+    document.getElementById('mapScale').addEventListener('input', (e) => {
+      state.mapScale = parseFloat(e.target.value);
+      document.getElementById('mapScaleVal').innerText = state.mapScale.toFixed(2);
+      applyCanvasPerspective();
+    });
+    document.getElementById('testGridToggle').addEventListener('change', (e) => {
+      document.getElementById('testGridOverlay').classList.toggle('hidden', !e.target.checked);
+    });
+
+    // TAP BPM
+    document.getElementById('tapBpmBtn').addEventListener('click', () => {
+      const now = performance.now();
+      tapTimes.push(now);
+      if (tapTimes.length > 5) tapTimes.shift();
+      if (tapTimes.length >= 2) {
+        let diffs = [];
+        for (let i = 1; i < tapTimes.length; i++) {
+          diffs.push(tapTimes[i] - tapTimes[i - 1]);
+        }
+        const avg = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+        const bpmCalc = Math.round(60000 / avg);
+        if (bpmCalc >= 50 && bpmCalc <= 200) {
+          state.bpm = bpmCalc;
+          document.getElementById('bpmSlider').value = bpmCalc;
+          document.getElementById('bpmVal').innerText = `${bpmCalc} BPM`;
+          showToast(`TAP: ${bpmCalc} BPM`);
+        }
+      }
+    });
+
+    // Blackout Handler
+    const blackoutBtn = document.getElementById('blackoutBtn');
+    function toggleBlackout() {
+      state.blackout = !state.blackout;
+      if (state.blackout) {
+        blackoutBtn.classList.add('bg-rose-600', 'text-white');
+        blackoutBtn.classList.remove('bg-zinc-900', 'text-zinc-200');
+        document.getElementById('layerStatus').innerText = 'PROJEÇÃO: BLACKOUT';
+        document.getElementById('layerStatus').className = 'text-rose-500 font-bold';
+      } else {
+        blackoutBtn.classList.remove('bg-rose-600', 'text-white');
+        blackoutBtn.classList.add('bg-zinc-900', 'text-zinc-200');
+        document.getElementById('layerStatus').innerText = 'PROJEÇÃO: ATIVA';
+        document.getElementById('layerStatus').className = 'text-fuchsia-400';
+      }
+    }
+    blackoutBtn.addEventListener('click', toggleBlackout);
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+      if (e.code === 'KeyB') {
+        toggleBlackout();
+      } else if (e.code === 'Space') {
+        e.preventDefault();
+        state.isPaused = !state.isPaused;
+        showToast(state.isPaused ? "Congelado (Freeze)" : "Reprodução Ativa");
+      } else if (e.code === 'KeyF') {
+        toggleNativeFullscreen();
+      } else if (e.code === 'KeyG') {
+        const grid = document.getElementById('testGridToggle');
+        grid.checked = !grid.checked;
+        document.getElementById('testGridOverlay').classList.toggle('hidden', !grid.checked);
+      }
+    });
+
+    function toggleNativeFullscreen() {
+      const cont = document.getElementById('canvasContainer');
+      if (!document.fullscreenElement) {
+        cont.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+    document.getElementById('fsBtn').addEventListener('click', toggleNativeFullscreen);
+
+    function randomizeMix() {
+      const titles = [
+        "CIÊNCIA DELAS 2026.2",
+        "ROBÓTICA E AUTOMAÇÃO SUSTENTÁVEL",
+        "BIOTECNOLOGIA & SAÚDE INTEGRADA",
+        "MULHERES EM CIÊNCIA & INOVAÇÃO",
+        "ARTES DIGITAIS & NEGÓCIOS CRIATIVOS"
+      ];
+      const subs = [
+        "CEEP ISAÍAS ALVES • SEMANA CIENTÍFICA 2026.2",
+        "ESTANDE DE DEMONSTRAÇÃO PRÁTICA • TURMA MATUTINO",
+        "DESENVOLVIMENTO DE PROJETOS E PROTÓTIPOS FUNCIONAIS",
+        "SALVADOR / BAHIA • INOVAÇÃO E EMPREENDEDORISMO JOVEM"
+      ];
+      const modes = ['bassPulse', 'strobeGlitch', 'marqueeScroll', 'cyberGlow', 'matrixRain', 'typewriter'];
+      const layouts = ['splitLeft', 'centered', 'textHeavy'];
+      
+      const randT = titles[Math.floor(Math.random() * titles.length)];
+      const randS = subs[Math.floor(Math.random() * subs.length)];
+      const randM = modes[Math.floor(Math.random() * modes.length)];
+      const randL = layouts[Math.floor(Math.random() * layouts.length)];
+      
+      launchCue(randT, randS, randM, randL);
+    }
+
+    /* Output Window for Projector (HDMI Mirror 16:9) */
+    document.getElementById('openOutputBtn').addEventListener('click', () => {
+      if (externalWindow && !externalWindow.closed) {
+        externalWindow.focus();
+        return;
+      }
+      
+      externalWindow = window.open('', 'VJOutputWindowHorizontal', 'width=1920,height=1080,menubar=no,toolbar=no,location=no,status=no');
+      if (!externalWindow) {
+        showToast("Permita pop-ups no navegador para abrir a saída HDMI do projetor!");
+        return;
+      }
+
+      externalWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>PROJETOR HDMI (1920x1080) - CIÊNCIA DELAS 2026.2</title>
+          <style>
+            * { margin:0; padding:0; box-sizing:border-box; background:#000; overflow:hidden; }
+            body, html { width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+            canvas { width:100%; height:100%; object-fit:contain; }
+          </style>
+        </head>
+        <body>
+          <canvas id="outputExtCanvas" width="1920" height="1080"></canvas>
+        </body>
+        </html>
+      `);
+      showToast("Janela HDMI Aberta! Arraste para o projetor e aperte F11.");
+    });
+
+    /* Direct WebM 1080p Recording */
+    const recordBtn = document.getElementById('recordClipBtn');
+    const recordLabel = document.getElementById('recordLabel');
+
+    recordBtn.addEventListener('click', () => {
+      if (!isRecording) {
+        startRecording();
+      } else {
+        stopRecording();
+      }
+    });
+
+    function startRecording() {
+      try {
+        const stream = canvas.captureStream(60);
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp9' });
+      } catch (err) {
+        try {
+          const stream = canvas.captureStream(30);
+          mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+        } catch (e) {
+          showToast("Gravação não suportada no navegador.");
+          return;
+        }
+      }
+
+      recordedChunks = [];
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `ciencia-delas-horizontal-loop-${canvas.width}x${canvas.height}-${Date.now()}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }, 100);
+        showToast("Vídeo Loop 16:9 Exportado!");
+      };
+
+      mediaRecorder.start();
+      isRecording = true;
+      recordBtn.classList.replace('from-rose-600', 'from-emerald-600');
+      recordBtn.classList.replace('to-pink-600', 'to-teal-600');
+      recordLabel.innerText = "PARAR & BAIXAR LOOP";
+      showToast(`Gravando em ${canvas.width}x${canvas.height}...`);
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+        recordBtn.classList.replace('from-emerald-600', 'from-rose-600');
+        recordBtn.classList.replace('to-teal-600', 'to-pink-600');
+        recordLabel.innerText = "EXPORTAR VJ LOOP 16:9 (1080p)";
+      }
+    }
+
+    /* =========================================================
+       MAIN RENDER LOOP (60 FPS 16:9 CANVAS ENGINE)
+       ========================================================= */
+    function render() {
+      requestAnimationFrame(render);
+
+      frameCounter++;
+      const now = performance.now();
+      if (now - fpsTimer >= 1000) {
+        document.getElementById('fpsCounter').innerText = `${frameCounter} FPS`;
+        frameCounter = 0;
+        fpsTimer = now;
+      }
+
+      const delta = (now - lastTime) / 1000;
+      lastTime = now;
+
+      if (!state.isPaused) {
+        const beatsPerSec = state.bpm / 60;
+        globalPhase += delta * beatsPerSec * state.speedMultiplier;
+      }
+
+      const W = canvas.width;  // Default 1920
+      const H = canvas.height; // Default 1080
+
+      // Blackout Emergency Handling
+      if (state.blackout) {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, W, H);
+        syncToExternalWindow();
+        return;
+      }
+
+      // Base Black Canvas
+      ctx.fillStyle = '#030408';
+      ctx.fillRect(0, 0, W, H);
+
+      // Subtle Background Cyber Grid in projection
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0, 243, 255, 0.035)';
+      ctx.lineWidth = 1.5;
+      const gridSize = 120;
+      const gridOffset = (globalPhase * 15) % gridSize;
+      for (let x = gridOffset; x < W; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, H);
+        ctx.stroke();
+      }
+      for (let y = 0; y < H; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Strobe Light Pulse
+      const strobeMod = Math.sin(globalPhase * Math.PI * 4);
+      const isStrobeTriggered = state.strobeIntensity > 0 && (Math.random() < (state.strobeIntensity / 100) * 0.15 || strobeMod > 0.96);
+      if (isStrobeTriggered) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // ==========================================
+      // LAYER 1: LOGO ENGINE (16:9 Widescreen)
+      // ==========================================
+      if (state.logoVisible && logoImg.complete && logoImg.naturalWidth > 0) {
+        ctx.save();
+        ctx.globalAlpha = state.logoOpacity;
+        ctx.globalCompositeOperation = state.logoBlendMode;
+
+        // Relative coordinates adapted to current canvas dimensions
+        let lx = (state.logoPosX / 1920) * W;
+        let ly = (state.logoPosY / 1080) * H;
+        let lScale = state.logoScale * (W / 1920);
+        let lRot = 0;
+        let lRgbOffset = 0;
+
+        const beatFrac = globalPhase % 1;
+        const kickPulse = Math.pow(1 - beatFrac, 3);
+
+        if (state.logoMotion === 'bassPulse') {
+          lScale *= (1 + kickPulse * 0.16);
+        } else if (state.logoMotion === 'floating') {
+          ly += Math.sin(globalPhase * Math.PI) * 25;
+        } else if (state.logoMotion === 'glitchRGB') {
+          if (Math.random() < 0.16) {
+            lx += (Math.random() - 0.5) * 35;
+            lRgbOffset = 18;
+          }
+        } else if (state.logoMotion === 'neonStrobe') {
+          ctx.globalAlpha *= (0.45 + Math.abs(Math.sin(globalPhase * Math.PI * 2)) * 0.55);
+        } else if (state.logoMotion === 'slowSpin') {
+          lRot = (globalPhase * 0.45) % (Math.PI * 2);
+        }
+
+        const drawW = 560 * lScale;
+        const drawH = 560 * lScale;
+
+        ctx.translate(lx, ly);
+        if (lRot !== 0) ctx.rotate(lRot);
+
+        if (lRgbOffset > 0) {
+          ctx.save();
+          ctx.filter = `drop-shadow(${lRgbOffset}px 0px 10px ${state.primaryColor})`;
+          ctx.drawImage(logoImg, -drawW / 2, -drawH / 2, drawW, drawH);
+          ctx.restore();
+          
+          ctx.save();
+          ctx.filter = `drop-shadow(${-lRgbOffset}px 0px 10px ${state.secondaryColor})`;
+          ctx.drawImage(logoImg, -drawW / 2, -drawH / 2, drawW, drawH);
+          ctx.restore();
+        }
+
+        ctx.save();
+        if (state.logoMonoNeon) {
+          ctx.shadowColor = state.primaryColor;
+          ctx.shadowBlur = state.glowIntensity * 0.8;
+        }
+        ctx.drawImage(logoImg, -drawW / 2, -drawH / 2, drawW, drawH);
+        ctx.restore();
+
+        ctx.restore();
+      }
+
+      // ==========================================
+      // LAYER 2: HORIZONTAL KINETIC TEXT ENGINE
+      // ==========================================
+      const scaleFactor = W / 1920;
+      const titleLines = state.text.split('\n').filter(l => l.length > 0);
+      const fontSizePx = state.fontSize * scaleFactor;
+      const subFontSizePx = state.subFontSize * scaleFactor;
+      const lineSpacing = fontSizePx * 1.15;
+      
+      const tX = (state.textPosX / 1920) * W;
+      const tY = (state.textPosY / 1080) * H;
+
+      ctx.save();
+      ctx.textAlign = state.textAlign;
+      ctx.textBaseline = 'middle';
+
+      switch (state.motionMode) {
+        
+        case 'bassPulse': {
+          /* Punchy kick expansion */
+          const frac = globalPhase % 1;
+          const kick = Math.pow(1 - frac, 4);
+          const zoom = 1 + kick * 0.18;
+
+          ctx.save();
+          ctx.translate(tX, tY);
+          ctx.scale(zoom, zoom);
+          renderTextBlock(ctx, titleLines, state.subtext, 0, 0, fontSizePx, subFontSizePx, lineSpacing, state.rgbShift * (1 + kick * 1.6), state.glowIntensity * (1 + kick));
+          ctx.restore();
+          break;
+        }
+
+        case 'strobeGlitch': {
+          /* Cyber glitch jumps */
+          const gx = Math.random() < 0.15 ? (Math.random() - 0.5) * 50 : 0;
+          const gy = Math.random() < 0.08 ? (Math.random() - 0.5) * 20 : 0;
+
+          ctx.save();
+          ctx.translate(tX + gx, tY + gy);
+          renderTextBlock(ctx, titleLines, state.subtext, 0, 0, fontSizePx, subFontSizePx, lineSpacing, state.rgbShift * 2.0, state.glowIntensity);
+          ctx.restore();
+          break;
+        }
+
+        case 'marqueeScroll': {
+          /* Continuous horizontal ticker */
+          const combinedStr = `${state.text.replace(/\n/g, ' • ')}  ★  ${state.subtext}  ★  `;
+          ctx.font = `900 ${fontSizePx}px ${state.fontFamily}`;
+          const textW = ctx.measureText(combinedStr).width;
+          const scrollX = -(globalPhase * 350 * state.speedMultiplier) % textW;
+
+          ctx.save();
+          for (let offset = scrollX; offset < W + textW; offset += textW) {
+            drawWidescreenLine(ctx, combinedStr, offset, tY, fontSizePx, state.rgbShift * 0.7, state.glowIntensity);
+          }
+          ctx.restore();
+          break;
+        }
+
+        case 'cyberGlow': {
+          /* Breathing neon glow */
+          const breathe = (Math.sin(globalPhase * Math.PI) + 1) / 2;
+          const glow = state.glowIntensity * (0.6 + breathe * 0.8);
+
+          ctx.save();
+          ctx.translate(tX, tY);
+          renderTextBlock(ctx, titleLines, state.subtext, 0, 0, fontSizePx, subFontSizePx, lineSpacing, state.rgbShift * 0.5, glow);
+          ctx.restore();
+          break;
+        }
+
+        case 'matrixRain': {
+          /* Digital rain columns in 16:9 background */
+          ctx.save();
+          ctx.font = `${Math.round(20 * scaleFactor)}px monospace`;
+          ctx.fillStyle = 'rgba(0, 255, 136, 0.45)';
+          const chars = '01CIÊNCIA DELAS 2026 CEEP ISAÍAS ALVES BAHIA TECH';
+          for (let i = 0; i < matrixCols; i++) {
+            const char = chars.charAt(Math.floor(Math.random() * chars.length));
+            const x = i * (W / matrixCols);
+            const y = (matrixDrops[i] * 32 * scaleFactor) % H;
+            ctx.fillText(char, x, y);
+            matrixDrops[i] += 0.9 * state.speedMultiplier;
+          }
+          ctx.restore();
+
+          // Foreground Text
+          ctx.save();
+          ctx.translate(tX, tY);
+          renderTextBlock(ctx, titleLines, state.subtext, 0, 0, fontSizePx, subFontSizePx, lineSpacing, state.rgbShift, state.glowIntensity * 1.2);
+          ctx.restore();
+          break;
+        }
+
+        case 'typewriter': {
+          /* Realtime typing with blinking cyber cursor */
+          const fullRaw = state.text;
+          const charCount = fullRaw.length;
+          const progress = (globalPhase * 3 * state.speedMultiplier) % (charCount + 8);
+          const visibleText = fullRaw.substring(0, Math.min(charCount, Math.floor(progress)));
+          const showCursor = Math.floor(globalPhase * 4) % 2 === 0;
+
+          const typedLines = (visibleText + (showCursor ? '_' : '')).split('\n');
+
+          ctx.save();
+          ctx.translate(tX, tY);
+          renderTextBlock(ctx, typedLines, state.subtext, 0, 0, fontSizePx, subFontSizePx, lineSpacing, state.rgbShift * 0.4, state.glowIntensity);
+          ctx.restore();
+          break;
+        }
+      }
+
+      // ==========================================
+      // CRT SCANLINES EFFECT
+      // ==========================================
+      if (state.scanlines) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+        for (let y = 0; y < H; y += 6) {
+          ctx.fillRect(0, y, W, 2);
+        }
+      }
+
+      ctx.restore();
+
+      // Mirror output to external HDMI projector popup
+      syncToExternalWindow();
+    }
+
+    /* Multi-line Title + Subtitle Block Renderer */
+    function renderTextBlock(c, lines, subtitle, originX, originY, fontSz, subFontSz, lineSpacing, shift, glow) {
+      const totalH = (lines.length * lineSpacing) + (subtitle ? subFontSz * 2.2 : 0);
+      let curY = originY - (totalH / 2) + (lineSpacing / 2);
+
+      // Draw Main Title Lines
+      lines.forEach((line) => {
+        drawWidescreenLine(c, line, originX, curY, fontSz, shift, glow);
+        curY += lineSpacing;
+      });
+
+      // Draw Subtitle / Stand metadata if present
+      if (subtitle) {
+        curY += subFontSz * 0.4;
+        c.save();
+        c.font = `700 ${subFontSz}px 'Inter', sans-serif`;
+        c.fillStyle = '#cbd5e1';
+        c.shadowColor = state.primaryColor;
+        c.shadowBlur = glow * 0.4;
+        c.letterSpacing = '3px';
+        c.fillText(subtitle, originX, curY);
+        c.restore();
+      }
+    }
+
+    /* Single line text renderer with RGB chromatic aberration */
+    function drawWidescreenLine(c, text, x, y, size, shift, glow) {
+      c.save();
+      c.font = `900 ${size}px ${state.fontFamily}`;
+
+      // Channel 1: Secondary Aberration (Pink / Red)
+      if (shift > 0) {
+        c.save();
+        c.fillStyle = state.secondaryColor;
+        c.strokeStyle = state.secondaryColor;
+        c.lineWidth = 4;
+        c.globalCompositeOperation = 'screen';
+        renderTextMode(c, text, x - shift, y);
+        c.restore();
+
+        // Channel 2: Primary Aberration (Cyan)
+        c.save();
+        c.fillStyle = state.primaryColor;
+        c.strokeStyle = state.primaryColor;
+        c.lineWidth = 4;
+        c.globalCompositeOperation = 'screen';
+        renderTextMode(c, text, x + shift, y);
+        c.restore();
+      }
+
+      // Channel 3: Foreground Bright White Core with Bloom
+      c.save();
+      c.shadowColor = state.primaryColor;
+      c.shadowBlur = glow;
+      c.fillStyle = '#ffffff';
+      c.strokeStyle = '#ffffff';
+      c.lineWidth = 5;
+      renderTextMode(c, text, x, y);
+      c.restore();
+
+      c.restore();
+    }
+
+    function renderTextMode(c, text, x, y) {
+      if (state.renderFillMode === 'fill') {
+        c.fillText(text, x, y);
+      } else if (state.renderFillMode === 'stroke') {
+        c.strokeText(text, x, y);
+      } else if (state.renderFillMode === 'both') {
+        c.fillText(text, x, y);
+        c.strokeText(text, x, y);
+      } else if (state.renderFillMode === 'wireframe') {
+        c.strokeText(text, x, y);
+        c.save();
+        c.setLineDash([10, 10]);
+        c.lineWidth = 2;
+        c.strokeText(text, x, y);
+        c.restore();
+      }
+    }
+
+    /* Sync to external projector popup window */
+    function syncToExternalWindow() {
+      if (externalWindow && !externalWindow.closed) {
+        const extCanvas = externalWindow.document.getElementById('outputExtCanvas');
+        if (extCanvas) {
+          if (extCanvas.width !== canvas.width || extCanvas.height !== canvas.height) {
+            extCanvas.width = canvas.width;
+            extCanvas.height = canvas.height;
+          }
+          const extCtx = extCanvas.getContext('2d');
+          extCtx.drawImage(canvas, 0, 0);
+        }
+      }
+    }
+
+    window.onload = () => {
+      render();
+    };
+  </script>
+</body>
+</html>
