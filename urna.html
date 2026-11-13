@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simulador da Urna Eletrônica - Justiça Eleitoral</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos customizados para fidelidade visual e responsividade tátil */
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            background: radial-gradient(circle at center, #334155 0%, #0f172a 100%);
+        }
+
+        /* Efeito 3D realista para as teclas numéricas pretas da urna */
+        .key-num {
+            background: linear-gradient(145deg, #2e3238, #1a1c20);
+            box-shadow: 0 5px 0 #090a0c, 0 7px 12px rgba(0,0,0,0.45), inset 0 1px 1px rgba(255,255,255,0.15);
+            transition: transform 0.06s ease, box-shadow 0.06s ease;
+            touch-action: manipulation;
+        }
+        .key-num:active, .key-num.pressed {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #090a0c, 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1);
+        }
+
+        /* Efeito 3D para as teclas de ação (Branco, Corrige, Confirma) */
+        .key-action {
+            transition: transform 0.06s ease, box-shadow 0.06s ease;
+            touch-action: manipulation;
+        }
+        .key-branco {
+            background: linear-gradient(145deg, #ffffff, #e2e8f0);
+            box-shadow: 0 5px 0 #94a3b8, 0 7px 12px rgba(0,0,0,0.3), inset 0 1px 2px #ffffff;
+        }
+        .key-branco:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #94a3b8, 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .key-corrige {
+            background: linear-gradient(145deg, #ff7024, #e0530c);
+            box-shadow: 0 5px 0 #9a3404, 0 7px 12px rgba(0,0,0,0.35), inset 0 1px 2px rgba(255,255,255,0.35);
+        }
+        .key-corrige:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #9a3404, 0 2px 4px rgba(0,0,0,0.35);
+        }
+
+        .key-confirma {
+            background: linear-gradient(145deg, #16a34a, #15803d);
+            box-shadow: 0 6px 0 #052e16, 0 8px 14px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.35);
+        }
+        .key-confirma:active {
+            transform: translateY(5px);
+            box-shadow: 0 1px 0 #052e16, 0 2px 4px rgba(0,0,0,0.4);
+        }
+
+        /* Animação de piscar da caixa de dígito ativa */
+        @keyframes blinkBox {
+            0%, 49% { border-color: #000000; background-color: rgba(255, 255, 255, 0.9); }
+            50%, 100% { border-color: #9ca3af; background-color: transparent; }
+        }
+        .digit-active {
+            animation: blinkBox 0.9s infinite;
+        }
+
+        /* Animação da mensagem de VOTO EM BRANCO / NULO piscando */
+        @keyframes blinkText {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0.15; }
+        }
+        .blink-slow {
+            animation: blinkText 1.2s infinite;
+        }
+
+        /* Textura sutil de plástico da carcaça da urna */
+        .urna-body {
+            background: linear-gradient(180deg, #e7e5df 0%, #d5d2c8 100%);
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                inset 0 2px 4px rgba(255, 255, 255, 0.8),
+                inset 0 -6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Moldura afundada da tela LCD */
+        .lcd-bezel {
+            background: #b8b4a8;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.45), 0 1px 2px rgba(255,255,255,0.7);
+        }
+
+        /* Tela LCD em si */
+        .lcd-screen {
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        /* Pontilhado em Braille nas teclas numéricas */
+        .braille-dots {
+            letter-spacing: 2px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.35);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-center items-center p-2 sm:p-4 md:p-6 overflow-x-hidden">
+
+    <!-- CORPO PRINCIPAL DA URNA ELETRÔNICA (SEM CABEÇALHO PARA IMERSÃO TOTAL NO TABLET) -->
+    <main class="flex-1 flex items-center justify-center w-full my-auto">
+        <div class="urna-body w-full max-w-6xl rounded-3xl p-3 sm:p-6 md:p-8 border-4 border-stone-300 flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-8 items-stretch">
+            
+            <!-- ESQUERDA: MONITOR LCD DA URNA -->
+            <div class="lcd-bezel flex-1 rounded-2xl p-3 sm:p-4 flex flex-col justify-between min-h-[370px] sm:min-h-[440px] lg:min-h-[490px]">
+                <div id="lcd-screen" class="lcd-screen w-full h-full rounded-lg border-2 border-stone-500 flex flex-col justify-between relative overflow-hidden text-black select-none">
+                    
+                    <!-- CONTEÚDO DINÂMICO RENDERIZADO VIA JAVASCRIPT -->
+
+                </div>
+            </div>
+
+            <!-- DIREITA: PAINEL DO TECLADO FÍSICO DA URNA -->
+            <div class="w-full lg:w-[370px] xl:w-[400px] flex flex-col justify-between gap-3 sm:gap-4 shrink-0">
+                
+                <!-- Cabeçalho "JUSTIÇA ELEITORAL" com Brasão (Gatilho Secreto para o Painel Admin) -->
+                <div onclick="handleSecretAdminTrigger()" title="" class="bg-[#ebe9e4] rounded-xl p-3 border-2 border-stone-400 shadow-inner flex items-center justify-center gap-4 cursor-default active:scale-[0.99] transition">
+                    <!-- Brasão da República Estilizado em SVG -->
+                    <svg class="w-11 h-11 text-stone-700 shrink-0" viewBox="0 0 64 64" fill="none">
+                        <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2" stroke-dasharray="3 2"/>
+                        <path d="M32 6L37 21L52 16L42 29L56 38L40 41L44 56L32 46L20 56L24 41L8 38L22 29L12 16L27 21L32 6Z" fill="#d6d3cb" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <circle cx="32" cy="32" r="10" fill="#ebe9e4" stroke="currentColor" stroke-width="2"/>
+                        <path d="M24 32C27 29 37 29 40 32" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="32" cy="27" r="1.5" fill="currentColor"/>
+                        <circle cx="29" cy="35" r="1.5" fill="currentColor"/>
+                        <circle cx="35" cy="35" r="1.5" fill="currentColor"/>
+                    </svg>
+                    <div class="text-center">
+                        <div class="text-stone-800 font-black tracking-wider text-base sm:text-lg leading-none">JUSTIÇA</div>
+                        <div class="text-stone-800 font-black tracking-wider text-base sm:text-lg leading-tight">ELEITORAL</div>
+                    </div>
+                </div>
+
+                <!-- Painel Cinza Escuro das Teclas -->
+                <div class="bg-[#24272c] rounded-2xl p-4 sm:p-5 border-4 border-stone-400 shadow-inner flex flex-col justify-between flex-1 gap-4">
+                    
+                    <!-- Teclado Numérico 1 a 0 -->
+                    <div class="grid grid-cols-3 gap-2.5 sm:gap-3.5 max-w-[290px] mx-auto w-full">
+                        <button onclick="pressNumber('1')" data-key="1" class="key-num h-12 sm:h-14 rounded-lg text-white font-bold text-xl sm:text-2xl flex flex-col items-start justify-center px-3.5 relative">
+                            <span>1</span>
+                            <span class="braille-dots absolute right-2 bottom-1">⠁</span>
+                        </button>
+                        <button onclick="pressNumber('2')" data-key="2" class="key-num h-12 sm:h-14 rounded-lg text-white font-bold text-xl sm:text-2xl flex flex-col items-start justify-center px-3.5 relative">
+                            <span>2</span>
+                            <span class="braille-dots absolute right-2 bottom-1">⠃</span>
+                        </button>
+                        <button onclick="pressNumber('3')" data-key="3" class="key-num h-12 sm:h-14 rounded-lg text-white font-bold text-xl sm:text-2xl flex flex-col items-start justify-center px-3.5 relative">
+                            <span>3</span>
+                            <span class="braille-dots absolute right-2 bottom-1">⠉</span>
+                        </button>
+
+                        <button onclick="pressNumber('4')" data-key="4" class="key-num h-12 sm:h-14 rounded-lg text-white font-bold text-xl sm:text-2xl flex flex-col items-start justify-center px-3.5 relative">
+                            <span>4</span>
+                            <span class="braille-dots absolute right-2 bottom-1">⠙</span>
+                        </button>
+                        <button onclick="pressNumber('5')" data-key="5" class="key-num h-12 sm:h-14 rounded-lg text-white font-bold text-xl sm:text-2xl flex flex-col items-start justify-center px-3.5 relative">
+                            <span>5</span>
+                            <span class="braille-dots absolute right-2 bottom-1">⠑</span>
+                        </button>
+                        <button onclick="pressNumber('6')" data-key="6" class="key-num h-12 sm:h-14 rounded-lg text-white font-bold text-xl sm:text-2xl flex flex-col items-start justify-center px-3.5 relative">
+                            <span>6</span>
+                            <span class="braille-dots absolute right-2 bottom-1">⠋</span>
+                        </button>
+
+                        <button onclick="pressNumber('7')" data-key="7" class="key-num h-12 sm:h-14 rounded-lg text-white font-bold text-xl sm:text-2xl flex flex-col items-start justify-center px-3.5 relative">
+                            <span>7</span>
+                            <span class="braille-dots absolute right-2 bottom-1">⠛</span>
+                        </button>
+                        <button onclick="pressNumber('8')" data-key="8" class="key-num h-12 sm:h-14 rounded-lg text-white font-bold text-xl sm:text-2xl flex flex-col items-start justify-center px-3.5 relative">
+                            <span>8</span>
+                            <span class="braille-dots absolute right-2 bottom-1">⠓</span>
+                        </button>
+                        <button onclick="pressNumber('9')" data-key="9" class="key-num h-12 sm:h-14 rounded-lg text-white font-bold text-xl sm:text-2xl flex flex-col items-start justify-center px-3.5 relative">
+                            <span>9</span>
+                            <span class="braille-dots absolute right-2 bottom-1">⠊</span>
+                        </button>
+
+                        <div></div>
+                        <button onclick="pressNumber('0')" data-key="0" class="key-num h-12 sm:h-14 rounded-lg text-white font-bold text-xl sm:text-2xl flex flex-col items-start justify-center px-3.5 relative">
+                            <span>0</span>
+                            <span class="braille-dots absolute right-2 bottom-1">⠚</span>
+                        </button>
+                        <div></div>
+                    </div>
+
+                    <!-- Teclas de Ação: BRANCO, CORRIGE, CONFIRMA -->
+                    <div class="grid grid-cols-3 gap-2 sm:gap-3 items-end pt-2">
+                        <button onclick="pressBranco()" class="key-action key-branco h-12 sm:h-14 rounded-lg text-slate-900 font-black text-xs sm:text-sm tracking-tight flex items-center justify-center uppercase px-1">
+                            BRANCO
+                        </button>
+                        <button onclick="pressCorrige()" class="key-action key-corrige h-12 sm:h-14 rounded-lg text-slate-950 font-black text-xs sm:text-sm tracking-tight flex items-center justify-center uppercase px-1">
+                            CORRIGE
+                        </button>
+                        <button onclick="pressConfirma()" class="key-action key-confirma h-14 sm:h-16 rounded-lg text-slate-950 font-black text-xs sm:text-sm tracking-tight flex items-center justify-center uppercase px-1">
+                            CONFIRMA
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ==========================================
+         MODAL 1: COLINHA DE CANDIDATOS PARA O ELEITOR
+         ========================================== -->
+    <div id="modal-cola" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+            <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-amber-400">Colinha Eleitoral - Candidatos Cadastrados</h2>
+                    <p class="text-xs text-slate-300">Clique em qualquer candidato para preencher os números automaticamente ou digite no teclado.</p>
+                </div>
+                <button onclick="closeColaModal()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="cola-content" class="p-5 overflow-y-auto space-y-5 flex-1 bg-slate-50">
+                <!-- Preenchido via JS -->
+            </div>
+            <div class="px-6 py-3 bg-slate-100 border-t border-slate-200 flex justify-end">
+                <button onclick="closeColaModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold rounded-lg">Fechar Colinha</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL 2: AUTENTICAÇÃO POR SENHA (ADMIN)
+         ========================================== -->
+    <div id="modal-password" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Acesso do Mesário / Admin</h3>
+                        <p class="text-xs text-slate-500">Digite a senha para configurar candidatos e ver votos</p>
+                    </div>
+                </div>
+                <button onclick="closePasswordModal()" class="text-slate-400 hover:text-slate-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <form onsubmit="verifyAdminPassword(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Senha de Acesso</label>
+                    <input type="password" id="admin-pass-input" inputmode="numeric" placeholder="Padrão: 1234" class="w-full px-4 py-3 text-center text-2xl tracking-widest font-bold border-2 border-slate-300 rounded-xl focus:border-indigo-600 focus:outline-none">
+                    <p id="admin-pass-error" class="text-xs text-red-600 font-semibold mt-1.5 hidden">Senha incorreta! Tente novamente (Padrão: 1234).</p>
+                </div>
+
+                <!-- Mini teclado para facilitar digitação no tablet -->
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <button type="button" onclick="appendPin('1')" class="py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg font-bold text-slate-800">1</button>
+                    <button type="button" onclick="appendPin('2')" class="py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg font-bold text-slate-800">2</button>
+                    <button type="button" onclick="appendPin('3')" class="py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg font-bold text-slate-800">3</button>
+                    <button type="button" onclick="appendPin('4')" class="py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg font-bold text-slate-800">4</button>
+                    <button type="button" onclick="appendPin('5')" class="py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg font-bold text-slate-800">5</button>
+                    <button type="button" onclick="appendPin('6')" class="py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg font-bold text-slate-800">6</button>
+                    <button type="button" onclick="appendPin('7')" class="py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg font-bold text-slate-800">7</button>
+                    <button type="button" onclick="appendPin('8')" class="py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg font-bold text-slate-800">8</button>
+                    <button type="button" onclick="appendPin('9')" class="py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg font-bold text-slate-800">9</button>
+                    <button type="button" onclick="clearPin()" class="py-2.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg font-semibold text-xs">Limpar</button>
+                    <button type="button" onclick="appendPin('0')" class="py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg font-bold text-slate-800">0</button>
+                    <button type="submit" class="py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-sm">Entrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL 3: PAINEL ADMINISTRATIVO E CONFIGURAÇÃO
+         ========================================== -->
+    <div id="modal-admin" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden items-center justify-center p-2 sm:p-4">
+        <div class="bg-white rounded-2xl max-w-5xl w-full h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-300">
+            
+            <!-- Cabeçalho Admin -->
+            <div class="px-5 py-4 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-indigo-500 flex items-center justify-center font-bold">
+                        ⚙️
+                    </div>
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold">Configuração da Urna & Boletim de Urna</h2>
+                        <p class="text-xs text-slate-400">Adicione ou edite candidatos, números, avatares, senha e acompanhe a apuração</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="testAudioConfirmation()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1">
+                        🔊 Testar Som "Pirilim"
+                    </button>
+                    <button onclick="closeAdminModal()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs font-bold">
+                        Voltar à Urna
+                    </button>
+                </div>
+            </div>
+
+            <!-- Abas de Navegação do Admin -->
+            <div class="flex border-b border-slate-200 bg-slate-100 px-5 pt-2 gap-2 overflow-x-auto">
+                <button onclick="switchAdminTab('candidates')" id="tab-btn-candidates" class="px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-lg bg-white text-indigo-700 border-t border-x border-slate-200">
+                    👤 Candidatos (Presidente e Vice)
+                </button>
+                <button onclick="switchAdminTab('audio')" id="tab-btn-audio" class="px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-lg text-slate-600 hover:text-slate-900">
+                    🔊 Áudio Original (Upload)
+                </button>
+                <button onclick="switchAdminTab('results')" id="tab-btn-results" class="px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-lg text-slate-600 hover:text-slate-900">
+                    📊 Boletim de Urna (Apuração)
+                </button>
+                <button onclick="switchAdminTab('security')" id="tab-btn-security" class="px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-lg text-slate-600 hover:text-slate-900">
+                    🔒 Senha e Sistema
+                </button>
+            </div>
+
+            <!-- Conteúdo das Abas -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50">
+                
+                <!-- ABA 1: CANDIDATOS E NÚMEROS -->
+                <div id="admin-tab-candidates" class="space-y-6">
+                    <!-- Cabeçalho de Cargo Único (Presidente) + Botão Novo Candidato -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <span class="px-3 py-1.5 bg-indigo-100 text-indigo-900 rounded-lg text-xs sm:text-sm font-black uppercase">
+                                Cargo Único: PRESIDENTE (2 Dígitos) + VICE-PRESIDENTE
+                            </span>
+                            <select id="admin-role-filter" onchange="renderAdminCandidates()" class="hidden">
+                                <option value="presidente">PRESIDENTE</option>
+                            </select>
+                        </div>
+                        <button onclick="openCandidateForm()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-lg shadow flex items-center gap-1.5">
+                            <span>+ Adicionar Candidato a Presidente</span>
+                        </button>
+                    </div>
+
+                    <!-- Formulário de Adição / Edição de Candidato (Oculto por padrão) -->
+                    <div id="candidate-form-card" class="hidden bg-indigo-50/70 border-2 border-indigo-200 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-indigo-200 pb-3">
+                            <h3 id="candidate-form-title" class="text-base font-bold text-indigo-950">Cadastrar Chapa Presidencial</h3>
+                            <button onclick="closeCandidateForm()" class="text-xs font-bold text-slate-500 hover:text-slate-800">Cancelar</button>
+                        </div>
+
+                        <form onsubmit="saveCandidateForm(event)" class="space-y-4">
+                            <input type="hidden" id="form-cand-original-number" value="">
+                            <select id="form-cand-role" class="hidden"><option value="presidente">PRESIDENTE</option></select>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Número (<span id="form-digits-hint">2</span> dígitos)</label>
+                                    <input type="text" id="form-cand-number" required maxlength="2" inputmode="numeric" pattern="[0-9]*" placeholder="Ex: 91" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-bold tracking-wider">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Nome do Presidente</label>
+                                    <input type="text" id="form-cand-name" required placeholder="Ex: Prof. Carlos" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-semibold">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Partido / Sigla</label>
+                                    <input type="text" id="form-cand-party" required placeholder="Ex: PEdu - Partido da Educação" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Seleção de Avatar Principal -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-2">Escolha o Avatar do Candidato a Presidente</label>
+                                <div id="avatar-picker-main" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-12 gap-2">
+                                    <!-- Gerado via JS -->
+                                </div>
+                            </div>
+
+                            <!-- Campos de Vice-Presidente (Obrigatório para aparecer na tela da urna) -->
+                            <div id="form-vice-section" class="pt-3 border-t border-indigo-200 space-y-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-1">Nome do Vice-Presidente</label>
+                                        <input type="text" id="form-cand-vice" required placeholder="Ex: Dra. Helena" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-semibold">
+                                    </div>
+                                    <div class="hidden">
+                                        <input type="text" id="form-cand-sup2">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-2">Escolha o Avatar do Vice-Presidente</label>
+                                    <div id="avatar-picker-vice" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-12 gap-2">
+                                        <!-- Gerado via JS -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="form-cand-feedback" class="text-xs font-bold text-red-600 hidden"></div>
+
+                            <div class="flex justify-end gap-2 pt-2">
+                                <button type="button" onclick="closeCandidateForm()" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-semibold rounded-lg">Cancelar</button>
+                                <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-lg shadow">Salvar Chapa</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Lista de Candidatos do Cargo Selecionado -->
+                    <div id="admin-candidates-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Preenchido via JS -->
+                    </div>
+                </div>
+
+                <!-- ABA 2: UPLOAD DE ÁUDIO ORIGINAL DA URNA -->
+                <div id="admin-tab-audio" class="hidden space-y-5">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">Upload do Efeito Sonoro Original da Urna</h3>
+                            <p class="text-xs text-slate-500 mt-1">
+                                Por padrão, o simulador possui um sintetizador interno de alta precisão, mas você pode enviar o arquivo de áudio original da urna (<strong>.mp3, .wav, .ogg</strong>) abaixo. O arquivo fica salvo na memória do seu navegador/tablet.
+                            </p>
+                        </div>
+
+                        <!-- Upload Som de Confirmação (FIM / Pirilim) -->
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-900">1. Som de Confirmação ("Pirilim" / FIM)</h4>
+                                    <p id="confirm-audio-status" class="text-xs font-semibold text-slate-500">Usando sintetizador interno padrão</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" onclick="testAudioConfirmation()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg">
+                                        ▶️ Ouvir Trecho Atual
+                                    </button>
+                                    <button type="button" onclick="removeCustomAudio('confirm')" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-lg">
+                                        Restaurar Sintetizador
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="file" id="upload-confirm-sound" accept="audio/*" onchange="handleAudioUpload(event, 'confirm')" class="block w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
+
+                            <!-- Recorte de Trecho em Segundos (Confirmação) -->
+                            <div class="pt-2 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Início do trecho (segundos)</label>
+                                    <input type="number" id="confirm-start-sec" step="0.1" min="0" placeholder="0" oninput="updateAudioTrimSettings('confirm')" onchange="updateAudioTrimSettings('confirm')" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Fim do trecho (segundos - 0 = até o fim)</label>
+                                    <input type="number" id="confirm-end-sec" step="0.1" min="0" placeholder="0 (até o fim)" oninput="updateAudioTrimSettings('confirm')" onchange="updateAudioTrimSettings('confirm')" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800">
+                                </div>
+                                <div class="text-[11px] text-slate-500 leading-tight pb-1">
+                                    Duração total detectada: <strong id="confirm-total-duration" class="text-slate-800">--</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload Bipe das Teclas (Opcional) -->
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-900">2. Som de Bipe ao Apertar Teclas (Opcional)</h4>
+                                    <p id="beep-audio-status" class="text-xs font-semibold text-slate-500">Usando sintetizador interno padrão</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" onclick="playKeyBeep()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded-lg">
+                                        ▶️ Ouvir Trecho do Bipe
+                                    </button>
+                                    <button type="button" onclick="removeCustomAudio('beep')" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-lg">
+                                        Restaurar Sintetizador
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="file" id="upload-beep-sound" accept="audio/*" onchange="handleAudioUpload(event, 'beep')" class="block w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
+
+                            <!-- Recorte de Trecho em Segundos (Bipe) -->
+                            <div class="pt-2 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Início do trecho (segundos)</label>
+                                    <input type="number" id="beep-start-sec" step="0.05" min="0" placeholder="0" oninput="updateAudioTrimSettings('beep')" onchange="updateAudioTrimSettings('beep')" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Fim do trecho (segundos - 0 = até o fim)</label>
+                                    <input type="number" id="beep-end-sec" step="0.05" min="0" placeholder="0 (até o fim)" oninput="updateAudioTrimSettings('beep')" onchange="updateAudioTrimSettings('beep')" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800">
+                                </div>
+                                <div class="text-[11px] text-slate-500 leading-tight pb-1">
+                                    Duração total detectada: <strong id="beep-total-duration" class="text-slate-800">--</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA 3: BOLETIM DE URNA (APURAÇÃO DE VOTOS) -->
+                <div id="admin-tab-results" class="hidden space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">Boletim de Urna - Totalização de Votos</h3>
+                            <p class="text-xs text-slate-500">Todos os votos confirmados na urna são contabilizados abaixo.</p>
+                        </div>
+                        <button onclick="clearVotesTotal()" class="px-3 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-lg shadow">
+                            🗑️ Zerar Urna (Limpar Votos)
+                        </button>
+                    </div>
+                    <div id="admin-results-container" class="space-y-4">
+                        <!-- Gerado via JS -->
+                    </div>
+                </div>
+
+                <!-- ABA 4: SENHA E SISTEMA -->
+                <div id="admin-tab-security" class="hidden space-y-6">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm max-w-md space-y-4">
+                        <h3 class="text-base font-bold text-slate-900">Alterar Senha do Painel</h3>
+                        <p class="text-xs text-slate-500">Defina uma nova senha para proteger a configuração dos candidatos e a zerésima da urna.</p>
+                        <form onsubmit="changeAdminPassword(event)" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Nova Senha</label>
+                                <input type="text" id="new-admin-pass" required placeholder="Ex: 2026" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold">
+                            </div>
+                            <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg">Salvar Nova Senha</button>
+                            <p id="pass-saved-msg" class="text-xs font-bold text-emerald-600 hidden">Senha atualizada com sucesso!</p>
+                        </form>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm max-w-md space-y-3">
+                        <h3 class="text-base font-bold text-slate-900">Acesso Oculto ao Painel</h3>
+                        <p class="text-xs text-slate-500">
+                            Para manter a aparência idêntica à urna real sem botões aparentes na tela, o painel de configuração abre ao <strong>tocar/clicar no Brasão da Justiça Eleitoral</strong> (acima do teclado da urna) ou pressionando a tecla <strong>F2</strong> no teclado físico.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm max-w-md space-y-3">
+                        <h3 class="text-base font-bold text-slate-900">Restaurar Candidatos de Fábrica</h3>
+                        <p class="text-xs text-slate-500">Caso queira voltar para todos os candidatos originais do simulador do TSE e limpar edições personalizadas.</p>
+                        <button onclick="restoreFactoryDefaults()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-lg">
+                            Restaurar Padrão do Simulador TSE
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================================================
+           1. GERADOR DE ÁUDIO REALISTA DA URNA + SUPORTE A UPLOAD DO SOM ORIGINAL
+           Sintetiza com precisão o timbre da urna ou reproduz o arquivo de áudio
+           original enviado pelo administrador no painel (com recorte exato em segundos).
+           ========================================================================= */
+        let audioCtx = null;
+        let customConfirmAudioBuffer = null;
+        let customBeepAudioBuffer = null;
+        let activeConfirmSource = null;
+        let activeBeepSource = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        // Converte DataURL base64 em ArrayBuffer para decodificação precisa via Web Audio API
+        function dataUrlToArrayBuffer(dataUrl) {
+            const base64 = dataUrl.split(',')[1];
+            const binaryString = window.atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        async function decodeCustomAudio(dataUrl, type) {
+            const durConfirmEl = document.getElementById('confirm-total-duration');
+            const durBeepEl = document.getElementById('beep-total-duration');
+            try {
+                const ctx = getAudioContext();
+                const arrayBuffer = dataUrlToArrayBuffer(dataUrl);
+                const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+                if (type === 'confirm') {
+                    customConfirmAudioBuffer = audioBuffer;
+                    if (durConfirmEl) durConfirmEl.textContent = audioBuffer.duration.toFixed(2) + 's';
+                } else {
+                    customBeepAudioBuffer = audioBuffer;
+                    if (durBeepEl) durBeepEl.textContent = audioBuffer.duration.toFixed(2) + 's';
+                }
+            } catch (err) {
+                console.error('Erro ao decodificar áudio:', err);
+            }
+        }
+
+        function syncCustomAudioObjects() {
+            const durConfirmEl = document.getElementById('confirm-total-duration');
+            const durBeepEl = document.getElementById('beep-total-duration');
+
+            if (appState.customConfirmAudio) {
+                decodeCustomAudio(appState.customConfirmAudio, 'confirm');
+            } else {
+                customConfirmAudioBuffer = null;
+                if (durConfirmEl) durConfirmEl.textContent = '--';
+            }
+
+            if (appState.customBeepAudio) {
+                decodeCustomAudio(appState.customBeepAudio, 'beep');
+            } else {
+                customBeepAudioBuffer = null;
+                if (durBeepEl) durBeepEl.textContent = '--';
+            }
+
+            const cStartInput = document.getElementById('confirm-start-sec');
+            const cEndInput = document.getElementById('confirm-end-sec');
+            if (cStartInput) cStartInput.value = appState.confirmAudioStart || 0;
+            if (cEndInput) cEndInput.value = appState.confirmAudioEnd || 0;
+
+            const bStartInput = document.getElementById('beep-start-sec');
+            const bEndInput = document.getElementById('beep-end-sec');
+            if (bStartInput) bStartInput.value = appState.beepAudioStart || 0;
+            if (bEndInput) bEndInput.value = appState.beepAudioEnd || 0;
+
+            updateAudioStatusLabels();
+        }
+
+        function parseInputSec(inputId, fallbackVal) {
+            const el = document.getElementById(inputId);
+            if (!el) return fallbackVal || 0;
+            const raw = String(el.value).replace(',', '.');
+            const val = parseFloat(raw);
+            return isNaN(val) ? 0 : Math.max(0, val);
+        }
+
+        function updateAudioTrimSettings(type) {
+            if (type === 'confirm') {
+                appState.confirmAudioStart = parseInputSec('confirm-start-sec', appState.confirmAudioStart);
+                appState.confirmAudioEnd = parseInputSec('confirm-end-sec', appState.confirmAudioEnd);
+            } else {
+                appState.beepAudioStart = parseInputSec('beep-start-sec', appState.beepAudioStart);
+                appState.beepAudioEnd = parseInputSec('beep-end-sec', appState.beepAudioEnd);
+            }
+            saveState();
+            updateAudioStatusLabels();
+        }
+
+        // Reproduz o AudioBuffer recortando exatamente do segundo inicial ao segundo final
+        function playSlicedAudioBuffer(buffer, startSec, endSec, type) {
+            if (!buffer) return false;
+            try {
+                const ctx = getAudioContext();
+
+                if (type === 'confirm' && activeConfirmSource) {
+                    try { activeConfirmSource.stop(); } catch (e) {}
+                    activeConfirmSource = null;
+                }
+                if (type === 'beep' && activeBeepSource) {
+                    try { activeBeepSource.stop(); } catch (e) {}
+                    activeBeepSource = null;
+                }
+
+                const totalDuration = buffer.duration;
+                const safeStart = Math.min(Math.max(0, Number(startSec) || 0), Math.max(0, totalDuration - 0.01));
+                const rawEnd = Number(endSec) || 0;
+
+                // Se fim > início, calcula a duração exata do trecho; caso contrário toca até o final do buffer
+                let sliceDuration = totalDuration - safeStart;
+                if (rawEnd > safeStart && rawEnd <= totalDuration) {
+                    sliceDuration = rawEnd - safeStart;
+                }
+
+                const source = ctx.createBufferSource();
+                source.buffer = buffer;
+                source.connect(ctx.destination);
+                source.start(0, safeStart, sliceDuration);
+
+                if (type === 'confirm') activeConfirmSource = source;
+                else activeBeepSource = source;
+
+                return true;
+            } catch (err) {
+                console.error('Erro ao reproduzir trecho:', err);
+                return false;
+            }
+        }
+
+        function updateAudioStatusLabels() {
+            const confirmStatus = document.getElementById('confirm-audio-status');
+            const beepStatus = document.getElementById('beep-audio-status');
+            if (confirmStatus) {
+                const start = appState.confirmAudioStart || 0;
+                const end = appState.confirmAudioEnd || 0;
+                const rangeInfo = (start > 0 || end > 0)
+                    ? ` (Trecho ativo: ${start}s até ${end > start ? end + 's' : 'o fim'})`
+                    : ' (Áudio completo)';
+                confirmStatus.textContent = appState.customConfirmAudio
+                    ? `✅ Áudio original carregado!${rangeInfo}`
+                    : 'Usando sintetizador interno da Urna TSE';
+                confirmStatus.className = appState.customConfirmAudio
+                    ? 'text-xs font-bold text-emerald-600'
+                    : 'text-xs font-semibold text-slate-500';
+            }
+            if (beepStatus) {
+                const start = appState.beepAudioStart || 0;
+                const end = appState.beepAudioEnd || 0;
+                const rangeInfo = (start > 0 || end > 0)
+                    ? ` (Trecho ativo: ${start}s até ${end > start ? end + 's' : 'o fim'})`
+                    : ' (Áudio completo)';
+                beepStatus.textContent = appState.customBeepAudio
+                    ? `✅ Bipe personalizado carregado!${rangeInfo}`
+                    : 'Usando sintetizador interno da Urna TSE';
+                beepStatus.className = appState.customBeepAudio
+                    ? 'text-xs font-bold text-emerald-600'
+                    : 'text-xs font-semibold text-slate-500';
+            }
+        }
+
+        function handleAudioUpload(event, type) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const dataUrl = e.target.result;
+                if (type === 'confirm') {
+                    appState.customConfirmAudio = dataUrl;
+                } else {
+                    appState.customBeepAudio = dataUrl;
+                }
+                saveState();
+                await decodeCustomAudio(dataUrl, type);
+                updateAudioStatusLabels();
+                if (type === 'confirm') {
+                    playUrnaConfirmSound(true);
+                } else {
+                    playKeyBeep();
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeCustomAudio(type) {
+            if (type === 'confirm') {
+                appState.customConfirmAudio = null;
+                appState.confirmAudioStart = 0;
+                appState.confirmAudioEnd = 0;
+                customConfirmAudioBuffer = null;
+                const input = document.getElementById('upload-confirm-sound');
+                if (input) input.value = '';
+            } else {
+                appState.customBeepAudio = null;
+                appState.beepAudioStart = 0;
+                appState.beepAudioEnd = 0;
+                customBeepAudioBuffer = null;
+                const input = document.getElementById('upload-beep-sound');
+                if (input) input.value = '';
+            }
+            saveState();
+            syncCustomAudioObjects();
+        }
+
+        // Bipe curto ao pressionar números, Branco ou Corrige
+        function playKeyBeep() {
+            updateAudioTrimSettings('beep');
+            if (customBeepAudioBuffer) {
+                const played = playSlicedAudioBuffer(
+                    customBeepAudioBuffer,
+                    appState.beepAudioStart,
+                    appState.beepAudioEnd,
+                    'beep'
+                );
+                if (played) return;
+            }
+
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                // Tom exato do bipe de tecla da urna (~1980 Hz)
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1980, now);
+
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.07);
+            } catch (e) {}
+        }
+
+        // Efeito sonoro de confirmação da Urna Eletrônica ("Pirilim")
+        // Se o usuário fez upload do arquivo original da urna, reproduz exatamente o trecho em segundos configurado.
+        // Caso contrário, usa a síntese exata das duas notas alternadas (D#6 ~1244.5Hz e F#6 ~1480Hz) com envelope de onda real.
+        function playUrnaConfirmSound(isFinalFim = true) {
+            updateAudioTrimSettings('confirm');
+            if (customConfirmAudioBuffer) {
+                const played = playSlicedAudioBuffer(
+                    customConfirmAudioBuffer,
+                    appState.confirmAudioStart,
+                    appState.confirmAudioEnd,
+                    'confirm'
+                );
+                if (played) return;
+            }
+
+            try {
+                const ctx = getAudioContext();
+                const startTime = ctx.currentTime + 0.015;
+
+                // Frequências reais medidas do áudio oficial da Urna Eletrônica do TSE:
+                // Alternância rápida entre ~1244.5 Hz (D#6) e ~1480 Hz (F#6) a cada 55ms,
+                // encerrando com a sustentação aguda característica em ~1480 Hz.
+                const freqLow  = 1244.5;
+                const freqHigh = 1480.0;
+                const stepDuration = 0.055;
+                const numPulses = isFinalFim ? 18 : 12;
+                const tailDuration = isFinalFim ? 0.65 : 0.40;
+
+                const oscMain = ctx.createOscillator();
+                const oscSub = ctx.createOscillator();
+                const filter = ctx.createBiquadFilter();
+                const masterGain = ctx.createGain();
+
+                // Combinação de triangle + square filtrada em passa-baixa para emular o alto-falante piezoelétrico da urna
+                oscMain.type = 'triangle';
+                oscSub.type = 'square';
+
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(3600, startTime);
+
+                const mainGain = ctx.createGain();
+                const subGain = ctx.createGain();
+                mainGain.gain.value = 0.38;
+                subGain.gain.value = 0.08;
+
+                oscMain.connect(mainGain);
+                oscSub.connect(subGain);
+                mainGain.connect(filter);
+                subGain.connect(filter);
+                filter.connect(masterGain);
+                masterGain.connect(ctx.destination);
+
+                let t = startTime;
+                for (let i = 0; i < numPulses; i++) {
+                    const f = (i % 2 === 0) ? freqLow : freqHigh;
+                    oscMain.frequency.setValueAtTime(f, t);
+                    oscSub.frequency.setValueAtTime(f, t);
+                    t += stepDuration;
+                }
+
+                // Sustenta a nota aguda final do "Pirilim"
+                oscMain.frequency.setValueAtTime(freqHigh, t);
+                oscSub.frequency.setValueAtTime(freqHigh, t);
+
+                masterGain.gain.setValueAtTime(0.001, startTime);
+                masterGain.gain.linearRampToValueAtTime(1.0, startTime + 0.01);
+                masterGain.gain.setValueAtTime(1.0, t + tailDuration - 0.08);
+                masterGain.gain.exponentialRampToValueAtTime(0.0001, t + tailDuration);
+
+                oscMain.start(startTime);
+                oscSub.start(startTime);
+                oscMain.stop(t + tailDuration + 0.02);
+                oscSub.stop(t + tailDuration + 0.02);
+            } catch (e) {}
+        }
+
+        function testAudioConfirmation() {
+            playUrnaConfirmSound(true);
+        }
+
+        /* =========================================================================
+           2. GALERIA DE AVATARES ILUSTRADOS EM ESTILO SEMELHANTE AO SIMULADOR TSE
+           12 avatares vetoriais variados (homens e mulheres, diferentes tons de pele,
+           cabelos, óculos e trajes formais) prontos para uso sem depender de links externos.
+           ========================================================================= */
+        const AVATAR_PRESETS = [
+            { id: 'av1', label: 'Executivo Azul', bg: '#dbeafe', skin: '#f1c27d', hair: '#2c1b18', hairStyle: 'short', suit: '#1e3a8a', tie: '#dc2626', glasses: false },
+            { id: 'av2', label: 'Executiva Coral', bg: '#fce7f3', skin: '#e0ac69', hair: '#4a2511', hairStyle: 'long', suit: '#be185d', tie: null, glasses: false },
+            { id: 'av3', label: 'Professor Óculos', bg: '#e0e7ff', skin: '#8d5524', hair: '#111827', hairStyle: 'curly', suit: '#374151', tie: '#2563eb', glasses: true },
+            { id: 'av4', label: 'Gestora Verde', bg: '#dcfce7', skin: '#ffdbac', hair: '#b45309', hairStyle: 'bob', suit: '#047857', tie: null, glasses: true },
+            { id: 'av5', label: 'Líder Sênior', bg: '#f3f4f6', skin: '#f1c27d', hair: '#9ca3af', hairStyle: 'senior', suit: '#1f2937', tie: '#d97706', glasses: true },
+            { id: 'av6', label: 'Jovem Líder', bg: '#fef3c7', skin: '#c68642', hair: '#1c1917', hairStyle: 'fade', suit: '#0f766e', tie: '#f59e0b', glasses: false },
+            { id: 'av7', label: 'Doutora Violeta', bg: '#ede9fe', skin: '#8d5524', hair: '#1f2937', hairStyle: 'bun', suit: '#6d28d9', tie: null, glasses: false },
+            { id: 'av8', label: 'Candidato Tradicional', bg: '#ffedd5', skin: '#ffdbac', hair: '#78350f', hairStyle: 'parted', suit: '#0f172a', tie: '#16a34a', glasses: false },
+            { id: 'av9', label: 'Senadora Dourada', bg: '#fef9c3', skin: '#f1c27d', hair: '#d97706', hairStyle: 'long', suit: '#1e40af', tie: null, glasses: true },
+            { id: 'av10', label: 'Ativista Cultural', bg: '#fae8ff', skin: '#c68642', hair: '#31102f', hairStyle: 'curly', suit: '#9d174d', tie: null, glasses: false },
+            { id: 'av11', label: 'Engenheiro Cinza', bg: '#e2e8f0', skin: '#e0ac69', hair: '#4b5563', hairStyle: 'short', suit: '#334155', tie: '#0284c7', glasses: true },
+            { id: 'av12', label: 'Comunicadora Rubi', bg: '#fee2e2', skin: '#ffdbac', hair: '#991b1b', hairStyle: 'bob', suit: '#7f1d1d', tie: null, glasses: false }
+        ];
+
+        function renderAvatarSVG(avatarId, className = "w-full h-full") {
+            const p = AVATAR_PRESETS.find(a => a.id === avatarId) || AVATAR_PRESETS[0];
+            
+            let hairBack = '';
+            let hairFront = '';
+
+            if (p.hairStyle === 'long') {
+                hairBack = `<path d="M26 42 C22 65 24 88 28 96 L92 96 C96 88 98 65 94 42 Z" fill="${p.hair}"/>`;
+                hairFront = `<path d="M30 44 C30 22 90 22 90 44 C82 32 68 30 60 34 C48 30 36 34 30 44 Z" fill="${p.hair}"/>`;
+            } else if (p.hairStyle === 'bob') {
+                hairBack = `<path d="M27 45 C24 62 28 76 34 80 L86 80 C92 76 96 62 93 45 Z" fill="${p.hair}"/>`;
+                hairFront = `<path d="M30 45 C32 22 88 22 90 45 C78 33 45 33 30 45 Z" fill="${p.hair}"/>`;
+            } else if (p.hairStyle === 'bun') {
+                hairBack = `<circle cx="60" cy="18" r="13" fill="${p.hair}"/>`;
+                hairFront = `<path d="M31 46 C31 23 89 23 89 46 C76 33 44 33 31 46 Z" fill="${p.hair}"/>`;
+            } else if (p.hairStyle === 'curly') {
+                hairBack = `
+                    <circle cx="34" cy="36" r="12" fill="${p.hair}"/>
+                    <circle cx="86" cy="36" r="12" fill="${p.hair}"/>
+                    <circle cx="44" cy="24" r="13" fill="${p.hair}"/>
+                    <circle cx="76" cy="24" r="13" fill="${p.hair}"/>
+                    <circle cx="60" cy="21" r="14" fill="${p.hair}"/>
+                `;
+            } else if (p.hairStyle === 'senior') {
+                hairFront = `<path d="M31 44 C31 28 42 25 60 25 C78 25 89 28 89 44 C84 35 76 33 60 34 C44 33 36 35 31 44 Z" fill="${p.hair}"/>`;
+            } else {
+                // short / parted / fade
+                hairFront = `<path d="M30 46 C29 22 91 22 90 46 C84 32 70 29 58 31 C45 29 35 34 30 46 Z" fill="${p.hair}"/>`;
+            }
+
+            const glassesSVG = p.glasses ? `
+                <g stroke="#1f2937" stroke-width="2.2" fill="rgba(255,255,255,0.25)">
+                    <rect x="39" y="47" width="16" height="11" rx="3"/>
+                    <rect x="65" y="47" width="16" height="11" rx="3"/>
+                    <line x1="55" y1="52" x2="65" y2="52"/>
+                </g>
+            ` : '';
+
+            const tieSVG = p.tie ? `
+                <polygon points="56,92 64,92 62,120 58,120" fill="${p.tie}"/>
+                <polygon points="55,89 65,89 63,95 57,95" fill="${p.tie}"/>
+            ` : `
+                <circle cx="60" cy="96" r="2.5" fill="#fbbf24"/>
+            `;
+
+            return `
+            <svg class="${className}" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+                <rect width="120" height="140" fill="${p.bg}"/>
+                ${hairBack}
+                <!-- Pescoço -->
+                <rect x="50" y="72" width="20" height="22" rx="6" fill="${p.skin}"/>
+                <!-- Paletó / Roupa -->
+                <path d="M16 140 C18 102 36 90 60 90 C84 90 102 102 104 140 Z" fill="${p.suit}"/>
+                <!-- Camisa Branca Interna -->
+                <polygon points="46,90 74,90 60,116" fill="#ffffff"/>
+                ${tieSVG}
+                <!-- Orelhas -->
+                <circle cx="31" cy="56" r="6" fill="${p.skin}"/>
+                <circle cx="89" cy="56" r="6" fill="${p.skin}"/>
+                <!-- Rosto -->
+                <rect x="33" y="28" width="54" height="54" rx="26" fill="${p.skin}"/>
+                <!-- Olhos -->
+                <circle cx="47" cy="52" r="3" fill="#1e293b"/>
+                <circle cx="73" cy="52" r="3" fill="#1e293b"/>
+                <!-- Sobrancelhas -->
+                <path d="M41 45 Q47 42 53 45" stroke="#332211" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <path d="M67 45 Q73 42 79 45" stroke="#332211" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <!-- Nariz -->
+                <path d="M60 52 L58 62 L63 62" stroke="rgba(0,0,0,0.22)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Sorriso -->
+                <path d="M50 69 Q60 76 70 69" stroke="#7c2d12" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                ${glassesSVG}
+                ${hairFront}
+            </svg>`;
+        }
+
+        /* =========================================================================
+           3. DADOS PADRÃO EXCLUSIVOS PARA PRESIDENTE E VICE-PRESIDENTE
+           ========================================================================= */
+        const DEFAULT_ROLES = [
+            { id: 'presidente', title: 'PRESIDENTE', digits: 2, hasVice: true, viceLabel: 'Vice-Presidente', hasSup2: false, enabled: true }
+        ];
+
+        const DEFAULT_CANDIDATES = [
+            // PRESIDENTE (2 dígitos) + VICE-PRESIDENTE
+            { role: 'presidente', number: '91', name: 'Copa do Mundo', party: 'PEsp - Partido dos Esportes', avatar: 'av8', vice: 'Olimpíadas', viceAvatar: 'av7', sup2: '' },
+            { role: 'presidente', number: '92', name: 'Festival de Música', party: 'PMus - Partido dos Ritmos Musicais', avatar: 'av2', vice: 'Carnaval', viceAvatar: 'av6', sup2: '' },
+            { role: 'presidente', number: '93', name: 'Ciência e Educação', party: 'PProf - Partido das Profissões', avatar: 'av3', vice: 'Tecnologia', viceAvatar: 'av12', sup2: '' }
+        ];
+
+        /* =========================================================================
+           4. ESTADO DA APLICAÇÃO E PERSISTÊNCIA (LOCALSTORAGE)
+           ========================================================================= */
+        let appState = {
+            adminPass: '1234',
+            roles: [],
+            candidates: [],
+            votes: {}, // { [roleId]: { [number | 'BRANCO' | 'NULO']: count } }
+            customConfirmAudio: null,
+            customBeepAudio: null,
+            confirmAudioStart: 0,
+            confirmAudioEnd: 0,
+            beepAudioStart: 0,
+            beepAudioEnd: 0
+        };
+
+        // Estado em tempo de execução da votação atual
+        let votingSession = {
+            stepIndex: 0,
+            typedDigits: '',
+            isBranco: false,
+            stage: 'VOTING', // 'VOTING' | 'GRAVANDO' | 'FIM'
+            locked: false
+        };
+
+        // Estado temporário dos seletores de avatar no Admin
+        let selectedMainAvatar = 'av1';
+        let selectedViceAvatar = 'av2';
+
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('urna_tse_simulador_pres_v2');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    appState.adminPass = parsed.adminPass || '1234';
+                    appState.roles = JSON.parse(JSON.stringify(DEFAULT_ROLES));
+                    appState.candidates = (parsed.candidates && parsed.candidates.length)
+                        ? parsed.candidates.filter(c => c.role === 'presidente').map(c => ({
+                            ...c,
+                            vice: c.vice || 'Vice-Presidente',
+                            viceAvatar: c.viceAvatar || 'av2'
+                        }))
+                        : JSON.parse(JSON.stringify(DEFAULT_CANDIDATES));
+                    appState.votes = parsed.votes || {};
+                    appState.customConfirmAudio = parsed.customConfirmAudio || null;
+                    appState.customBeepAudio = parsed.customBeepAudio || null;
+                    appState.confirmAudioStart = Number(parsed.confirmAudioStart) || 0;
+                    appState.confirmAudioEnd = Number(parsed.confirmAudioEnd) || 0;
+                    appState.beepAudioStart = Number(parsed.beepAudioStart) || 0;
+                    appState.beepAudioEnd = Number(parsed.beepAudioEnd) || 0;
+                    syncCustomAudioObjects();
+                    return;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+            appState.roles = JSON.parse(JSON.stringify(DEFAULT_ROLES));
+            appState.candidates = JSON.parse(JSON.stringify(DEFAULT_CANDIDATES));
+            appState.votes = {};
+            appState.customConfirmAudio = null;
+            appState.customBeepAudio = null;
+            appState.confirmAudioStart = 0;
+            appState.confirmAudioEnd = 0;
+            appState.beepAudioStart = 0;
+            appState.beepAudioEnd = 0;
+            syncCustomAudioObjects();
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('urna_tse_simulador_pres_v2', JSON.stringify(appState));
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function getActiveRoles() {
+            return appState.roles;
+        }
+
+        function getCurrentRole() {
+            return appState.roles[0];
+        }
+
+        // Acionador secreto no Brasão da Justiça Eleitoral para abrir o painel com senha
+        function handleSecretAdminTrigger() {
+            requestAdminAccess();
+        }
+
+        /* =========================================================================
+           5. LÓGICA DO TECLADO E FLUXO DE VOTAÇÃO DA URNA
+           ========================================================================= */
+        function pressNumber(digit) {
+            if (votingSession.locked || votingSession.stage !== 'VOTING') return;
+
+            const role = getCurrentRole();
+            if (votingSession.isBranco) return; // Quando em Branco, números são ignorados até apertar Corrige
+
+            if (votingSession.typedDigits.length < role.digits) {
+                playKeyBeep();
+                votingSession.typedDigits += String(digit);
+                renderScreen();
+            }
+        }
+
+        function pressBranco() {
+            if (votingSession.locked || votingSession.stage !== 'VOTING') return;
+
+            // Na urna real, o botão BRANCO só funciona se nenhum número tiver sido digitado
+            if (votingSession.typedDigits.length === 0 && !votingSession.isBranco) {
+                playKeyBeep();
+                votingSession.isBranco = true;
+                renderScreen();
+            }
+        }
+
+        function pressCorrige() {
+            if (votingSession.locked || votingSession.stage !== 'VOTING') return;
+
+            if (votingSession.typedDigits.length > 0 || votingSession.isBranco) {
+                playKeyBeep();
+                votingSession.typedDigits = '';
+                votingSession.isBranco = false;
+                renderScreen();
+            }
+        }
+
+        function pressConfirma() {
+            if (votingSession.locked) return;
+
+            // Se já estiver na tela FIM, permite reiniciar rapidamente pelo botão Confirma
+            if (votingSession.stage === 'FIM') {
+                resetSimulation();
+                return;
+            }
+
+            const role = getCurrentRole();
+            const isCompleteNumber = votingSession.typedDigits.length === role.digits;
+            const isLegendaVote = (role.id === 'dep_fed' || role.id === 'dep_est') && votingSession.typedDigits.length === 2;
+
+            // Só confirma se votou em Branco, completou os dígitos ou votou na legenda (2 dígitos para deputados)
+            if (!votingSession.isBranco && !isCompleteNumber && !isLegendaVote) {
+                return;
+            }
+
+            // Registra o voto na memória da urna
+            recordVote(role, votingSession.typedDigits, votingSession.isBranco);
+
+            const activeRoles = getActiveRoles();
+            const isLastStep = votingSession.stepIndex >= activeRoles.length - 1;
+
+            if (!isLastStep) {
+                // Toca som parcial da urna e avança para o próximo cargo
+                playUrnaConfirmSound(false);
+                votingSession.stepIndex++;
+                votingSession.typedDigits = '';
+                votingSession.isBranco = false;
+                renderScreen();
+            } else {
+                // Último cargo: exibe barra "GRAVANDO" e depois tela "FIM" com o som completo da urna
+                votingSession.locked = true;
+                votingSession.stage = 'GRAVANDO';
+                renderScreen();
+
+                setTimeout(() => {
+                    playUrnaConfirmSound(true);
+                    votingSession.stage = 'FIM';
+                    votingSession.locked = false;
+                    renderScreen();
+                }, 750);
+            }
+        }
+
+        function recordVote(role, typed, isBranco) {
+            if (!appState.votes[role.id]) {
+                appState.votes[role.id] = {};
+            }
+            let key = 'NULO';
+            if (isBranco) {
+                key = 'BRANCO';
+            } else {
+                const exactCandidate = appState.candidates.find(c => c.role === role.id && c.number === typed);
+                if (exactCandidate) {
+                    key = exactCandidate.number;
+                } else if ((role.id === 'dep_fed' || role.id === 'dep_est') && typed.length >= 2) {
+                    const prefix = typed.substring(0, 2);
+                    const partyMatch = appState.candidates.find(c => c.number.startsWith(prefix));
+                    if (partyMatch && typed.length === 2) {
+                        key = `LEGENDA_${prefix}`;
+                    }
+                }
+            }
+            appState.votes[role.id][key] = (appState.votes[role.id][key] || 0) + 1;
+            saveState();
+        }
+
+        function resetSimulation() {
+            votingSession.stepIndex = 0;
+            votingSession.typedDigits = '';
+            votingSession.isBranco = false;
+            votingSession.stage = 'VOTING';
+            votingSession.locked = false;
+            renderScreen();
+        }
+
+        /* =========================================================================
+           6. RENDERIZAÇÃO FIEL DA TELA LCD DA URNA ELETRÔNICA
+           ========================================================================= */
+        function renderScreen() {
+            const screen = document.getElementById('lcd-screen');
+            const currentRole = getCurrentRole();
+
+            // 1. TELA DE GRAVAÇÃO DOS VOTOS
+            if (votingSession.stage === 'GRAVANDO') {
+                screen.innerHTML = `
+                    <div class="flex-1 flex flex-col items-center justify-center p-8 gap-4">
+                        <div class="text-xl sm:text-2xl font-bold tracking-wider text-stone-800">GRAVANDO...</div>
+                        <div class="w-4/5 max-w-md h-6 bg-stone-200 border-2 border-stone-600 rounded overflow-hidden p-0.5">
+                            <div class="h-full bg-emerald-600 animate-pulse w-full transition-all"></div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // 2. TELA FINAL "FIM"
+            if (votingSession.stage === 'FIM') {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('pt-BR');
+                const timeStr = now.toLocaleTimeString('pt-BR');
+                screen.innerHTML = `
+                    <div class="flex-1 flex flex-col justify-between p-4 sm:p-6">
+                        <div class="flex justify-between items-center text-xs font-bold text-stone-600">
+                            <span>${dateStr} ${timeStr}</span>
+                            <span class="bg-stone-200 px-2 py-0.5 rounded border border-stone-400">BATERIA OK</span>
+                        </div>
+                        <div class="my-auto flex flex-col items-center justify-center">
+                            <div class="text-7xl sm:text-8xl md:text-9xl font-black tracking-widest text-stone-900 select-none">FIM</div>
+                            <div class="mt-4 text-sm sm:text-base font-bold text-emerald-800 bg-emerald-100 border border-emerald-400 px-4 py-1.5 rounded-full">
+                                VOTO CONFIRMADO
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end border-t-2 border-stone-400 pt-3">
+                            <button onclick="resetSimulation()" class="px-4 py-1.5 bg-stone-800 hover:bg-stone-700 text-white text-xs sm:text-sm font-bold rounded shadow">
+                                Novo Voto
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // 3. TELA DE VOTAÇÃO PARA PRESIDENTE (COM EXIBIÇÃO DO VICE-PRESIDENTE)
+            const typed = votingSession.typedDigits;
+            const totalDigits = currentRole.digits;
+
+            // Caixas dos dígitos
+            let boxesHtml = '';
+            for (let i = 0; i < totalDigits; i++) {
+                const char = typed[i] || '';
+                const isActive = (i === typed.length) && !votingSession.isBranco;
+                boxesHtml += `
+                    <div class="w-10 h-12 sm:w-12 sm:h-14 border-2 border-stone-800 flex items-center justify-center text-2xl sm:text-3xl font-bold bg-white/70 ${isActive ? 'digit-active' : ''}">
+                        ${char}
+                    </div>
+                `;
+            }
+
+            // Identifica candidato a Presidente conforme os 2 dígitos digitados
+            const exactCandidate = appState.candidates.find(c => c.role === currentRole.id && c.number === typed);
+            const isCompleted = typed.length === totalDigits;
+            const showInstructionsFooter = votingSession.isBranco || isCompleted;
+
+            let topHeaderTitle = (typed.length > 0 || votingSession.isBranco) ? 'SEU VOTO PARA' : '&nbsp;';
+            let centerDetailsHtml = '';
+            let rightPhotosHtml = '';
+
+            if (votingSession.isBranco) {
+                // VOTO EM BRANCO
+                centerDetailsHtml = `
+                    <div class="mt-8 sm:mt-12 flex items-center justify-center">
+                        <div class="text-2xl sm:text-4xl font-bold tracking-wide text-stone-900 blink-slow">
+                            VOTO EM BRANCO
+                        </div>
+                    </div>
+                `;
+            } else if (typed.length === 0) {
+                // NENHUM DÍGITO DIGITADO AINDA
+                centerDetailsHtml = `
+                    <div class="mt-4 flex items-center gap-3">
+                        <span class="text-sm font-semibold w-20 hidden">Número:</span>
+                        <div class="flex gap-1.5">${boxesHtml}</div>
+                    </div>
+                `;
+            } else if (exactCandidate && isCompleted) {
+                // CANDIDATO A PRESIDENTE + VICE ENCONTRADOS
+                const viceName = exactCandidate.vice || 'Não informado';
+                centerDetailsHtml = `
+                    <div class="mt-2 flex items-center gap-2">
+                        <span class="text-xs sm:text-sm font-semibold w-24 sm:w-28">Número:</span>
+                        <div class="flex gap-1">${boxesHtml}</div>
+                    </div>
+                    <div class="mt-3 text-sm sm:text-base">
+                        <span class="font-semibold inline-block w-24 sm:w-28">Nome:</span>
+                        <span class="font-bold text-base sm:text-xl">${exactCandidate.name}</span>
+                    </div>
+                    <div class="mt-2 text-xs sm:text-sm">
+                        <span class="font-semibold inline-block w-24 sm:w-28">Partido:</span>
+                        <span class="font-bold">${exactCandidate.party}</span>
+                    </div>
+                    <div class="mt-3 text-xs sm:text-sm">
+                        <span class="font-semibold inline-block w-24 sm:w-28">Vice-Presidente:</span>
+                        <span class="font-bold text-sm sm:text-base">${viceName}</span>
+                    </div>
+                `;
+
+                // Fotos / Avatares à direita da tela LCD (Presidente + Vice-Presidente sempre exibidos)
+                rightPhotosHtml = `
+                    <div class="flex flex-col items-end gap-2 shrink-0">
+                        <div class="border-2 border-stone-800 bg-white w-24 sm:w-28 md:w-32 shadow-sm">
+                            <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden">
+                                ${renderAvatarSVG(exactCandidate.avatar)}
+                            </div>
+                            <div class="text-[10px] sm:text-xs font-bold text-center py-0.5 bg-white border-t border-stone-400 truncate px-1">
+                                Presidente
+                            </div>
+                        </div>
+                        <div class="border-2 border-stone-800 bg-white w-20 sm:w-24 shadow-sm">
+                            <div class="w-full h-20 sm:h-24 overflow-hidden">
+                                ${renderAvatarSVG(exactCandidate.viceAvatar || 'av2')}
+                            </div>
+                            <div class="text-[9px] sm:text-[10px] font-bold text-center py-0.5 bg-white border-t border-stone-400 truncate px-1">
+                                Vice-Presidente
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (!exactCandidate && isCompleted) {
+                // NÚMERO COMPLETO MAS INEXISTENTE -> VOTO NULO
+                centerDetailsHtml = `
+                    <div class="mt-2 flex items-center gap-2">
+                        <span class="text-xs sm:text-sm font-semibold w-20">Número:</span>
+                        <div class="flex gap-1">${boxesHtml}</div>
+                    </div>
+                    <div class="mt-4 text-base sm:text-lg font-bold text-stone-800">
+                        NÚMERO ERRADO
+                    </div>
+                    <div class="mt-3 text-2xl sm:text-4xl font-black text-stone-900 blink-slow text-center">
+                        VOTO NULO
+                    </div>
+                `;
+            } else {
+                // DIGITANDO O PRIMEIRO DÍGITO
+                centerDetailsHtml = `
+                    <div class="mt-2 flex items-center gap-2">
+                        <span class="text-xs sm:text-sm font-semibold w-20">Número:</span>
+                        <div class="flex gap-1">${boxesHtml}</div>
+                    </div>
+                `;
+            }
+
+            // Rodapé de instruções oficial da tela da urna
+            const footerHtml = showInstructionsFooter ? `
+                <div class="border-t-2 border-stone-800 px-3 sm:px-4 py-2 text-[11px] sm:text-xs leading-snug bg-white/40">
+                    <div class="font-bold">Aperte a tecla:</div>
+                    <div class="pl-3 font-semibold">CONFIRMA para CONFIRMAR este voto</div>
+                    <div class="pl-3 font-semibold">CORRIGE para REINICIAR este voto</div>
+                </div>
+            ` : `<div class="h-12"></div>`;
+
+            screen.innerHTML = `
+                <div class="flex-1 flex justify-between gap-2 p-3 sm:p-5">
+                    <div class="flex-1 flex flex-col">
+                        <div class="text-xs sm:text-sm font-bold tracking-wide text-stone-800">${topHeaderTitle}</div>
+                        <div class="text-xl sm:text-2xl md:text-3xl font-black tracking-wide text-stone-900 mt-1 sm:mt-2 pl-2 sm:pl-6">
+                            ${currentRole.title}
+                        </div>
+                        ${centerDetailsHtml}
+                    </div>
+                    ${rightPhotosHtml}
+                </div>
+                ${footerHtml}
+            `;
+        }
+
+        /* =========================================================================
+           7. MODAL DE COLINHA DE CANDIDATOS (PREENCHIMENTO RÁPIDO OU CONSULTA)
+           ========================================================================= */
+        function openColaModal() {
+            const container = document.getElementById('cola-content');
+            const activeRoles = getActiveRoles();
+            const currentRole = getCurrentRole();
+
+            let html = '';
+            activeRoles.forEach(role => {
+                const roleCandidates = appState.candidates.filter(c => c.role === role.id);
+                const isCurrent = role.id === currentRole.id && votingSession.stage === 'VOTING';
+
+                html += `
+                    <div class="bg-white rounded-xl border-2 ${isCurrent ? 'border-amber-400 ring-2 ring-amber-200' : 'border-slate-200'} p-4 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-black text-sm sm:text-base text-slate-900 flex items-center gap-2">
+                                <span>${role.title}</span>
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">${role.digits} dígitos</span>
+                            </h3>
+                            ${isCurrent ? `<span class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">Cargo Atual na Tela</span>` : ''}
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                            ${roleCandidates.map(c => `
+                                <div onclick="quickTypeCandidate('${role.id}', '${c.number}')" class="cursor-pointer group flex items-center gap-3 p-2 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 transition">
+                                    <div class="w-12 h-14 rounded overflow-hidden border border-slate-300 shrink-0">
+                                        ${renderAvatarSVG(c.avatar)}
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-base font-black text-indigo-700 group-hover:text-indigo-900 tracking-wider">${c.number}</div>
+                                        <div class="text-xs font-bold text-slate-900 truncate">${c.name}</div>
+                                        <div class="text-[11px] text-slate-500 truncate">${c.party}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            const modal = document.getElementById('modal-cola');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeColaModal() {
+            const modal = document.getElementById('modal-cola');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Preenche automaticamente os dígitos na urna se o candidato clicado pertencer ao cargo atual
+        function quickTypeCandidate(roleId, numberStr) {
+            const currentRole = getCurrentRole();
+            closeColaModal();
+            if (votingSession.stage !== 'VOTING' || currentRole.id !== roleId) return;
+
+            votingSession.isBranco = false;
+            votingSession.typedDigits = '';
+            renderScreen();
+
+            // Digita cada número com pequeno intervalo para simular os bipes reais
+            numberStr.split('').forEach((digit, idx) => {
+                setTimeout(() => {
+                    pressNumber(digit);
+                }, idx * 110);
+            });
+        }
+
+        /* =========================================================================
+           8. ACESSO COM SENHA E PAINEL DE CONFIGURAÇÃO DE CANDIDATOS
+           ========================================================================= */
+        function requestAdminAccess() {
+            document.getElementById('admin-pass-input').value = '';
+            document.getElementById('admin-pass-error').classList.add('hidden');
+            const modal = document.getElementById('modal-password');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => document.getElementById('admin-pass-input').focus(), 100);
+        }
+
+        function closePasswordModal() {
+            const modal = document.getElementById('modal-password');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function appendPin(num) {
+            const input = document.getElementById('admin-pass-input');
+            input.value += num;
+            document.getElementById('admin-pass-error').classList.add('hidden');
+        }
+
+        function clearPin() {
+            document.getElementById('admin-pass-input').value = '';
+            document.getElementById('admin-pass-error').classList.add('hidden');
+        }
+
+        function verifyAdminPassword(e) {
+            e.preventDefault();
+            const typedPass = document.getElementById('admin-pass-input').value.trim();
+            if (typedPass === appState.adminPass) {
+                closePasswordModal();
+                openAdminModal();
+            } else {
+                document.getElementById('admin-pass-error').classList.remove('hidden');
+            }
+        }
+
+        function openAdminModal() {
+            populateAdminRoleSelectors();
+            renderAdminCandidates();
+            renderAdminResults();
+            updateAudioStatusLabels();
+            const modal = document.getElementById('modal-admin');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAdminModal() {
+            const modal = document.getElementById('modal-admin');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            resetSimulation();
+        }
+
+        function switchAdminTab(tabName) {
+            const tabs = ['candidates', 'audio', 'results', 'security'];
+            tabs.forEach(t => {
+                const content = document.getElementById(`admin-tab-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (!content || !btn) return;
+                if (t === tabName) {
+                    content.classList.remove('hidden');
+                    btn.className = 'px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-lg bg-white text-indigo-700 border-t border-x border-slate-200';
+                } else {
+                    content.classList.add('hidden');
+                    btn.className = 'px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-lg text-slate-600 hover:text-slate-900';
+                }
+            });
+            if (tabName === 'results') renderAdminResults();
+            if (tabName === 'audio') updateAudioStatusLabels();
+        }
+
+        function populateAdminRoleSelectors() {
+            const filterSelect = document.getElementById('admin-role-filter');
+            const formSelect = document.getElementById('form-cand-role');
+            const optionsHtml = `<option value="presidente">PRESIDENTE (2 dígitos)</option>`;
+            if (filterSelect) filterSelect.innerHTML = optionsHtml;
+            if (formSelect) formSelect.innerHTML = optionsHtml;
+        }
+
+        function renderAvatarPickers() {
+            const mainContainer = document.getElementById('avatar-picker-main');
+            const viceContainer = document.getElementById('avatar-picker-vice');
+
+            mainContainer.innerHTML = AVATAR_PRESETS.map(av => `
+                <button type="button" onclick="selectMainAvatar('${av.id}')" class="p-1 rounded-xl border-2 transition ${selectedMainAvatar === av.id ? 'border-indigo-600 bg-indigo-100 scale-105 shadow' : 'border-slate-200 bg-white hover:border-slate-400'}">
+                    <div class="w-full aspect-[6/7] rounded overflow-hidden">
+                        ${renderAvatarSVG(av.id)}
+                    </div>
+                </button>
+            `).join('');
+
+            viceContainer.innerHTML = AVATAR_PRESETS.map(av => `
+                <button type="button" onclick="selectViceAvatar('${av.id}')" class="p-1 rounded-xl border-2 transition ${selectedViceAvatar === av.id ? 'border-indigo-600 bg-indigo-100 scale-105 shadow' : 'border-slate-200 bg-white hover:border-slate-400'}">
+                    <div class="w-full aspect-[6/7] rounded overflow-hidden">
+                        ${renderAvatarSVG(av.id)}
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function selectMainAvatar(id) {
+            selectedMainAvatar = id;
+            renderAvatarPickers();
+        }
+
+        function selectViceAvatar(id) {
+            selectedViceAvatar = id;
+            renderAvatarPickers();
+        }
+
+        function updateNumberDigitsHint() {
+            const roleId = document.getElementById('form-cand-role').value;
+            const role = appState.roles.find(r => r.id === roleId);
+            if (!role) return;
+
+            document.getElementById('form-digits-hint').textContent = role.digits;
+            const numInput = document.getElementById('form-cand-number');
+            numInput.maxLength = role.digits;
+            numInput.placeholder = 'Ex: ' + '91234'.substring(0, role.digits);
+
+            const viceSection = document.getElementById('form-vice-section');
+            if (role.hasVice) {
+                viceSection.classList.remove('hidden');
+            } else {
+                viceSection.classList.add('hidden');
+            }
+        }
+
+        function openCandidateForm(editRole = null, editNumber = null) {
+            const card = document.getElementById('candidate-form-card');
+            const feedback = document.getElementById('form-cand-feedback');
+            feedback.classList.add('hidden');
+
+            const filterRole = document.getElementById('admin-role-filter').value;
+            document.getElementById('form-cand-role').value = editRole || filterRole;
+            updateNumberDigitsHint();
+
+            if (editRole && editNumber) {
+                const cand = appState.candidates.find(c => c.role === editRole && c.number === editNumber);
+                if (cand) {
+                    document.getElementById('candidate-form-title').textContent = `Editar Candidato (${cand.number} - ${cand.name})`;
+                    document.getElementById('form-cand-original-number').value = `${cand.role}__${cand.number}`;
+                    document.getElementById('form-cand-number').value = cand.number;
+                    document.getElementById('form-cand-name').value = cand.name;
+                    document.getElementById('form-cand-party').value = cand.party;
+                    document.getElementById('form-cand-vice').value = cand.vice || '';
+                    document.getElementById('form-cand-sup2').value = cand.sup2 || '';
+                    selectedMainAvatar = cand.avatar || 'av1';
+                    selectedViceAvatar = cand.viceAvatar || 'av2';
+                }
+            } else {
+                document.getElementById('candidate-form-title').textContent = 'Cadastrar Novo Candidato';
+                document.getElementById('form-cand-original-number').value = '';
+                document.getElementById('form-cand-number').value = '';
+                document.getElementById('form-cand-name').value = '';
+                document.getElementById('form-cand-party').value = '';
+                document.getElementById('form-cand-vice').value = '';
+                document.getElementById('form-cand-sup2').value = '';
+                selectedMainAvatar = AVATAR_PRESETS[Math.floor(Math.random() * AVATAR_PRESETS.length)].id;
+                selectedViceAvatar = AVATAR_PRESETS[Math.floor(Math.random() * AVATAR_PRESETS.length)].id;
+            }
+
+            renderAvatarPickers();
+            card.classList.remove('hidden');
+        }
+
+        function closeCandidateForm() {
+            document.getElementById('candidate-form-card').classList.add('hidden');
+        }
+
+        function saveCandidateForm(e) {
+            e.preventDefault();
+            const roleId = document.getElementById('form-cand-role').value;
+            const role = appState.roles.find(r => r.id === roleId);
+            const number = document.getElementById('form-cand-number').value.trim();
+            const name = document.getElementById('form-cand-name').value.trim();
+            const party = document.getElementById('form-cand-party').value.trim();
+            const vice = document.getElementById('form-cand-vice').value.trim();
+            const sup2 = document.getElementById('form-cand-sup2').value.trim();
+            const originalKey = document.getElementById('form-cand-original-number').value;
+
+            const feedback = document.getElementById('form-cand-feedback');
+            if (number.length !== role.digits || !/^\d+$/.test(number)) {
+                feedback.textContent = `O número para ${role.title} deve conter exatamente ${role.digits} dígitos numéricos.`;
+                feedback.classList.remove('hidden');
+                return;
+            }
+
+            // Se estava editando, remove o registro antigo
+            if (originalKey) {
+                const [origRole, origNum] = originalKey.split('__');
+                appState.candidates = appState.candidates.filter(c => !(c.role === origRole && c.number === origNum));
+            }
+
+            // Substitui caso já exista candidato com o mesmo número e cargo
+            appState.candidates = appState.candidates.filter(c => !(c.role === roleId && c.number === number));
+
+            appState.candidates.push({
+                role: roleId,
+                number,
+                name,
+                party,
+                avatar: selectedMainAvatar,
+                vice: role.hasVice ? vice : '',
+                viceAvatar: selectedViceAvatar,
+                sup2: role.hasSup2 ? sup2 : ''
+            });
+
+            saveState();
+            document.getElementById('admin-role-filter').value = roleId;
+            closeCandidateForm();
+            renderAdminCandidates();
+        }
+
+        function deleteCandidate(roleId, number) {
+            appState.candidates = appState.candidates.filter(c => !(c.role === roleId && c.number === number));
+            saveState();
+            renderAdminCandidates();
+        }
+
+        function renderAdminCandidates() {
+            const roleId = document.getElementById('admin-role-filter').value;
+            const role = appState.roles.find(r => r.id === roleId);
+            const listEl = document.getElementById('admin-candidates-list');
+            const filtered = appState.candidates.filter(c => c.role === roleId);
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div class="col-span-full bg-white p-8 rounded-xl border border-slate-200 text-center text-slate-500">
+                        Nenhum candidato cadastrado para <strong>${role.title}</strong>. Clique em "+ Adicionar Candidato" acima.
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(c => `
+                <div class="bg-white rounded-xl border border-slate-200 p-4 flex items-center justify-between gap-4 shadow-sm">
+                    <div class="flex items-center gap-3.5 min-w-0">
+                        <div class="flex items-end gap-1.5 shrink-0">
+                            <div class="w-14 h-18 rounded-lg overflow-hidden border-2 border-slate-300" title="Presidente">
+                                ${renderAvatarSVG(c.avatar)}
+                            </div>
+                            <div class="w-10 h-12 rounded overflow-hidden border border-slate-300" title="Vice-Presidente">
+                                ${renderAvatarSVG(c.viceAvatar || 'av2')}
+                            </div>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="inline-block px-2.5 py-0.5 bg-indigo-100 text-indigo-900 font-black text-base rounded mb-1 tracking-wider">
+                                ${c.number}
+                            </div>
+                            <h4 class="font-bold text-slate-900 text-base truncate">${c.name}</h4>
+                            <p class="text-xs text-slate-500 truncate">${c.party}</p>
+                            <p class="text-xs text-slate-700 mt-1 truncate"><strong>Vice-Presidente:</strong> ${c.vice || 'Não informado'}</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1.5 shrink-0">
+                        <button onclick="openCandidateForm('${c.role}', '${c.number}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-lg">
+                            ✏️ Editar
+                        </button>
+                        <button onclick="deleteCandidate('${c.role}', '${c.number}')" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold rounded-lg">
+                            🗑️ Excluir
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderAdminResults() {
+            const container = document.getElementById('admin-results-container');
+            let html = '';
+
+            appState.roles.forEach(role => {
+                const roleVotes = appState.votes[role.id] || {};
+                const roleCandidates = appState.candidates.filter(c => c.role === role.id);
+
+                let totalVotes = 0;
+                Object.values(roleVotes).forEach(v => totalVotes += v);
+
+                html += `
+                    <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2 mb-3">
+                            <h4 class="font-black text-slate-900 text-sm sm:text-base">${role.title}</h4>
+                            <span class="text-xs font-bold bg-indigo-50 text-indigo-800 px-3 py-1 rounded-full">Total: ${totalVotes} voto(s)</span>
+                        </div>
+                        <div class="space-y-2">
+                            ${roleCandidates.map(c => {
+                                const count = roleVotes[c.number] || 0;
+                                const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+                                return `
+                                    <div class="flex items-center justify-between text-xs sm:text-sm py-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-black text-indigo-700 w-12">${c.number}</span>
+                                            <span class="font-bold text-slate-800">${c.name}</span>
+                                            <span class="text-slate-400">(${c.party})</span>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-24 sm:w-36 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                                <div class="h-full bg-indigo-600" style="width: ${pct}%"></div>
+                                            </div>
+                                            <span class="font-bold text-slate-900 w-20 text-right">${count} (${pct}%)</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                            <div class="flex items-center justify-between text-xs text-slate-600 pt-2 border-t border-slate-100">
+                                <span>Votos em Branco: <strong>${roleVotes['BRANCO'] || 0}</strong></span>
+                                <span>Votos Nulos: <strong>${roleVotes['NULO'] || 0}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function clearVotesTotal() {
+            appState.votes = {};
+            saveState();
+            renderAdminResults();
+        }
+
+        function changeAdminPassword(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('new-admin-pass').value.trim();
+            if (!newPass) return;
+            appState.adminPass = newPass;
+            saveState();
+            const msg = document.getElementById('pass-saved-msg');
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 3000);
+        }
+
+        function restoreFactoryDefaults() {
+            appState.roles = JSON.parse(JSON.stringify(DEFAULT_ROLES));
+            appState.candidates = JSON.parse(JSON.stringify(DEFAULT_CANDIDATES));
+            appState.votes = {};
+            saveState();
+            populateAdminRoleSelectors();
+            renderAdminCandidates();
+            renderAdminResults();
+        }
+
+        /* =========================================================================
+           9. SUPORTE AO TECLADO FÍSICO E INICIALIZAÇÃO
+           ========================================================================= */
+        window.addEventListener('keydown', (e) => {
+            // Atalho F2 para abrir o painel administrativo oculto
+            if (e.key === 'F2') {
+                e.preventDefault();
+                requestAdminAccess();
+                return;
+            }
+
+            // Ignora atalhos da urna caso algum modal esteja aberto
+            const anyModalOpen = !document.getElementById('modal-cola').classList.contains('hidden') ||
+                                 !document.getElementById('modal-password').classList.contains('hidden') ||
+                                 !document.getElementById('modal-admin').classList.contains('hidden');
+            if (anyModalOpen) return;
+
+            if (e.key >= '0' && e.key <= '9') {
+                e.preventDefault();
+                const btn = document.querySelector(`button[data-key="${e.key}"]`);
+                if (btn) {
+                    btn.classList.add('pressed');
+                    setTimeout(() => btn.classList.remove('pressed'), 120);
+                }
+                pressNumber(e.key);
+            } else if (e.key === 'Backspace' || e.key === 'Delete') {
+                e.preventDefault();
+                pressCorrige();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                pressConfirma();
+            } else if (e.key.toLowerCase() === 'b') {
+                e.preventDefault();
+                pressBranco();
+            }
+        });
+
+        window.onload = function () {
+            loadState();
+            renderScreen();
+        };
+    </script>
+</body>
+</html>
